@@ -36,7 +36,7 @@ public class GitVersion implements Serializable {
 
   /**
    * Get latest commit hash.
-   * 
+   *
    * @return The hash.
    */
   public String getLastCommit() {
@@ -45,7 +45,7 @@ public class GitVersion implements Serializable {
 
   /**
    * Whether the source was modified from the most recent local release.
-   * 
+   *
    * @return Whether this source was modified.
    */
   public boolean isModified() {
@@ -54,7 +54,7 @@ public class GitVersion implements Serializable {
 
   /**
    * Get the latest build date.
-   * 
+   *
    * @return The build date.
    */
   public Date getBuildDate() {
@@ -63,7 +63,7 @@ public class GitVersion implements Serializable {
 
   /**
    * Get the latest build author's name.
-   * 
+   *
    * @return The build author.
    */
   public String getBuildAuthor() {
@@ -72,7 +72,7 @@ public class GitVersion implements Serializable {
 
   /**
    * Publish the git version info to network tables
-   * 
+   *
    * @param tableName The table name to publish to.
    */
   public void publishVersions(String tableName) {
@@ -91,7 +91,7 @@ public class GitVersion implements Serializable {
 
   /**
    * Load the git version info from file.
-   * 
+   *
    * @return The GitVersion wrapper object.
    */
   public static GitVersion loadVersion(String filename) {
@@ -112,7 +112,7 @@ public class GitVersion implements Serializable {
 
   /**
    * Execute a shell command using the supplied runtime.
-   * 
+   *
    * @param command The command to run.
    * @param runtime The runtime to run in.
    * @return The command result.
@@ -135,7 +135,7 @@ public class GitVersion implements Serializable {
 
   /**
    * Write a generic object to a file
-   * 
+   *
    * @param location The location to write to.
    * @param object The object to write.
    */

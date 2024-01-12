@@ -1,16 +1,13 @@
 package frc.robot.auto.campaign;
 
-import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj2.command.Command;
 
 public class CampaignExecutor extends Command {
   private Campaign campaign;
   private MissionTree nextMission = null;
   private Mission currentMission = null;
-  private int successes = 0;
 
   public CampaignExecutor(Campaign campaign) {
-    DataLogManager.log("Campaign -> " + campaign.getName());
     this.campaign = campaign;
   }
 
@@ -18,8 +15,6 @@ public class CampaignExecutor extends Command {
   public void initialize() {
     nextMission = campaign.getMissions();
     currentMission = nextMission.getNode();
-
-    DataLogManager.log("initalizing command -> " + currentMission.getName());
     currentMission.initialize();
   }
 
@@ -33,41 +28,12 @@ public class CampaignExecutor extends Command {
       currentMission.end(false);
     }
 
-    if (currentMission.isSuccess()) {
-      successes += 1;
-      MissionTree cMission = nextMission.getSuccessNode();
-      String message =
-          cMission == null
-              ? currentMission.getName()
-                  + " was successful. "
-                  + "Successfully campaigned "
-                  + successes
-                  + " nextMission"
-              : currentMission.getName()
-                  + " was successful. executing mission -> "
-                  + nextMission.getSuccessNode().getNode().getName();
-      DataLogManager.log(message);
-
-      nextMission = nextMission.getSuccessNode();
-    } else {
-      MissionTree cMission = nextMission.getFailureNode();
-      String message =
-          cMission == null
-              ? currentMission.getName()
-                  + " failed. "
-                  + "Successfully campaigned "
-                  + successes
-                  + " nextMission"
-              : currentMission.getName()
-                  + " failed. executing mission -> "
-                  + nextMission.getFailureNode().getNode().getName();
-      DataLogManager.log(message);
-      nextMission = nextMission.getFailureNode();
-    }
+    nextMission =
+        currentMission.isSuccess() ? nextMission.getSuccessNode() : nextMission.getFailureNode();
 
     if (nextMission == null) {
-      currentMission = null;
-      return; // TODO: Logic needs reworking here
+      currentMission = null; // maybe use this.end()?
+      return; // TODO: Logic needs reworking here, maybe
     }
 
     currentMission = nextMission.getNode();
@@ -76,7 +42,6 @@ public class CampaignExecutor extends Command {
 
   @Override
   public void end(boolean interrupted) {
-    DataLogManager.log("Ended campaign -> " + campaign.getName());
     if (currentMission != null) {
       currentMission.end(false);
     }

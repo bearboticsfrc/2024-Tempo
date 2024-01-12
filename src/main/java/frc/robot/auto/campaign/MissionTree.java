@@ -1,5 +1,6 @@
 package frc.robot.auto.campaign;
 
+/* A binary tree containing a success node and a failure node. */
 public class MissionTree {
   private Mission node;
   private MissionTree successNode = null;
