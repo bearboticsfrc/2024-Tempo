@@ -4,17 +4,39 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import frc.robot.constants.DriveConstants;
 
 public class RobotContainer {
+  private boolean isTeleop;
+
+  private SendableChooser<Command> autoCommandChooser = new SendableChooser<>();
+
   public RobotContainer() {
     configureBindings();
+    buildAutoList();
   }
 
   private void configureBindings() {}
 
+  public void setTeleop(boolean mode) {
+    isTeleop = mode;
+  }
+
+  public void teleopInit() {}
+
+  private void buildAutoList() {
+    autoCommandChooser.addOption("0 - NoOp", new InstantCommand());
+
+    DriveConstants.COMPETITION_TAB
+        .add("Auto Command", autoCommandChooser)
+        .withSize(4, 1)
+        .withPosition(0, 1);
+  }
+
   public Command getAutonomousCommand() {
-    return Commands.print("No autonomous command configured");
+    return autoCommandChooser.getSelected();
   }
 }
