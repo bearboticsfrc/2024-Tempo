@@ -1,19 +1,22 @@
 package frc.robot.commands;
 
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.LimelightHelpers;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.subsystems.vision.VisionSubsystem;
 
-public class AlignGridCommand extends CommandBase {
+public class AlignAmpCommand extends InstantCommand {
 
   private final DriveSubsystem driveSubsystem;
-  private final String LIMELIGHT_NAME = "limelight";
+  private final VisionSubsystem visionSubsystem;
+
   private final PIDController ySpeedController = new PIDController(0.05, 0, 0);
   private final PIDController xSpeedController = new PIDController(0.05, 0, 0);
 
-  public AlignGridCommand(DriveSubsystem driveSubsystem) {
+  public AlignAmpCommand(DriveSubsystem driveSubsystem, VisionSubsystem visionSubsystem) {
     this.driveSubsystem = driveSubsystem;
+    this.visionSubsystem = visionSubsystem;
+
     addRequirements(driveSubsystem);
 
     ySpeedController.setTolerance(0.1);
@@ -21,22 +24,20 @@ public class AlignGridCommand extends CommandBase {
   }
 
   @Override
-  public void initialize() {
-    LimelightHelpers.setPipelineIndex(LIMELIGHT_NAME, 1);
-  }
-
-  @Override
   public void execute() {
-    if (!LimelightHelpers.getTV(LIMELIGHT_NAME)) {
+    if (!visionSubsystem.hasAmpTag()) {
       driveSubsystem.drive(0, 0, 0);
       return;
     }
 
-    double targetX = LimelightHelpers.getTX(LIMELIGHT_NAME);
-    double targetY = LimelightHelpers.getTY(LIMELIGHT_NAME);
+    double angleOffTarget = visionSubsystem.getX(visionSubsystem.getAmpTagId());
+    double distanceFromTarget = visionSubsystem.getDistance(visionSubsystem.getAmpTagId());
 
-    double ySpeed = ySpeedController.calculate(targetX, 0);
-    double xSpeed = xSpeedController.calculate(targetY, 0);
+    double x = Math.cos(Math.toRadians(angleOffTarget)) * distanceFromTarget;
+    double y = Math.sin(Math.toRadians(angleOffTarget)) * distanceFromTarget;
+
+    double ySpeed = ySpeedController.calculate(x, 0);
+    double xSpeed = xSpeedController.calculate(y, 0);
 
     driveSubsystem.drive(-xSpeed, ySpeed, 0, false);
   }
@@ -44,10 +45,5 @@ public class AlignGridCommand extends CommandBase {
   @Override
   public boolean isFinished() {
     return ySpeedController.atSetpoint() && xSpeedController.atSetpoint();
-  }
-
-  @Override
-  public void end(boolean interrupted) {
-    // LimelightHelpers.setPipelineIndex(LIMELIGHT_NAME, 0);
   }
 }
