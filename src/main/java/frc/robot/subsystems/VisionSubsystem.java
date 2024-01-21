@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems;
 
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.VisionConstants;
@@ -18,18 +19,25 @@ public class VisionSubsystem extends SubsystemBase {
 
   private HashMap<Integer, Double> tagX = new HashMap<>();
   private HashMap<Integer, Double> tagDistance = new HashMap<>();
+  private Double noteX;
+  private Double noteY;
+  public double noteDistance;
   private PhotonCamera photonCamera = null;
+  private PhotonCamera photonCameraObject = null;
   private boolean driverCameraMode = false;
 
   public VisionSubsystem() {
     photonCamera = new PhotonCamera(VisionConstants.CAMERA_NAME);
+    photonCameraObject = new PhotonCamera(VisionConstants.OBJECT_CAMERA_NAME);
   }
 
   @Override
   public void periodic() {
     tagX.clear();
     tagDistance.clear();
+
     PhotonPipelineResult photonResults = photonCamera.getLatestResult();
+    PhotonPipelineResult photonResultsObject = photonCameraObject.getLatestResult();
     if (photonResults.hasTargets()) {
       List<PhotonTrackedTarget> targets = photonResults.getTargets();
       for (PhotonTrackedTarget target : targets) {
@@ -39,6 +47,16 @@ public class VisionSubsystem extends SubsystemBase {
         tagX.put(id, x);
         tagDistance.put(id, distance);
       }
+    }
+
+    if (photonResultsObject.hasTargets()) {
+      PhotonTrackedTarget target = photonResultsObject.getBestTarget();
+      Transform3d note = target.getBestCameraToTarget();
+      noteX = note.getX();
+      noteY = note.getY();
+    } else {
+      noteX = null;
+      noteY = null;
     }
   }
 
@@ -62,6 +80,15 @@ public class VisionSubsystem extends SubsystemBase {
       return VisionConstants.TAG.BLUE_SPEAKER_CENTER.getValue();
     }
     return VisionConstants.TAG.RED_SPEAKER_CENTER.getValue();
+  }
+
+  public Double getNoteX() {
+
+    return noteX;
+  }
+
+  public Double getNoteY() {
+    return noteY;
   }
 
   public int getAmpTagId() {
