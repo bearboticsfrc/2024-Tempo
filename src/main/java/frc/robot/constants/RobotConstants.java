@@ -11,16 +11,25 @@ public class RobotConstants {
   public static final double WHEEL_DIAMETER = 000;
   public static final int PIGEON_CAN_ID = 000;
 
+  public static final double ROBOT_LOOP_HERTZ = 50;
+  public static final double ROBOT_LOOP_PERIOD = 1 / ROBOT_LOOP_HERTZ;
+
   public static final ShuffleboardTab MANIPULATOR_SYSTEM_TAB =
       Shuffleboard.getTab("Manipulator System");
 
+  public static final Translation2d FRONT_LEFT = new Translation2d(WHEEL_BASE / 2, TRACK_WIDTH / 2);
+  public static final Translation2d FRONT_RIGHT =
+      new Translation2d(WHEEL_BASE / 2, -TRACK_WIDTH / 2);
+  public static final Translation2d BACK_LEFT = new Translation2d(-WHEEL_BASE / 2, TRACK_WIDTH / 2);
+  public static final Translation2d BACK_RIGHT =
+      new Translation2d(-WHEEL_BASE / 2, -TRACK_WIDTH / 2);
+
+  public static final Translation2d[] moduleLocations = {
+    FRONT_LEFT, FRONT_RIGHT, BACK_LEFT, BACK_RIGHT
+  };
   // Order here must line-up with SwerveCorner order!!
   public static final SwerveDriveKinematics DRIVE_KINEMATICS =
-      new SwerveDriveKinematics(
-          new Translation2d(WHEEL_BASE / 2, TRACK_WIDTH / 2), // FL
-          new Translation2d(WHEEL_BASE / 2, -TRACK_WIDTH / 2), // FR
-          new Translation2d(-WHEEL_BASE / 2, TRACK_WIDTH / 2), // BL
-          new Translation2d(-WHEEL_BASE / 2, -TRACK_WIDTH / 2)); // BR
+      new SwerveDriveKinematics(FRONT_LEFT, FRONT_RIGHT, BACK_LEFT, BACK_RIGHT);
 
   public static double ROBOT_RADIUS = new Translation2d(WHEEL_BASE / 2, TRACK_WIDTH / 2).getNorm();
 
