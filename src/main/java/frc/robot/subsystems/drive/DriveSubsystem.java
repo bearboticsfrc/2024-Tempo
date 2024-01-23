@@ -39,6 +39,7 @@ import java.util.Map;
 /** Controls the four swerve modules for autonomous and teleoperated modes. */
 public class DriveSubsystem extends SubsystemBase {
   // Linked to maintain order.
+
   private final LinkedHashMap<SwerveCorner, SwerveModule> swerveModules = new LinkedHashMap<>();
   private final WPI_PigeonIMU pigeonImu = new WPI_PigeonIMU(RobotConstants.PIGEON_CAN_ID);
 
@@ -69,6 +70,10 @@ public class DriveSubsystem extends SubsystemBase {
 
   public void zeroHeading() {
     pigeonImu.reset();
+  }
+
+  public boolean getFieldRelative() {
+    return fieldRelativeMode;
   }
 
   private void setupShuffleboardTab() {
