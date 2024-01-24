@@ -4,84 +4,50 @@
 
 package frc.robot.subsystems;
 
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.constants.VisionConstants;
-import frc.robot.fms.AllianceColor;
 import java.util.HashMap;
-import java.util.List;
+import java.util.Optional;
 import org.photonvision.PhotonCamera;
-import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
+// TODO: Update to support a multicam setup
 public class VisionSubsystem extends SubsystemBase {
+  private final HashMap<Integer, PhotonTrackedTarget> trackedTargets = new HashMap<>();
 
-  private HashMap<Integer, Double> tagX = new HashMap<>();
-  private HashMap<Integer, Double> tagDistance = new HashMap<>();
-  private PhotonCamera photonCamera = null;
+  private final PhotonCamera photonCamera;
   private boolean driverCameraMode = false;
 
-  public VisionSubsystem() {
-    photonCamera = new PhotonCamera(VisionConstants.CAMERA_NAME);
+  /**
+   * Initalize VisionSubsystem.
+   *
+   * @param cameraName the camera to use.
+   */
+  public VisionSubsystem(String cameraName) {
+    photonCamera = new PhotonCamera(cameraName);
   }
 
   @Override
   public void periodic() {
-    tagX.clear();
-    tagDistance.clear();
-    PhotonPipelineResult photonResults = photonCamera.getLatestResult();
-    if (photonResults.hasTargets()) {
-      List<PhotonTrackedTarget> targets = photonResults.getTargets();
-      for (PhotonTrackedTarget target : targets) {
-        double x = target.getYaw();
-        int id = target.getFiducialId();
-        double distance = target.getBestCameraToTarget().getX();
-        tagX.put(id, x);
-        tagDistance.put(id, distance);
-      }
+    trackedTargets.clear();
+
+    for (PhotonTrackedTarget target : photonCamera.getLatestResult().getTargets()) {
+
+      trackedTargets.put(target.getFiducialId(), target);
     }
+  }
+
+  /**
+   * Get the latest target by its fiducial ID.
+   *
+   * @param fiducialId The ID.
+   * @return The target, returned as an {@link Optional} of type {@link PhotonTrackedTarget}
+   */
+  public Optional<PhotonTrackedTarget> getTarget(int fiducialId) {
+    return Optional.ofNullable(trackedTargets.get(fiducialId));
   }
 
   public void toggleDriverCamera() {
     driverCameraMode = !driverCameraMode;
     photonCamera.setDriverMode(driverCameraMode);
-  }
-
-  public double getX(int tagNumber) {
-    if (tagX.get(tagNumber) == null) return 0.0; // maybe this should be -1 ?
-    return tagX.get(tagNumber);
-  }
-
-  public double getDistance(int tagNumber) {
-    if (tagDistance.get(tagNumber) == null) return 0.0; // maybe this should be -1 ?
-    return tagDistance.get(tagNumber);
-  }
-
-  public int getSpeakerCenterTag() {
-    if (AllianceColor.alliance == Alliance.Blue) {
-      return VisionConstants.TAG.BLUE_SPEAKER_CENTER.getValue();
-    }
-    return VisionConstants.TAG.RED_SPEAKER_CENTER.getValue();
-  }
-
-  public int getAmpTagId() {
-    if (AllianceColor.alliance == Alliance.Blue) {
-      return VisionConstants.TAG.BLUE_AMP.getValue();
-    }
-    return VisionConstants.TAG.RED_AMP.getValue();
-  }
-
-  public boolean hasSpeakerCenterTag() {
-    if (getX(getSpeakerCenterTag()) != 0.0) {
-      return true;
-    }
-    return false;
-  }
-
-  public boolean hasAmpTag() {
-    if (getX(getAmpTagId()) != 0.0) {
-      return true;
-    }
-    return false;
   }
 }
