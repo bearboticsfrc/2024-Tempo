@@ -138,6 +138,15 @@ public class FieldPositions implements AllianceReadyListener {
     return layout.getTagPose(tagId).get();
   }
 
+  public int getAmpTagId() {
+    int tagId = VisionConstants.TAG.BLUE_AMP.getValue();
+
+    if (AllianceColor.alliance == Alliance.Red) {
+      tagId = VisionConstants.TAG.RED_AMP.getValue();
+    }
+    return tagId;
+  }
+
   public Pose3d getAmp() {
     int tagId = VisionConstants.TAG.BLUE_AMP.getValue();
 
