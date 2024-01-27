@@ -50,7 +50,7 @@ public class RobotContainer {
 
     driverController.y().whileTrue(new AlignAmpCommand(driveSubsystem, visionSubsystem));
 
-    driverController.a().whileTrue(new AlignSpeakerCommand(driveSubsystem,visionSubsystem));
+    driverController.a().whileTrue(new AlignSpeakerCommand(driveSubsystem, visionSubsystem));
 
     driverController
         .leftBumper()
