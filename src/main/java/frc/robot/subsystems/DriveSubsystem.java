@@ -314,6 +314,10 @@ public class DriveSubsystem extends SubsystemBase {
     return pigeonImu.getRoll();
   }
 
+  public boolean getFieldRelative() {
+    return fieldRelativeMode;
+  }
+
   /**
    * Get an array of swerve modules in order.
    *

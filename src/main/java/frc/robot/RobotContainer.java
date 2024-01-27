@@ -4,20 +4,22 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.commands.AlignAmpCommand;
 import frc.robot.commands.AlignSpeakerCommand;
-import frc.robot.commands.NoteHuntCommand;
+import frc.robot.commands.notehuntcommand.NoteHuntCommand;
 import frc.robot.constants.DriveConstants;
 import frc.robot.constants.DriveConstants.SpeedMode;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
 
 public class RobotContainer {
-  private boolean isTeleop;
+  private boolean isTeleop = false;
 
   private DriveSubsystem driveSubsystem = new DriveSubsystem();
   private VisionSubsystem visionSubsystem = new VisionSubsystem();
@@ -29,6 +31,23 @@ public class RobotContainer {
   public RobotContainer() {
     configureBindings();
     buildAutoList();
+    driveSubsystem.setDefaultCommand(getDefaultCommand());
+  }
+
+  private RunCommand getDefaultCommand() {
+    return new RunCommand(
+        () ->
+            driveSubsystem.drive(
+                -MathUtil.applyDeadband(driverController.getLeftY(), 0.1),
+                -MathUtil.applyDeadband(driverController.getLeftX(), 0.1),
+                -MathUtil.applyDeadband(driverController.getRightX(), 0.1),
+                driveSubsystem.getFieldRelative()),
+        driveSubsystem);
+  }
+
+  public void teleopInit() {
+    driveSubsystem.setParkMode(false);
+    driveSubsystem.setSpeedMode(SpeedMode.NORMAL);
   }
 
   private void configureBindings() {
@@ -71,8 +90,6 @@ public class RobotContainer {
   public void setTeleop(boolean mode) {
     isTeleop = mode;
   }
-
-  public void teleopInit() {}
 
   private void buildAutoList() {
     autoCommandChooser.addOption("0 - NoOp", new InstantCommand());
