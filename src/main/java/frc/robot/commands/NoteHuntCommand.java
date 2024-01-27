@@ -1,6 +1,7 @@
 package frc.robot.commands;
 
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
@@ -22,13 +23,15 @@ public class NoteHuntCommand extends InstantCommand {
 
   @Override
   public void execute() {
-    if (visionSubsystem.getNoteX() == null) {
+    if (visionSubsystem.getNote() == null) {
       driveSubsystem.drive(0, 0, 0);
       return;
     }
 
-    double targetX = visionSubsystem.getNoteX();
-    double targetY = visionSubsystem.getNoteY();
+    Transform3d note = visionSubsystem.getNote().getBestCameraToTarget();
+
+    double targetX = note.getX();
+    double targetY = note.getY();
 
     double xSpeed = -xSpeedController.calculate(targetY, 0);
     double rot = rotSpeedController.calculate(targetX, 0);

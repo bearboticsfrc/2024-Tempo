@@ -5,6 +5,7 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.constants.VisionConstants;
 import java.util.HashMap;
 import java.util.Optional;
 import org.photonvision.PhotonCamera;
@@ -15,19 +16,18 @@ public class VisionSubsystem extends SubsystemBase {
   private final HashMap<Integer, PhotonTrackedTarget> trackedTargets = new HashMap<>();
 
   private final PhotonCamera photonCamera;
+  private final PhotonCamera photonCameraObject;
   private boolean driverCameraMode = false;
+  private PhotonTrackedTarget note;
 
-  /**
-   * Initalize VisionSubsystem.
-   *
-   * @param cameraName the camera to use.
-   */
-  public VisionSubsystem(String cameraName) {
-    photonCamera = new PhotonCamera(cameraName);
+  public VisionSubsystem() {
+    photonCamera = new PhotonCamera(VisionConstants.CAMERA_1_NAME);
+    photonCameraObject = new PhotonCamera(VisionConstants.CAMERA_2_NAME);
   }
 
   @Override
   public void periodic() {
+    note = photonCameraObject.getLatestResult().getBestTarget();
     trackedTargets.clear();
 
     for (PhotonTrackedTarget target : photonCamera.getLatestResult().getTargets()) {
@@ -44,6 +44,10 @@ public class VisionSubsystem extends SubsystemBase {
    */
   public Optional<PhotonTrackedTarget> getTarget(int fiducialId) {
     return Optional.ofNullable(trackedTargets.get(fiducialId));
+  }
+
+  public PhotonTrackedTarget getNote() {
+    return note;
   }
 
   public void toggleDriverCamera() {
