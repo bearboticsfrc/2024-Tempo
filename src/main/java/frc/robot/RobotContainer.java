@@ -24,6 +24,7 @@ public class RobotContainer {
 
   public RobotContainer() {
     driveSubsystem = new DriveSubsystem();
+    driveSubsystem.setDefaultCommand(getDefaultCommand());
     configureBindings();
     buildAutoList();
   }
