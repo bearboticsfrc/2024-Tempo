@@ -73,6 +73,7 @@ public final class VisionConstants {
   public static final double FIELD_WIDTH_METERS = 8.0137;
 
   public static final String CAMERA_NAME = "Arducam_OV9782_USB_Camera"; // "OV9281_2";
+  public static final String OBJECT_CAMERA_NAME = "objectcamname";
 
   public enum TAG {
     BLUE_SOURCE_RIGHT(1),
