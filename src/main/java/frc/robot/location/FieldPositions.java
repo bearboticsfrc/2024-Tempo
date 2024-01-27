@@ -120,6 +120,15 @@ public class FieldPositions implements AllianceReadyListener {
     return new Pose3d(x, y, 0.0, new Rotation3d());
   }
 
+  public int getSpeakerCenterTagID() {
+    int tagId = VisionConstants.TAG.BLUE_SPEAKER_CENTER.getValue();
+
+    if (AllianceColor.alliance == Alliance.Red) {
+      tagId = VisionConstants.TAG.RED_SPEAKER_CENTER.getValue();
+    }
+    return tagId;
+  }
+
   public Pose3d getSpeakerCenter() {
     int tagId = VisionConstants.TAG.BLUE_SPEAKER_CENTER.getValue();
 
