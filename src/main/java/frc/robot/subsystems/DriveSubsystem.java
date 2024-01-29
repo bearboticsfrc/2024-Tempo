@@ -35,6 +35,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.stream.DoubleStream;
 
 /** Controls the four swerve modules for autonomous and teleoperated modes. */
 public class DriveSubsystem implements Subsystem {
@@ -83,6 +84,7 @@ public class DriveSubsystem implements Subsystem {
     DriveConstants.DRIVE_SYSTEM_TAB.addDouble("Pitch", this::getPitch);
     DriveConstants.DRIVE_SYSTEM_TAB.addDouble("Roll", this::getRoll);
     DriveConstants.DRIVE_SYSTEM_TAB.addBoolean("Field Relative?", () -> fieldRelativeMode);
+    DriveConstants.DRIVE_SYSTEM_TAB.addDoubleArray("MyStates", this::getSwerveTelemetry);
   }
 
   @Override
@@ -453,6 +455,19 @@ public class DriveSubsystem implements Subsystem {
     return getSwerveModules().stream()
         .map(module -> module.getPosition())
         .toArray(SwerveModulePosition[]::new);
+  }
+
+  /**
+   * Gets an array which contains swerve modules rotation and velocity. This is used for
+   * AdvantageScope.
+   *
+   * @return The array
+   */
+  private double[] getSwerveTelemetry() {
+    return Arrays.stream(getModuleStates())
+        .flatMapToDouble(
+            state -> DoubleStream.of(state.angle.getRadians(), state.speedMetersPerSecond))
+        .toArray();
   }
 
   /**
