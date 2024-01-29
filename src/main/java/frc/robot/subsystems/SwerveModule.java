@@ -1,9 +1,7 @@
 package frc.robot.subsystems;
 
 import com.revrobotics.AbsoluteEncoder;
-import com.revrobotics.CANSparkBase;
 import com.revrobotics.CANSparkBase.ControlType;
-import com.revrobotics.CANSparkFlex;
 import com.revrobotics.CANSparkLowLevel;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
@@ -28,7 +26,7 @@ public class SwerveModule {
 
   private String moduleName;
 
-  private CANSparkFlex driveMotor;
+  private CANSparkMax driveMotor;
   private CANSparkMax pivotMotor;
 
   private RelativeEncoder driveMotorEncoder;
@@ -57,7 +55,7 @@ public class SwerveModule {
     this.chassisAngularOffset = swerveModule.getChassisAngularOffset();
 
     this.driveMotor =
-        new CANSparkFlex(
+        new CANSparkMax(
             swerveModule.getDriveMotor().getMotorPort(), CANSparkLowLevel.MotorType.kBrushless);
 
     this.pivotMotor =
@@ -154,7 +152,7 @@ public class SwerveModule {
   /** Updates data logs */
   public void updateDataLogs() {
     for (Entry<String, DoubleLogEntry> entry : dataLogs.entrySet()) {
-      CANSparkBase motor = entry.getKey().startsWith("PIVOT") ? pivotMotor : driveMotor;
+      CANSparkMax motor = entry.getKey().startsWith("PIVOT") ? pivotMotor : driveMotor;
       String property =
           entry
               .getKey()
@@ -172,7 +170,7 @@ public class SwerveModule {
    * @param property The property.
    * @return The getter, wrapped as a DoubleSupplier.
    */
-  public DoubleSupplier getPropertySupplier(CANSparkBase motor, String property) {
+  public DoubleSupplier getPropertySupplier(CANSparkMax motor, String property) {
     switch (property) {
       case "CURRENT":
         return motor::getOutputCurrent;
