@@ -31,6 +31,7 @@ import frc.robot.util.CTREUtil;
 import frc.robot.util.MotorConfig.MotorBuilder;
 import frc.robot.util.MotorConfig.MotorPIDBuilder;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -321,8 +322,8 @@ public class DriveSubsystem implements Subsystem {
    *
    * @return An array containing the swerve modules, ordered.
    */
-  public SwerveModule[] getSwerveModules() {
-    return (SwerveModule[]) swerveModules.values().toArray(new SwerveModule[4]);
+  public Collection<SwerveModule> getSwerveModules() {
+    return swerveModules.values();
   }
 
   /**
@@ -427,7 +428,7 @@ public class DriveSubsystem implements Subsystem {
     SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, maxSpeed);
     Iterator<SwerveModuleState> stateIterator = Arrays.asList(swerveModuleStates).iterator();
 
-    for (SwerveModule module : swerveModules.values()) {
+    for (SwerveModule module : getSwerveModules()) {
       module.set(stateIterator.next());
     }
   }
@@ -438,12 +439,20 @@ public class DriveSubsystem implements Subsystem {
    * @return The states.
    */
   public SwerveModuleState[] getModuleStates() {
-    SwerveModuleState[] states = new SwerveModuleState[4];
-    int index = 0;
-    for (SwerveModule module : swerveModules.values()) {
-      states[index++] = module.getState();
-    }
-    return states;
+    return getSwerveModules().stream()
+        .map(module -> module.getState())
+        .toArray(SwerveModuleState[]::new);
+  }
+
+  /**
+   * Returns the position of every swerve module.
+   *
+   * @return The positions.
+   */
+  public SwerveModulePosition[] getModulePositions() {
+    return getSwerveModules().stream()
+        .map(module -> module.getPosition())
+        .toArray(SwerveModulePosition[]::new);
   }
 
   /**
@@ -454,18 +463,6 @@ public class DriveSubsystem implements Subsystem {
   public Rotation2d getHeading() {
     return Rotation2d.fromDegrees(
         MathUtil.inputModulus(pigeonImu.getRotation2d().getDegrees(), 0, 360));
-  }
-
-  /**
-   * Returns the position of every swerve module.
-   *
-   * @return The positions.
-   */
-  public SwerveModulePosition[] getModulePositions() {
-    return (SwerveModulePosition[])
-        Arrays.stream(getSwerveModules())
-            .map(module -> module.getPosition())
-            .toArray(SwerveModulePosition[]::new);
   }
 
   /**
