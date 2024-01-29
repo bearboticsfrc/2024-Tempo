@@ -1,13 +1,14 @@
 package frc.robot.util;
 
 import com.revrobotics.AbsoluteEncoder;
+import com.revrobotics.CANSparkBase;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.MotorFeedbackSensor;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkPIDController;
 
 public class MotorConfig {
-  private CANSparkMax motor;
+  private CANSparkBase motor;
   private MotorFeedbackSensor motorEncoder;
   private String moduleName;
   private String name;
@@ -26,7 +27,7 @@ public class MotorConfig {
    * @param currentLimit The current limit for this motor
    */
   public MotorConfig(
-      CANSparkMax motor,
+      CANSparkBase motor,
       MotorFeedbackSensor motorEncoder,
       String moduleName,
       String name,
@@ -125,7 +126,7 @@ public class MotorConfig {
   }
 
   public static MotorConfig fromMotorConstants(
-      CANSparkMax motor, MotorFeedbackSensor motorEncoder, MotorBuilder constants) {
+      CANSparkBase motor, MotorFeedbackSensor motorEncoder, MotorBuilder constants) {
     return new MotorConfig(
         motor,
         motorEncoder,
