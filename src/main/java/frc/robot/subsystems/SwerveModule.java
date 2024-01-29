@@ -3,7 +3,6 @@ package frc.robot.subsystems;
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.CANSparkBase;
 import com.revrobotics.CANSparkBase.ControlType;
-import com.revrobotics.CANSparkFlex;
 import com.revrobotics.CANSparkLowLevel;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
@@ -28,7 +27,7 @@ public class SwerveModule {
 
   private String moduleName;
 
-  private CANSparkFlex driveMotor;
+  private CANSparkMax driveMotor;
   private CANSparkMax pivotMotor;
 
   private RelativeEncoder driveMotorEncoder;
@@ -57,7 +56,7 @@ public class SwerveModule {
     this.chassisAngularOffset = swerveModule.getChassisAngularOffset();
 
     this.driveMotor =
-        new CANSparkFlex(
+        new CANSparkMax(
             swerveModule.getDriveMotor().getMotorPort(), CANSparkLowLevel.MotorType.kBrushless);
 
     this.pivotMotor =
@@ -85,6 +84,11 @@ public class SwerveModule {
     }
 
     setupDataLogging(DataLogManager.getLog());
+  }
+
+  @Override
+  public String toString() {
+    return moduleName;
   }
 
   /**
@@ -204,7 +208,7 @@ public class SwerveModule {
    * @return The angle, wrapped as a Rotation2d.
    */
   public Rotation2d getSteerAngle() {
-    return Rotation2d.fromRadians(pivotMotorEncoder.getPosition());
+    return Rotation2d.fromRadians(pivotMotorEncoder.getPosition()); // TODO: Why is there two? ^^^
   }
 
   /**
@@ -265,6 +269,10 @@ public class SwerveModule {
    */
   public void set(SwerveModuleState state) {
     if (parked) {
+      return;
+    }
+
+    if (Math.random() > 0.5) {
       return;
     }
 

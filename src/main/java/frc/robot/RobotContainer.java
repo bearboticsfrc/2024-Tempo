@@ -7,16 +7,21 @@ package frc.robot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import frc.bearbotics.test.DriveSubsystemTest;
 import frc.robot.constants.DriveConstants;
+import frc.robot.subsystems.DriveSubsystem;
 
 public class RobotContainer {
   private boolean isTeleop;
+
+  private DriveSubsystem driveSubsystem = new DriveSubsystem();
 
   private SendableChooser<Command> autoCommandChooser = new SendableChooser<>();
 
   public RobotContainer() {
     configureBindings();
     buildAutoList();
+    buildTestList();
   }
 
   private void configureBindings() {}
@@ -25,8 +30,6 @@ public class RobotContainer {
     isTeleop = mode;
   }
 
-  public void teleopInit() {}
-
   private void buildAutoList() {
     autoCommandChooser.addOption("0 - NoOp", new InstantCommand());
 
@@ -34,6 +37,15 @@ public class RobotContainer {
         .add("Auto Command", autoCommandChooser)
         .withSize(4, 1)
         .withPosition(0, 1);
+  }
+
+  private void buildTestList() {
+    DriveConstants.TEST_TAB
+        .add(
+            "Drive Subsystem Test",
+            new DriveSubsystemTest(driveSubsystem, DriveConstants.TEST_TAB).withTimeout(5000))
+        .withPosition(2, 1)
+        .withSize(2, 1);
   }
 
   public Command getAutonomousCommand() {

@@ -13,6 +13,9 @@ public class SwerveModuleConstants {
   public static final double PIVOT_POSITION_CONVERSION_FACTOR = 2 * Math.PI;
   public static final double PIVOT_VELOCITY_CONVERSION_FACTOR = (2 * Math.PI) / 60;
 
+  public static final double TEST_WAIT = 0.75;
+  public static final double TEST_TIMEOUT = 1;
+
   public static class FrontLeftConstants {
     public static final String MODULE_NAME = "FL";
     public static final Rotation2d PARK_ANGLE = Rotation2d.fromDegrees(135);
@@ -20,7 +23,7 @@ public class SwerveModuleConstants {
 
     public static class DriveMotor {
       public static final String NAME = MODULE_NAME + " Drive";
-      public static final int MOTOR_PORT = 00;
+      public static final int MOTOR_PORT = 3;
       public static final int CURRENT_LIMT = 50;
       public static final boolean INVERTED = false;
       public static final boolean ENCODER_INVERTED = false;
@@ -35,7 +38,7 @@ public class SwerveModuleConstants {
 
     public static class PivotMotor {
       public static final String NAME = MODULE_NAME + " Pivot";
-      public static final int MOTOR_PORT = 00;
+      public static final int MOTOR_PORT = 8;
       public static final int CURRENT_LIMT = 20;
       public static final boolean INVERTED = false;
       public static final boolean ENCODER_INVERTED = true;
@@ -58,7 +61,7 @@ public class SwerveModuleConstants {
 
     public static class DriveMotor {
       public static final String NAME = MODULE_NAME + " Drive";
-      public static final int MOTOR_PORT = 00;
+      public static final int MOTOR_PORT = 20;
       public static final int CURRENT_LIMT = 50;
       public static final boolean INVERTED = false;
       public static final boolean ENCODER_INVERTED = false;
@@ -73,7 +76,7 @@ public class SwerveModuleConstants {
 
     public static class PivotMotor {
       public static final String NAME = MODULE_NAME + " Pivot";
-      public static final int MOTOR_PORT = 00;
+      public static final int MOTOR_PORT = 15;
       public static final int CURRENT_LIMT = 20;
       public static final boolean INVERTED = false;
       public static final boolean ENCODER_INVERTED = true;
@@ -96,7 +99,7 @@ public class SwerveModuleConstants {
 
     public static class DriveMotor {
       public static final String NAME = MODULE_NAME + " Drive";
-      public static final int MOTOR_PORT = 00;
+      public static final int MOTOR_PORT = 2;
       public static final int CURRENT_LIMT = 50;
       public static final boolean INVERTED = false;
       public static final boolean ENCODER_INVERTED = false;
@@ -111,7 +114,7 @@ public class SwerveModuleConstants {
 
     public static class PivotMotor {
       public static final String NAME = MODULE_NAME + " Pivot";
-      public static final int MOTOR_PORT = 00;
+      public static final int MOTOR_PORT = 6;
       public static final int CURRENT_LIMT = 20;
       public static final boolean INVERTED = false;
       public static final boolean ENCODER_INVERTED = true;
@@ -134,7 +137,7 @@ public class SwerveModuleConstants {
 
     public static class DriveMotor {
       public static final String NAME = MODULE_NAME + " Drive";
-      public static final int MOTOR_PORT = 00;
+      public static final int MOTOR_PORT = 21;
       public static final int CURRENT_LIMT = 50;
       public static final boolean INVERTED = false;
       public static final boolean ENCODER_INVERTED = false;
@@ -149,7 +152,7 @@ public class SwerveModuleConstants {
 
     public static class PivotMotor {
       public static final String NAME = MODULE_NAME + " Pivot";
-      public static final int MOTOR_PORT = 00;
+      public static final int MOTOR_PORT = 17;
       public static final int CURRENT_LIMT = 20;
       public static final boolean INVERTED = false;
       public static final boolean ENCODER_INVERTED = true;

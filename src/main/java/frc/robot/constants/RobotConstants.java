@@ -9,7 +9,7 @@ public class RobotConstants {
   public static final double TRACK_WIDTH = 000;
   public static final double WHEEL_BASE = 000;
   public static final double WHEEL_DIAMETER = 000;
-  public static final int PIGEON_CAN_ID = 000;
+  public static final int PIGEON_CAN_ID = 24;
 
   public static final ShuffleboardTab MANIPULATOR_SYSTEM_TAB =
       Shuffleboard.getTab("Manipulator System");
