@@ -404,11 +404,14 @@ public class DriveSubsystem implements Subsystem {
       rot /= 4;
     } // TODO: refactor
 
+    ChassisSpeeds chassisSpeeds =
+        fieldRelative
+            ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rot, getHeading())
+            : new ChassisSpeeds(xSpeed, ySpeed, rot);
+
     SwerveModuleState[] swerveModuleStates =
         RobotConstants.DRIVE_KINEMATICS.toSwerveModuleStates(
-            fieldRelative
-                ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rot, getHeading())
-                : new ChassisSpeeds(xSpeed, ySpeed, rot));
+            ChassisSpeeds.discretize(chassisSpeeds, RobotConstants.CYCLE_TIME));
 
     setModuleStates(swerveModuleStates);
   }
