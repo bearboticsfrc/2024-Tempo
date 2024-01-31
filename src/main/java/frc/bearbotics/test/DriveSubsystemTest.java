@@ -11,7 +11,6 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.constants.SwerveModuleConstants;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.SwerveModule;
-import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -76,7 +75,7 @@ public class DriveSubsystemTest extends AbstractTestCommand {
   @Override
   protected ParallelCommandGroup getTestCommand() {
     return new ParallelCommandGroup(
-        Arrays.stream(driveSubsystem.getSwerveModules())
+        driveSubsystem.getSwerveModules().stream()
             .map(this::getModuleTestCommand)
             .toArray(SequentialCommandGroup[]::new));
   }
