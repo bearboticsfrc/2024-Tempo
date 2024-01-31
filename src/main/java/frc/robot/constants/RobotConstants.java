@@ -2,6 +2,7 @@ package frc.robot.constants;
 
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 
@@ -13,6 +14,8 @@ public class RobotConstants {
 
   public static final ShuffleboardTab MANIPULATOR_SYSTEM_TAB =
       Shuffleboard.getTab("Manipulator System");
+
+  public static final double CYCLE_TIME = Units.millisecondsToSeconds(20);
 
   // Order here must line-up with SwerveCorner order!!
   public static final SwerveDriveKinematics DRIVE_KINEMATICS =
