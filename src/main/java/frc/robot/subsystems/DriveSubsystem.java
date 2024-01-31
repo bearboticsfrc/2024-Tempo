@@ -81,8 +81,6 @@ public class DriveSubsystem implements Subsystem {
             .getEntry();
 
     DriveConstants.COMPETITION_TAB.addNumber("Pigeon Heading", () -> getHeading().getDegrees());
-    DriveConstants.DRIVE_SYSTEM_TAB.addDouble("Pitch", this::getPitch);
-    DriveConstants.DRIVE_SYSTEM_TAB.addDouble("Roll", this::getRoll);
     DriveConstants.DRIVE_SYSTEM_TAB.addBoolean("Field Relative?", () -> fieldRelativeMode);
     DriveConstants.DRIVE_SYSTEM_TAB.addDoubleArray("MyStates", this::getSwerveTelemetry);
   }
@@ -307,14 +305,6 @@ public class DriveSubsystem implements Subsystem {
             .setPivotMotor(pivotConfig);
 
     return moduleConfig;
-  }
-
-  public double getPitch() {
-    return pigeonImu.getPitch();
-  }
-
-  public double getRoll() {
-    return pigeonImu.getRoll();
   }
 
   /**
