@@ -42,8 +42,7 @@ public class RobotContainer {
   private void buildTestList() {
     DriveConstants.TEST_TAB
         .add(
-            "Drive Subsystem Test",
-            new DriveSubsystemTest(driveSubsystem, DriveConstants.TEST_TAB).withTimeout(5000))
+            "Drive Subsystem Test", new DriveSubsystemTest(driveSubsystem, DriveConstants.TEST_TAB))
         .withPosition(2, 1)
         .withSize(2, 1);
   }

@@ -41,16 +41,12 @@ public class DriveSubsystemTest extends AbstractTestCommand {
 
   @Override
   protected void setupShuffleboardTab(ShuffleboardTab shuffleboardTab) {
-    int row = 0;
-    int column = 0;
+    int row = 0, column = 0;
 
     for (String module : outcomes.keySet()) {
       shuffleboardTab.addBoolean(module, () -> outcomes.get(module)).withPosition(column, row);
-
       column = (column + 1) % 4;
-      if (column == 0) {
-        row = 1;
-      }
+      row = (column == 0) ? 1 : row;
     }
   }
 
