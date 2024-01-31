@@ -49,6 +49,8 @@ public class DriveSubsystem implements Subsystem {
   private double maxSpeed = DriveConstants.DRIVE_VELOCITY;
   private boolean fieldRelativeMode = true;
 
+  private SwerveModuleState[] targetSwerveModuleStates;
+
   public DriveSubsystem() {
     CTREUtil.checkCtreError(pigeonImu.configFactoryDefault());
 
@@ -82,7 +84,10 @@ public class DriveSubsystem implements Subsystem {
 
     DriveConstants.COMPETITION_TAB.addNumber("Pigeon Heading", () -> getHeading().getDegrees());
     DriveConstants.DRIVE_SYSTEM_TAB.addBoolean("Field Relative?", () -> fieldRelativeMode);
-    DriveConstants.DRIVE_SYSTEM_TAB.addDoubleArray("MyStates", this::getSwerveTelemetry);
+    DriveConstants.DRIVE_SYSTEM_TAB.addDoubleArray(
+        "MeasuredStates", this::getMeasuredSwerveModuleStates);
+    DriveConstants.DRIVE_SYSTEM_TAB.addDoubleArray(
+        "TargetStates", this::getTargetSwerveModuleStates);
   }
 
   @Override
@@ -419,6 +424,7 @@ public class DriveSubsystem implements Subsystem {
   public void setModuleStates(SwerveModuleState[] swerveModuleStates) {
     SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, maxSpeed);
     Iterator<SwerveModuleState> stateIterator = Arrays.asList(swerveModuleStates).iterator();
+    this.targetSwerveModuleStates = swerveModuleStates;
 
     for (SwerveModule module : getSwerveModules()) {
       module.set(stateIterator.next());
@@ -448,13 +454,34 @@ public class DriveSubsystem implements Subsystem {
   }
 
   /**
-   * Gets an array which contains swerve modules rotation and velocity. This is used for
+   * Gets an array which contains current swerve modules rotation and velocity. This is used for
    * AdvantageScope.
    *
-   * @return The array
+   * @return The array.
    */
-  private double[] getSwerveTelemetry() {
-    return Arrays.stream(getModuleStates())
+  private double[] getMeasuredSwerveModuleStates() {
+    return getNormalizedSwerveModuleStates(getModuleStates());
+  }
+
+  /**
+   * Gets an array which contains the targeted swerve modules rotation and velocity. This is used
+   * for AdvantageScope.
+   *
+   * @return The array.
+   */
+  private double[] getTargetSwerveModuleStates() {
+    return getNormalizedSwerveModuleStates(targetSwerveModuleStates);
+  }
+
+  /**
+   * Normalizes an array of {@link SwerveModuleState} to an array containing the states's rotation
+   * and velocity. This method is used for AdvantageScope.
+   *
+   * @param swerveModuleStates The array of swerve module states to be normalized.
+   * @return The normalized array.
+   */
+  private double[] getNormalizedSwerveModuleStates(SwerveModuleState[] states) {
+    return Arrays.stream(states)
         .flatMapToDouble(
             state -> DoubleStream.of(state.angle.getRadians(), state.speedMetersPerSecond))
         .toArray();
