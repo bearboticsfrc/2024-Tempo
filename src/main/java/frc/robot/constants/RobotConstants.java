@@ -10,7 +10,6 @@ public class RobotConstants {
   public static final double WHEEL_DIAMETER = 0.0962; // TODO: Measure again
   public static final int PIGEON_CAN_ID = 000;
 
-
   public static final double CYCLE_TIME = Units.millisecondsToSeconds(20);
 
   // Order here must line-up with SwerveCorner order!!
