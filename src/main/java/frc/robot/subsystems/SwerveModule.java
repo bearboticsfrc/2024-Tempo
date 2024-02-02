@@ -104,9 +104,6 @@ public class SwerveModule {
         .addNumber(String.format("%s Steer Deg", moduleName), () -> getSteerAngle().getDegrees())
         .withSize(1, 1);
     shuffleboardTab
-        .addNumber(String.format("%s AE Deg", moduleName), () -> getAbsoluteAngle().getDegrees())
-        .withSize(1, 1);
-    shuffleboardTab
         .addNumber(String.format("%s Ref Deg", moduleName), () -> referenceAngle.getDegrees())
         .withSize(1, 1);
   }
@@ -185,15 +182,6 @@ public class SwerveModule {
       default:
         throw new IllegalArgumentException("Unknown motor property: " + property);
     }
-  }
-
-  /**
-   * A Rotation2d representation of the angle of the steer absolute encoder.
-   *
-   * @return The angle, wrapped as a Rotation2d.
-   */
-  public Rotation2d getAbsoluteAngle() {
-    return Rotation2d.fromRadians(pivotMotorEncoder.getPosition());
   }
 
   /**
