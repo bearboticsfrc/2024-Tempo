@@ -22,7 +22,7 @@ import frc.bearbotics.swerve.MotorConfig.MotorBuilder;
 import frc.bearbotics.swerve.MotorConfig.MotorPIDBuilder;
 import frc.bearbotics.swerve.SwerveModule;
 import frc.bearbotics.swerve.SwerveModule.SwerveModuleBuilder;
-import frc.bearbotics.swerve.can.CANCoders.CANCoderBuilder;
+import frc.bearbotics.swerve.cancoder.CANCoders.CANCoderBuilder;
 import frc.robot.constants.DriveConstants;
 import frc.robot.constants.DriveConstants.SpeedMode;
 import frc.robot.constants.RobotConstants;

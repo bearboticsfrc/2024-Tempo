@@ -7,8 +7,8 @@ import com.revrobotics.MotorFeedbackSensor;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkPIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
-import frc.bearbotics.swerve.can.CANCoders;
-import frc.bearbotics.swerve.can.CANCoders.CANCoderBuilder;
+import frc.bearbotics.swerve.cancoder.CANCoders;
+import frc.bearbotics.swerve.cancoder.CANCoders.CANCoderBuilder;
 import frc.robot.util.RevUtil;
 
 public class MotorConfig {

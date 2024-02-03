@@ -1,4 +1,4 @@
-package frc.bearbotics.swerve.can;
+package frc.bearbotics.swerve.cancoder;
 
 import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;

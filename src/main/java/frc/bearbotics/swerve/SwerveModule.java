@@ -15,7 +15,7 @@ import edu.wpi.first.util.datalog.DoubleLogEntry;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import frc.bearbotics.swerve.MotorConfig.MotorBuilder;
-import frc.bearbotics.swerve.can.CANCoders;
+import frc.bearbotics.swerve.cancoder.CANCoders;
 import java.util.HashMap;
 import java.util.Map.Entry;
 import java.util.function.DoubleSupplier;
