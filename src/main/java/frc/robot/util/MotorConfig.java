@@ -6,10 +6,14 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.MotorFeedbackSensor;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkPIDController;
+import edu.wpi.first.math.geometry.Rotation2d;
+import frc.robot.subsystems.CANCoders;
+import frc.robot.subsystems.CANCoders.CANCoderBuilder;
 
 public class MotorConfig {
   private CANSparkBase motor;
   private MotorFeedbackSensor motorEncoder;
+  private CANCoderBuilder canCoderBuilder;
   private String moduleName;
   private String name;
   private boolean motorInverted;
@@ -49,6 +53,38 @@ public class MotorConfig {
     this.velocityConversionFactor = velocityConversionFactor;
   }
 
+  /**
+   * @param motor Specific motor to configure
+   * @param motorEncoder Motor encoder for this motor
+   * @param inverted Whether this motor should be inverted or not
+   * @param nominalVoltage The nominal voltage compansation for this motor
+   * @param currentLimit The current limit for this motor
+   */
+  public MotorConfig(
+      CANSparkBase motor,
+      MotorFeedbackSensor motorEncoder,
+      CANCoderBuilder canCoderBuilder,
+      String moduleName,
+      String name,
+      boolean motorInverted,
+      boolean encoderInverted,
+      double nominalVoltage,
+      int currentLimit,
+      double positionConversionFactor,
+      double velocityConversionFactor) {
+    this.motor = motor;
+    this.motorEncoder = motorEncoder;
+    this.canCoderBuilder = canCoderBuilder;
+    this.moduleName = moduleName;
+    this.name = name;
+    this.motorInverted = motorInverted;
+    this.encoderInverted = encoderInverted;
+    this.nominalVoltage = nominalVoltage;
+    this.currentLimit = currentLimit;
+    this.positionConversionFactor = positionConversionFactor;
+    this.velocityConversionFactor = velocityConversionFactor;
+  }
+
   /*
    * Generic configuration method
    */
@@ -60,6 +96,10 @@ public class MotorConfig {
     RevUtil.checkRevError(motor.setSmartCurrentLimit(currentLimit));
     RevUtil.setPeriodicFramePeriodHigh(motor, String.format("%s - %s", moduleName, name));
 
+    return this;
+  }
+
+  public MotorConfig configureEncoder(Rotation2d initalPosition) {
     if (motorEncoder instanceof RelativeEncoder) {
       RelativeEncoder encoder = (RelativeEncoder) motorEncoder;
       RevUtil.checkRevError(motor.getPIDController().setFeedbackDevice(encoder));
@@ -67,7 +107,7 @@ public class MotorConfig {
       RevUtil.checkRevError(encoder.setPositionConversionFactor(positionConversionFactor));
       RevUtil.checkRevError(encoder.setVelocityConversionFactor(velocityConversionFactor));
 
-      ((RelativeEncoder) motorEncoder).setPosition(0);
+      ((RelativeEncoder) motorEncoder).setPosition(initalPosition.getRadians());
     } else if (motorEncoder instanceof AbsoluteEncoder) {
       // Since we use AbsoluteEncoder with our
       // pivot motor it's safe to assume here.
@@ -81,6 +121,11 @@ public class MotorConfig {
       RevUtil.checkRevError(encoder.setVelocityConversionFactor(velocityConversionFactor));
     }
 
+    return this;
+  }
+
+  public MotorConfig configureAbsoluteEncoder() {
+    CANCoders.getInstance().configure(canCoderBuilder);
     return this;
   }
 
@@ -130,6 +175,25 @@ public class MotorConfig {
     return new MotorConfig(
         motor,
         motorEncoder,
+        constants.getModuleName(),
+        constants.getName(),
+        constants.isMotorInverted(),
+        constants.isEncoderInverted(),
+        constants.getNominalVoltage(),
+        constants.getCurrentLimit(),
+        constants.getPositionConversionFactor(),
+        constants.getVelocityConversionFactor());
+  }
+
+  public static MotorConfig fromMotorConstants(
+      CANSparkBase motor,
+      MotorFeedbackSensor motorEncoder,
+      CANCoderBuilder canCoderBuilder,
+      MotorBuilder constants) {
+    return new MotorConfig(
+        motor,
+        motorEncoder,
+        canCoderBuilder,
         constants.getModuleName(),
         constants.getName(),
         constants.isMotorInverted(),
@@ -239,12 +303,22 @@ public class MotorConfig {
     private int motorPort;
     private boolean motorInverted;
     private boolean encoderInverted;
+    private CANCoderBuilder canCoder;
     private MotorPIDBuilder motorPID;
     private double nominalVoltage = 12;
     private int currentLimit;
     private double positionConversionFactor = 1;
     private double velocityConversionFactor = 1;
     private MotorPIDBuilder[] pidSlots = new MotorPIDBuilder[2];
+
+    public CANCoderBuilder getCanCoder() {
+      return canCoder;
+    }
+
+    public MotorBuilder setCanCoder(CANCoderBuilder canCoder) {
+      this.canCoder = canCoder;
+      return this;
+    }
 
     public MotorBuilder setMotorPid(MotorPIDBuilder motorPid, int slot) {
       pidSlots[slot] = motorPid;
