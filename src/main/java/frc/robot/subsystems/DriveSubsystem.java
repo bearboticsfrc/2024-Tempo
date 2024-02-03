@@ -93,7 +93,7 @@ public class DriveSubsystem implements Subsystem {
     DriveConstants.DRIVE_SYSTEM_TAB.addDoubleArray(
         "MeasuredStates", this::getMeasuredSwerveModuleStates);
     DriveConstants.DRIVE_SYSTEM_TAB.addDoubleArray(
-        "TargetStates", this::getTargetSwerveModuleStates);
+        "DesiredStates", this::getDesiredSwerveModuleStates);
   }
 
   @Override
@@ -433,7 +433,6 @@ public class DriveSubsystem implements Subsystem {
   public void setModuleStates(SwerveModuleState[] swerveModuleStates) {
     SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, maxSpeed);
     Iterator<SwerveModuleState> stateIterator = Arrays.asList(swerveModuleStates).iterator();
-
     this.desiredSwerveModuleStates = swerveModuleStates;
 
     for (SwerveModule module : getSwerveModules()) {
@@ -474,8 +473,8 @@ public class DriveSubsystem implements Subsystem {
   }
 
   /**
-   * Gets an array which contains the desired swerve modules rotation and velocity. This is used for
-   * AdvantageScope.
+   * Gets an array which contains the targeted swerve modules rotation and velocity. This is used
+   * for AdvantageScope.
    *
    * @return The array.
    */
@@ -491,14 +490,11 @@ public class DriveSubsystem implements Subsystem {
    * @return The normalized array.
    */
   private double[] getNormalizedSwerveModuleStates(SwerveModuleState[] states) {
-    double[] normalizedStates = new double[8];
-
-    for (int idx = 0; idx < states.length; idx++) {
-      normalizedStates[idx * 2] = states[idx].angle.getDegrees();
-      normalizedStates[(idx * 2) + 1] = states[idx].speedMetersPerSecond;
-    }
-
-    return normalizedStates;
+    return Arrays.stream(states)
+        .flatMapToDouble(
+            state -> DoubleStream.of(state.angle.getRadians(), state.speedMetersPerSecond))
+        .toArray();
+  }
 
   /**
    * Returns the heading of the robot.

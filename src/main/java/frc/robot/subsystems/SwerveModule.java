@@ -20,7 +20,7 @@ import java.util.HashMap;
 import java.util.Map.Entry;
 import java.util.function.DoubleSupplier;
 
-/** A SwerveModules consists of a drive motor and a steer motor */
+/** A SwerveModules consists of a drive motor and a pivot motor */
 public class SwerveModule {
   private final boolean SHUFFLEBOARD_ENABLED = false;
 
@@ -117,7 +117,10 @@ public class SwerveModule {
         .addNumber(String.format("%s Pos", moduleName), this::getDistance)
         .withSize(1, 1);
     shuffleboardTab
-        .addNumber(String.format("%s Steer Deg", moduleName), () -> getRelativeAngle().getDegrees())
+        .addNumber(String.format("%s Rel Deg", moduleName), () -> getRelativeAngle().getDegrees())
+        .withSize(1, 1);
+    shuffleboardTab
+        .addNumber(String.format("%s Abs Deg", moduleName), () -> getAbsoluteAngle().getDegrees())
         .withSize(1, 1);
     shuffleboardTab
         .addNumber(String.format("%s Ref Deg", moduleName), () -> referenceAngle.getDegrees())
@@ -270,7 +273,7 @@ public class SwerveModule {
   }
 
   /**
-   * Sets the steer angle in radians.
+   * Sets the relative angle in radians.
    *
    * @param state The state of the swerve module.
    */
@@ -279,18 +282,13 @@ public class SwerveModule {
       return;
     }
 
-    if (Math.random() > 0.5) {
-      return;
-    }
+    state.angle = state.angle.plus(chassisAngularOffset);
+    state = SwerveModuleState.optimize(state, getRelativeAngle());
 
-    SwerveModuleState desiredState =
-        new SwerveModuleState(state.speedMetersPerSecond, state.angle.plus(chassisAngularOffset));
-    desiredState = SwerveModuleState.optimize(desiredState, getRelativeAngle());
+    pivotMotorPIDController.setReference(state.angle.getRadians(), ControlType.kPosition);
+    driveMotorPIDController.setReference(state.speedMetersPerSecond, ControlType.kVelocity);
 
-    pivotMotorPIDController.setReference(desiredState.angle.getRadians(), ControlType.kPosition);
-    driveMotorPIDController.setReference(desiredState.speedMetersPerSecond, ControlType.kVelocity);
-
-    referenceAngle = desiredState.angle;
+    referenceAngle = state.angle;
   }
 
   public static class SwerveModuleBuilder {

@@ -15,19 +15,19 @@ import frc.robot.constants.DriveConstants;
 import frc.robot.subsystems.DriveSubsystem;
 
 public class RobotContainer {
-  private DriveSubsystem driveSubsystem = new DriveSubsystem();
-  private boolean isTeleop;
-
   private final CommandXboxController driverController =
       new CommandXboxController(DriveConstants.DRIVER_CONTROLLER_PORT);
-  private DriveSubsystem driveSubsystem = new DriveSubsystem();
+
+  private final DriveSubsystem driveSubsystem = new DriveSubsystem();
+
+  private boolean isTeleop;
 
   private SendableChooser<Command> autoCommandChooser = new SendableChooser<>();
 
   public RobotContainer() {
-    driveSubsystem.setDefaultCommand(getDefaultCommand());
     buildAutoList();
     buildTestList();
+    configureBindings();
   }
 
   private RunCommand getDefaultCommand() {
@@ -40,7 +40,9 @@ public class RobotContainer {
         driveSubsystem);
   }
 
-  private void configureBindings() {}
+  private void configureBindings() {
+    driveSubsystem.setDefaultCommand(getDefaultCommand());
+  }
 
   public void setTeleop(boolean mode) {
     isTeleop = mode;
