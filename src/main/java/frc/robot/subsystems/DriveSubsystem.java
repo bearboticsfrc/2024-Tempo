@@ -49,7 +49,13 @@ public class DriveSubsystem implements Subsystem {
   private double maxSpeed = DriveConstants.DRIVE_VELOCITY;
   private boolean fieldRelativeMode = true;
 
-  private SwerveModuleState[] targetSwerveModuleStates;
+  private SwerveModuleState[] desiredSwerveModuleStates =
+      new SwerveModuleState[] {
+        new SwerveModuleState(),
+        new SwerveModuleState(),
+        new SwerveModuleState(),
+        new SwerveModuleState()
+      };
 
   public DriveSubsystem() {
     CTREUtil.checkCtreError(pigeonImu.configFactoryDefault());
@@ -87,7 +93,7 @@ public class DriveSubsystem implements Subsystem {
     DriveConstants.DRIVE_SYSTEM_TAB.addDoubleArray(
         "MeasuredStates", this::getMeasuredSwerveModuleStates);
     DriveConstants.DRIVE_SYSTEM_TAB.addDoubleArray(
-        "TargetStates", this::getTargetSwerveModuleStates);
+        "DesiredStates", this::getDesiredSwerveModuleStates);
   }
 
   @Override
@@ -427,7 +433,7 @@ public class DriveSubsystem implements Subsystem {
   public void setModuleStates(SwerveModuleState[] swerveModuleStates) {
     SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, maxSpeed);
     Iterator<SwerveModuleState> stateIterator = Arrays.asList(swerveModuleStates).iterator();
-    this.targetSwerveModuleStates = swerveModuleStates;
+    this.desiredSwerveModuleStates = swerveModuleStates;
 
     for (SwerveModule module : getSwerveModules()) {
       module.set(stateIterator.next());
@@ -472,8 +478,8 @@ public class DriveSubsystem implements Subsystem {
    *
    * @return The array.
    */
-  private double[] getTargetSwerveModuleStates() {
-    return getNormalizedSwerveModuleStates(targetSwerveModuleStates);
+  private double[] getDesiredSwerveModuleStates() {
+    return getNormalizedSwerveModuleStates(desiredSwerveModuleStates);
   }
 
   /**
