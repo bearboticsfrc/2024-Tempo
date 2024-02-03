@@ -68,6 +68,10 @@ public class DriveSubsystem implements Subsystem {
     pigeonImu.reset();
   }
 
+  public boolean getFieldRelative() {
+    return fieldRelativeMode;
+  }
+
   private void setupShuffleboardTab() {
     competitionTabMaxSpeedEntry =
         DriveConstants.COMPETITION_TAB
