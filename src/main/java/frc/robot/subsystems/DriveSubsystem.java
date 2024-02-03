@@ -14,7 +14,6 @@ import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.networktables.GenericEntry;
-import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -88,13 +87,12 @@ public class DriveSubsystem implements Subsystem {
             .withProperties(Map.of("min", 0, "max", maxSpeed * 2))
             .getEntry();
 
-    DataLogManager.log("foo");
     DriveConstants.COMPETITION_TAB.addNumber("Pigeon Heading", () -> getHeading().getDegrees());
     DriveConstants.DRIVE_SYSTEM_TAB.addBoolean("Field Relative?", () -> fieldRelativeMode);
     DriveConstants.DRIVE_SYSTEM_TAB.addDoubleArray(
         "MeasuredStates", this::getMeasuredSwerveModuleStates);
     DriveConstants.DRIVE_SYSTEM_TAB.addDoubleArray(
-        "TargetStates", this::getTargetSwerveModuleStates);
+        "DesiredStates", this::getTargetSwerveModuleStates);
   }
 
   @Override
