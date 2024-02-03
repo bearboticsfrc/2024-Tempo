@@ -400,7 +400,7 @@ public class DriveSubsystem implements Subsystem {
       rot /= 18;
     } else if (maxSpeed == SpeedMode.TURBO.getMaxSpeed()) {
       rot /= 4;
-    } // TODO: refactor
+    } // TODO: refactor. Maybe make maxSpeed into a SpeedMode enum and handle logic within?
 
     ChassisSpeeds chassisSpeeds =
         fieldRelative
