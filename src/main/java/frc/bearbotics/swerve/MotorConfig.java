@@ -1,4 +1,4 @@
-package frc.robot.util;
+package frc.bearbotics.swerve;
 
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.CANSparkBase;
@@ -7,8 +7,9 @@ import com.revrobotics.MotorFeedbackSensor;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkPIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
-import frc.robot.subsystems.CANCoders;
-import frc.robot.subsystems.CANCoders.CANCoderBuilder;
+import frc.bearbotics.swerve.can.CANCoders;
+import frc.bearbotics.swerve.can.CANCoders.CANCoderBuilder;
+import frc.robot.util.RevUtil;
 
 public class MotorConfig {
   private CANSparkBase motor;
