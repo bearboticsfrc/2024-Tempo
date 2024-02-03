@@ -14,6 +14,7 @@ import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.networktables.GenericEntry;
+import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -35,7 +36,6 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.stream.DoubleStream;
 
 /** Controls the four swerve modules for autonomous and teleoperated modes. */
 public class DriveSubsystem implements Subsystem {
@@ -49,7 +49,13 @@ public class DriveSubsystem implements Subsystem {
   private double maxSpeed = DriveConstants.DRIVE_VELOCITY;
   private boolean fieldRelativeMode = true;
 
-  private SwerveModuleState[] targetSwerveModuleStates;
+  private SwerveModuleState[] targetSwerveModuleStates =
+      new SwerveModuleState[] {
+        new SwerveModuleState(),
+        new SwerveModuleState(),
+        new SwerveModuleState(),
+        new SwerveModuleState()
+      };
 
   public DriveSubsystem() {
     CTREUtil.checkCtreError(pigeonImu.configFactoryDefault());
@@ -82,6 +88,7 @@ public class DriveSubsystem implements Subsystem {
             .withProperties(Map.of("min", 0, "max", maxSpeed * 2))
             .getEntry();
 
+    DataLogManager.log("foo");
     DriveConstants.COMPETITION_TAB.addNumber("Pigeon Heading", () -> getHeading().getDegrees());
     DriveConstants.DRIVE_SYSTEM_TAB.addBoolean("Field Relative?", () -> fieldRelativeMode);
     DriveConstants.DRIVE_SYSTEM_TAB.addDoubleArray(
@@ -481,10 +488,14 @@ public class DriveSubsystem implements Subsystem {
    * @return The normalized array.
    */
   private double[] getNormalizedSwerveModuleStates(SwerveModuleState[] states) {
-    return Arrays.stream(states)
-        .flatMapToDouble(
-            state -> DoubleStream.of(state.angle.getRadians(), state.speedMetersPerSecond))
-        .toArray();
+    double[] normalizedStates = new double[8];
+
+    for (int idx = 0; idx < states.length; idx++) {
+      normalizedStates[idx * 2] = states[idx].angle.getDegrees();
+      normalizedStates[(idx * 2) + 1] = states[idx].speedMetersPerSecond;
+    }
+
+    return normalizedStates;
   }
 
   /**
