@@ -35,6 +35,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.stream.DoubleStream;
 
 /** Controls the four swerve modules for autonomous and teleoperated modes. */
 public class DriveSubsystem implements Subsystem {
@@ -92,7 +93,7 @@ public class DriveSubsystem implements Subsystem {
     DriveConstants.DRIVE_SYSTEM_TAB.addDoubleArray(
         "MeasuredStates", this::getMeasuredSwerveModuleStates);
     DriveConstants.DRIVE_SYSTEM_TAB.addDoubleArray(
-        "DesiredStates", this::getDesiredSwerveModuleStates);
+        "TargetStates", this::getTargetSwerveModuleStates);
   }
 
   @Override
@@ -432,6 +433,7 @@ public class DriveSubsystem implements Subsystem {
   public void setModuleStates(SwerveModuleState[] swerveModuleStates) {
     SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, maxSpeed);
     Iterator<SwerveModuleState> stateIterator = Arrays.asList(swerveModuleStates).iterator();
+
     this.desiredSwerveModuleStates = swerveModuleStates;
 
     for (SwerveModule module : getSwerveModules()) {
@@ -497,7 +499,6 @@ public class DriveSubsystem implements Subsystem {
     }
 
     return normalizedStates;
-  }
 
   /**
    * Returns the heading of the robot.

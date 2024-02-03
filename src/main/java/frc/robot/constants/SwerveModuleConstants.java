@@ -13,6 +13,9 @@ public class SwerveModuleConstants {
   public static final double PIVOT_POSITION_CONVERSION_FACTOR = 2 * Math.PI;
   public static final double PIVOT_VELOCITY_CONVERSION_FACTOR = (2 * Math.PI) / 60;
 
+  public static final double TEST_WAIT = 0.75;
+  public static final double TEST_TIMEOUT = 1;
+
   public static class FrontLeftConstants {
     public static final String MODULE_NAME = "FL";
     public static final Rotation2d PARK_ANGLE = Rotation2d.fromDegrees(135);
