@@ -57,7 +57,7 @@ public class DriveSubsystemTest extends AbstractTestCommand {
   @Override
   public void end(boolean interrupted) {
     for (SwerveModule module : driveSubsystem.getSwerveModules()) {
-      module.set(new SwerveModuleState(0, module.getSteerAngle()));
+      module.set(new SwerveModuleState(0, module.getRelativeAngle()));
     }
 
     List<String> failed = getFailedTests();
@@ -81,7 +81,7 @@ public class DriveSubsystemTest extends AbstractTestCommand {
   }
 
   private SequentialCommandGroup getModuleTestCommand(SwerveModule module) {
-    Rotation2d initalSteerAngle = module.getSteerAngle();
+    Rotation2d initalSteerAngle = module.getRelativeAngle();
     SwerveModuleState newState =
         new SwerveModuleState(0.5, Rotation2d.fromDegrees(90).plus(driveSubsystem.getHeading()));
 
@@ -90,6 +90,6 @@ public class DriveSubsystemTest extends AbstractTestCommand {
         new WaitCommand(SwerveModuleConstants.TEST_WAIT),
         new InstantCommand(() -> outcomes.put(module + " Drive", module.getDriveVelocity() != 0)),
         new InstantCommand(
-            () -> outcomes.put(module + " Pivot", module.getSteerAngle() != initalSteerAngle)));
+            () -> outcomes.put(module + " Pivot", module.getRelativeAngle() != initalSteerAngle)));
   }
 }
