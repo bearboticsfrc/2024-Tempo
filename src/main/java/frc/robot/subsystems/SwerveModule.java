@@ -1,13 +1,12 @@
 package frc.robot.subsystems;
 
-import com.revrobotics.AbsoluteEncoder;
+import com.ctre.phoenix6.hardware.CANcoder;
 import com.revrobotics.CANSparkBase;
 import com.revrobotics.CANSparkBase.ControlType;
 import com.revrobotics.CANSparkFlex;
 import com.revrobotics.CANSparkLowLevel;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
-import com.revrobotics.SparkAbsoluteEncoder.Type;
 import com.revrobotics.SparkPIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
@@ -32,7 +31,8 @@ public class SwerveModule {
   private CANSparkMax pivotMotor;
 
   private RelativeEncoder driveMotorEncoder;
-  private AbsoluteEncoder pivotMotorEncoder;
+  private RelativeEncoder pivotMotorRelativeEncoder;
+  private CANcoder pivotMotorAbsoluteEncoder;
 
   private SparkPIDController driveMotorPIDController;
   private SparkPIDController pivotMotorPIDController;
@@ -65,17 +65,29 @@ public class SwerveModule {
             swerveModule.getPivotMotor().getMotorPort(), CANSparkLowLevel.MotorType.kBrushless);
 
     this.driveMotorEncoder = driveMotor.getEncoder();
-    this.pivotMotorEncoder = pivotMotor.getAbsoluteEncoder(Type.kDutyCycle);
+    this.pivotMotorRelativeEncoder = pivotMotor.getEncoder();
 
     MotorConfig.fromMotorConstants(driveMotor, driveMotorEncoder, swerveModule.getDriveMotor())
         .configureMotor()
+        .configureEncoder(Rotation2d.fromRadians(0))
         .configurePID(swerveModule.getDriveMotor().getMotorPID())
         .burnFlash();
 
-    MotorConfig.fromMotorConstants(pivotMotor, pivotMotorEncoder, swerveModule.getPivotMotor())
+    MotorConfig.fromMotorConstants(
+            pivotMotor,
+            pivotMotorRelativeEncoder,
+            swerveModule.getPivotMotor().getCanCoder(),
+            swerveModule.getPivotMotor())
         .configureMotor()
+        .configureEncoder(getAbsoluteAngle())
+        .configureAbsoluteEncoder()
         .configurePID(swerveModule.getPivotMotor().getMotorPID())
         .burnFlash();
+
+    this.pivotMotorAbsoluteEncoder =
+        CANCoders.getInstance()
+            .get(swerveModule.getPivotMotor().getCanCoder().getId())
+            .getCancoder();
 
     this.driveMotorPIDController = driveMotor.getPIDController();
     this.pivotMotorPIDController = pivotMotor.getPIDController();
@@ -101,10 +113,7 @@ public class SwerveModule {
         .addNumber(String.format("%s Pos", moduleName), this::getDistance)
         .withSize(1, 1);
     shuffleboardTab
-        .addNumber(String.format("%s Steer Deg", moduleName), () -> getSteerAngle().getDegrees())
-        .withSize(1, 1);
-    shuffleboardTab
-        .addNumber(String.format("%s AE Deg", moduleName), () -> getAbsoluteAngle().getDegrees())
+        .addNumber(String.format("%s Steer Deg", moduleName), () -> getRelativeAngle().getDegrees())
         .withSize(1, 1);
     shuffleboardTab
         .addNumber(String.format("%s Ref Deg", moduleName), () -> referenceAngle.getDegrees())
@@ -117,8 +126,6 @@ public class SwerveModule {
    * @param log The data log to use.
    */
   private void setupDataLogging(DataLog log) {
-    // TODO: refactor this, maybe
-
     for (String motorType : new String[] {"DRIVE", "PIVOT"}) {
       String pathMotorType = motorType.toLowerCase();
 
@@ -183,28 +190,28 @@ public class SwerveModule {
       case "TEMPERATURE":
         return motor::getMotorTemperature;
       case "POSITION":
-        return pivotMotorEncoder::getPosition;
+        return pivotMotorRelativeEncoder::getPosition;
       default:
         throw new IllegalArgumentException("Unknown motor property: " + property);
     }
   }
 
   /**
-   * A Rotation2d representation of the angle of the steer absolute encoder.
+   * Returns the current angle from the relative encoder.
+   *
+   * @return The angle, wrapped as a Rotation2d.
+   */
+  public Rotation2d getRelativeAngle() {
+    return Rotation2d.fromRadians(pivotMotorRelativeEncoder.getPosition());
+  }
+
+  /**
+   * Returns the current angle from the absolute encoder
    *
    * @return The angle, wrapped as a Rotation2d.
    */
   public Rotation2d getAbsoluteAngle() {
-    return Rotation2d.fromRadians(pivotMotorEncoder.getPosition());
-  }
-
-  /**
-   * Returns the current steer angle.
-   *
-   * @return The angle, wrapped as a Rotation2d.
-   */
-  public Rotation2d getSteerAngle() {
-    return Rotation2d.fromRadians(pivotMotorEncoder.getPosition());
+    return Rotation2d.fromRadians(pivotMotorAbsoluteEncoder.getPosition().getValueAsDouble());
   }
 
   /**
@@ -233,11 +240,13 @@ public class SwerveModule {
   public SwerveModulePosition getPosition() {
     return new SwerveModulePosition(
         driveMotorEncoder.getPosition(),
-        new Rotation2d(pivotMotorEncoder.getPosition() - chassisAngularOffset.getRadians()));
+        new Rotation2d(
+            pivotMotorAbsoluteEncoder.getPosition().getValueAsDouble()
+                - chassisAngularOffset.getRadians()));
   }
 
   public SwerveModuleState getState() {
-    return new SwerveModuleState(getDriveVelocity(), getSteerAngle());
+    return new SwerveModuleState(getDriveVelocity(), getRelativeAngle());
   }
 
   /**
@@ -270,7 +279,7 @@ public class SwerveModule {
 
     SwerveModuleState desiredState =
         new SwerveModuleState(state.speedMetersPerSecond, state.angle.plus(chassisAngularOffset));
-    desiredState = SwerveModuleState.optimize(desiredState, getSteerAngle());
+    desiredState = SwerveModuleState.optimize(desiredState, getRelativeAngle());
 
     pivotMotorPIDController.setReference(desiredState.angle.getRadians(), ControlType.kPosition);
     driveMotorPIDController.setReference(desiredState.speedMetersPerSecond, ControlType.kVelocity);

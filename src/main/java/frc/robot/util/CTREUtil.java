@@ -5,6 +5,7 @@
 package frc.robot.util;
 
 import com.ctre.phoenix.ErrorCode;
+import com.ctre.phoenix6.StatusCode;
 import edu.wpi.first.wpilibj.DriverStation;
 
 /** Convenience methods for using the CTRE api. */
@@ -17,6 +18,17 @@ public class CTREUtil {
     if (errorCode != ErrorCode.OK) {
       DriverStation.reportError(errorCode.toString(), true);
     }
+  }
+
+  /**
+   * @param statusCode
+   */
+  public static StatusCode checkCtreError(StatusCode statusCode) {
+    if (statusCode.isError()) {
+      DriverStation.reportError(statusCode.toString(), true);
+    }
+
+    return statusCode;
   }
 
   /**

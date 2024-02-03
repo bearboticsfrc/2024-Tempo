@@ -407,13 +407,16 @@ public class DriveSubsystem implements Subsystem {
       rot /= 18;
     } else if (maxSpeed == SpeedMode.TURBO.getMaxSpeed()) {
       rot /= 4;
-    } // TODO: refactor
+    } // TODO: refactor. Maybe make maxSpeed into a SpeedMode enum and handle logic within?
+
+    ChassisSpeeds chassisSpeeds =
+        fieldRelative
+            ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rot, getHeading())
+            : new ChassisSpeeds(xSpeed, ySpeed, rot);
 
     SwerveModuleState[] swerveModuleStates =
         RobotConstants.DRIVE_KINEMATICS.toSwerveModuleStates(
-            fieldRelative
-                ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rot, getHeading())
-                : new ChassisSpeeds(xSpeed, ySpeed, rot));
+            ChassisSpeeds.discretize(chassisSpeeds, RobotConstants.CYCLE_TIME));
 
     setModuleStates(swerveModuleStates);
   }
