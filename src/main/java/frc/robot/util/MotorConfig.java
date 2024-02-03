@@ -303,7 +303,7 @@ public class MotorConfig {
     private int motorPort;
     private boolean motorInverted;
     private boolean encoderInverted;
-    private CANCoderBuilder canCoder;
+    private CANCoderBuilder absoluteEncoder;
     private MotorPIDBuilder motorPID;
     private double nominalVoltage = 12;
     private int currentLimit;
@@ -311,12 +311,12 @@ public class MotorConfig {
     private double velocityConversionFactor = 1;
     private MotorPIDBuilder[] pidSlots = new MotorPIDBuilder[2];
 
-    public CANCoderBuilder getCanCoder() {
-      return canCoder;
+    public CANCoderBuilder getAbsoluteEncoder() {
+      return absoluteEncoder;
     }
 
-    public MotorBuilder setCanCoder(CANCoderBuilder canCoder) {
-      this.canCoder = canCoder;
+    public MotorBuilder setAbsoluteEncoder(CANCoderBuilder canCoder) {
+      this.absoluteEncoder = canCoder;
       return this;
     }
 

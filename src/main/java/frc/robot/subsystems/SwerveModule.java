@@ -75,7 +75,7 @@ public class SwerveModule {
     MotorConfig.fromMotorConstants(
             pivotMotor,
             pivotMotorRelativeEncoder,
-            swerveModule.getPivotMotor().getCanCoder(),
+            swerveModule.getPivotMotor().getAbsoluteEncoder(),
             swerveModule.getPivotMotor())
         .configureMotor()
         .configureEncoder(getAbsoluteAngle())
@@ -85,7 +85,7 @@ public class SwerveModule {
 
     this.pivotMotorAbsoluteEncoder =
         CANCoders.getInstance()
-            .get(swerveModule.getPivotMotor().getCanCoder().getId())
+            .get(swerveModule.getPivotMotor().getAbsoluteEncoder().getId())
             .getCancoder();
 
     this.driveMotorPIDController = driveMotor.getPIDController();

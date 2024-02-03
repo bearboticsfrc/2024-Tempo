@@ -26,6 +26,7 @@ import frc.robot.constants.SwerveModuleConstants.BackLeftConstants;
 import frc.robot.constants.SwerveModuleConstants.BackRightConstants;
 import frc.robot.constants.SwerveModuleConstants.FrontLeftConstants;
 import frc.robot.constants.SwerveModuleConstants.FrontRightConstants;
+import frc.robot.subsystems.CANCoders.CANCoderBuilder;
 import frc.robot.subsystems.SwerveModule.SwerveModuleBuilder;
 import frc.robot.util.CTREUtil;
 import frc.robot.util.MotorConfig.MotorBuilder;
@@ -138,6 +139,11 @@ public class DriveSubsystem implements Subsystem {
             .setPositionPidWrappingMax(
                 FrontLeftConstants.PivotMotor.MotorPid.POSITION_PID_WRAPPING_MAX);
 
+    CANCoderBuilder pivotAbsoluteEncoder =
+        new CANCoderBuilder()
+            .setId(FrontLeftConstants.PivotMotor.ABSOLUTE_ENCODER_PORT)
+            .setOffsetDegrees(FrontLeftConstants.PivotMotor.ABSOLUTE_ENCODER_OFFSET);
+
     MotorBuilder driveConfig =
         new MotorBuilder()
             .setName(FrontLeftConstants.DriveMotor.NAME)
@@ -153,6 +159,7 @@ public class DriveSubsystem implements Subsystem {
         new MotorBuilder()
             .setName(FrontLeftConstants.PivotMotor.NAME)
             .setMotorPort(FrontLeftConstants.PivotMotor.MOTOR_PORT)
+            .setAbsoluteEncoder(pivotAbsoluteEncoder)
             .setCurrentLimit(FrontLeftConstants.PivotMotor.CURRENT_LIMT)
             .setMotorInverted(FrontLeftConstants.PivotMotor.INVERTED)
             .setEncoderInverted(FrontLeftConstants.PivotMotor.ENCODER_INVERTED)
@@ -187,6 +194,11 @@ public class DriveSubsystem implements Subsystem {
             .setPositionPidWrappingMax(
                 BackLeftConstants.PivotMotor.MotorPid.POSITION_PID_WRAPPING_MAX);
 
+    CANCoderBuilder pivotAbsoluteEncoder =
+        new CANCoderBuilder()
+            .setId(BackLeftConstants.PivotMotor.ABSOLUTE_ENCODER_PORT)
+            .setOffsetDegrees(BackLeftConstants.PivotMotor.ABSOLUTE_ENCODER_OFFSET);
+
     MotorBuilder driveConfig =
         new MotorBuilder()
             .setName(BackLeftConstants.DriveMotor.NAME)
@@ -202,6 +214,7 @@ public class DriveSubsystem implements Subsystem {
         new MotorBuilder()
             .setName(BackLeftConstants.PivotMotor.NAME)
             .setMotorPort(BackLeftConstants.PivotMotor.MOTOR_PORT)
+            .setAbsoluteEncoder(pivotAbsoluteEncoder)
             .setCurrentLimit(BackLeftConstants.PivotMotor.CURRENT_LIMT)
             .setMotorInverted(BackLeftConstants.PivotMotor.INVERTED)
             .setEncoderInverted(BackLeftConstants.PivotMotor.ENCODER_INVERTED)
@@ -236,6 +249,11 @@ public class DriveSubsystem implements Subsystem {
             .setPositionPidWrappingMax(
                 FrontRightConstants.PivotMotor.MotorPid.POSITION_PID_WRAPPING_MAX);
 
+    CANCoderBuilder pivotAbsoluteEncoder =
+        new CANCoderBuilder()
+            .setId(FrontRightConstants.PivotMotor.ABSOLUTE_ENCODER_PORT)
+            .setOffsetDegrees(FrontRightConstants.PivotMotor.ABSOLUTE_ENCODER_OFFSET);
+
     MotorBuilder driveConfig =
         new MotorBuilder()
             .setName(FrontRightConstants.DriveMotor.NAME)
@@ -251,6 +269,7 @@ public class DriveSubsystem implements Subsystem {
         new MotorBuilder()
             .setName(FrontRightConstants.PivotMotor.NAME)
             .setMotorPort(FrontRightConstants.PivotMotor.MOTOR_PORT)
+            .setAbsoluteEncoder(pivotAbsoluteEncoder)
             .setCurrentLimit(FrontRightConstants.PivotMotor.CURRENT_LIMT)
             .setMotorInverted(FrontRightConstants.PivotMotor.INVERTED)
             .setEncoderInverted(FrontRightConstants.PivotMotor.ENCODER_INVERTED)
@@ -285,6 +304,11 @@ public class DriveSubsystem implements Subsystem {
             .setPositionPidWrappingMax(
                 BackRightConstants.PivotMotor.MotorPid.POSITION_PID_WRAPPING_MAX);
 
+    CANCoderBuilder pivotAbsoluteEncoder =
+        new CANCoderBuilder()
+            .setId(BackRightConstants.PivotMotor.ABSOLUTE_ENCODER_PORT)
+            .setOffsetDegrees(BackRightConstants.PivotMotor.ABSOLUTE_ENCODER_OFFSET);
+
     MotorBuilder driveConfig =
         new MotorBuilder()
             .setName(BackRightConstants.DriveMotor.NAME)
@@ -300,6 +324,7 @@ public class DriveSubsystem implements Subsystem {
         new MotorBuilder()
             .setName(BackRightConstants.PivotMotor.NAME)
             .setMotorPort(BackRightConstants.PivotMotor.MOTOR_PORT)
+            .setAbsoluteEncoder(pivotAbsoluteEncoder)
             .setCurrentLimit(BackRightConstants.PivotMotor.CURRENT_LIMT)
             .setMotorInverted(BackRightConstants.PivotMotor.INVERTED)
             .setEncoderInverted(BackRightConstants.PivotMotor.ENCODER_INVERTED)
