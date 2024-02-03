@@ -92,35 +92,34 @@ public class MotorConfig {
   public MotorConfig configureMotor() {
     motor.setInverted(motorInverted);
 
+    String motorDescription =
+        name == null ? moduleName : String.format("%s - %s", moduleName, name);
+
     RevUtil.checkRevError(motor.setIdleMode(CANSparkMax.IdleMode.kBrake));
     RevUtil.checkRevError(motor.enableVoltageCompensation(nominalVoltage));
     RevUtil.checkRevError(motor.setSmartCurrentLimit(currentLimit));
-    RevUtil.setPeriodicFramePeriodHigh(motor, String.format("%s - %s", moduleName, name));
+    RevUtil.setPeriodicFramePeriodHigh(motor, motorDescription);
 
     return this;
   }
 
   public MotorConfig configureEncoder(Rotation2d initalPosition) {
     if (motorEncoder instanceof RelativeEncoder) {
-      RelativeEncoder encoder = (RelativeEncoder) motorEncoder;
-      RevUtil.checkRevError(motor.getPIDController().setFeedbackDevice(encoder));
-
-      RevUtil.checkRevError(encoder.setPositionConversionFactor(positionConversionFactor));
-      RevUtil.checkRevError(encoder.setVelocityConversionFactor(velocityConversionFactor));
-
       ((RelativeEncoder) motorEncoder).setPosition(initalPosition.getRadians());
     } else if (motorEncoder instanceof AbsoluteEncoder) {
-      // Since we use AbsoluteEncoder with our
-      // pivot motor it's safe to assume here.
-      // Won't be the case for 100% of builds although.
-      AbsoluteEncoder encoder = (AbsoluteEncoder) motorEncoder; // silly cast for silly java
-
-      RevUtil.checkRevError(encoder.setInverted(encoderInverted));
-      RevUtil.checkRevError(motor.getPIDController().setFeedbackDevice(encoder));
-
-      RevUtil.checkRevError(encoder.setPositionConversionFactor(positionConversionFactor));
-      RevUtil.checkRevError(encoder.setVelocityConversionFactor(velocityConversionFactor));
+      RevUtil.checkRevError(((AbsoluteEncoder) motorEncoder).setInverted(encoderInverted));
     }
+
+    // Since both relative and absolute encoders
+    // define this method, the cast shouldn't matter.
+    if (motor.getPIDController() != null) {
+      RevUtil.checkRevError(motor.getPIDController().setFeedbackDevice(motorEncoder));
+    }
+
+    RevUtil.checkRevError(
+        ((RelativeEncoder) motorEncoder).setPositionConversionFactor(positionConversionFactor));
+    RevUtil.checkRevError(
+        ((RelativeEncoder) motorEncoder).setVelocityConversionFactor(velocityConversionFactor));
 
     return this;
   }
