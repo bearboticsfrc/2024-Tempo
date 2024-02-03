@@ -1,11 +1,21 @@
-package frc.robot.auto.campaign;
+package frc.bearbotics.campaign;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import java.util.function.BooleanSupplier;
 
 /** Adapter class for a Command to a Mission */
-public class CommandMission extends Mission {
+public class CommandMission extends AbstractMission {
+  private final Command command;
   private BooleanSupplier successSupplier = () -> true;
+
+  /**
+   * New CommandMission adapter.
+   *
+   * @param command The command to adapt.
+   */
+  public CommandMission(final Command command) {
+    this.command = command;
+  }
 
   /**
    * @see edu.wpi.first.wpilibj2.command.Command#initialize()
@@ -74,11 +84,5 @@ public class CommandMission extends Mission {
 
   public boolean isSuccess() {
     return successSupplier.getAsBoolean();
-  }
-
-  private final Command command;
-
-  public CommandMission(final Command command) {
-    this.command = command;
   }
 }

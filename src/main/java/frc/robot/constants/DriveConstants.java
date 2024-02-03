@@ -7,6 +7,7 @@ import frc.robot.util.RateLimiter;
 public class DriveConstants {
   public static final ShuffleboardTab DRIVE_SYSTEM_TAB = Shuffleboard.getTab("Drive System");
   public static final ShuffleboardTab COMPETITION_TAB = Shuffleboard.getTab("Competition");
+  public static final ShuffleboardTab TEST_TAB = Shuffleboard.getTab("Test");
 
   public static final int DRIVER_CONTROLLER_PORT = 0;
   public static final int OPERATOR_CONTROLLER_PORT = 1;
