@@ -4,8 +4,8 @@
 
 package frc.robot.util;
 
+import com.revrobotics.CANSparkBase;
 import com.revrobotics.CANSparkLowLevel;
-import com.revrobotics.CANSparkMax;
 import com.revrobotics.REVLibError;
 import edu.wpi.first.wpilibj.DriverStation;
 
@@ -30,7 +30,7 @@ public class RevUtil {
    * @param motor A CANSparkMax motor controller
    * @param desc Description of the motor ("Climber1", "Left Drive", etc)
    */
-  public static void setPeriodicFramePeriodHigh(CANSparkMax motor, String desc) {
+  public static void setPeriodicFramePeriodHigh(CANSparkBase motor, String desc) {
     checkRevError(motor.setPeriodicFramePeriod(CANSparkLowLevel.PeriodicFrame.kStatus0, 10));
     checkRevError(motor.setPeriodicFramePeriod(CANSparkLowLevel.PeriodicFrame.kStatus1, 20));
     checkRevError(motor.setPeriodicFramePeriod(CANSparkLowLevel.PeriodicFrame.kStatus2, 20));

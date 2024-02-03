@@ -17,7 +17,7 @@ import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.Subsystem;
 import frc.robot.constants.DriveConstants;
 import frc.robot.constants.DriveConstants.SpeedMode;
 import frc.robot.constants.RobotConstants;
@@ -36,7 +36,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 /** Controls the four swerve modules for autonomous and teleoperated modes. */
-public class DriveSubsystem extends SubsystemBase {
+public class DriveSubsystem implements Subsystem {
   // Linked to maintain order.
   private final LinkedHashMap<SwerveCorner, SwerveModule> swerveModules = new LinkedHashMap<>();
   private final WPI_PigeonIMU pigeonImu = new WPI_PigeonIMU(RobotConstants.PIGEON_CAN_ID);
@@ -314,10 +314,6 @@ public class DriveSubsystem extends SubsystemBase {
     return pigeonImu.getRoll();
   }
 
-  public boolean getFieldRelative() {
-    return fieldRelativeMode;
-  }
-
   /**
    * Get an array of swerve modules in order.
    *
@@ -325,7 +321,7 @@ public class DriveSubsystem extends SubsystemBase {
    *
    * @return An array containing the swerve modules, ordered.
    */
-  private SwerveModule[] getSwerveModules() {
+  public SwerveModule[] getSwerveModules() {
     return (SwerveModule[]) swerveModules.values().toArray(new SwerveModule[4]);
   }
 
@@ -406,13 +402,16 @@ public class DriveSubsystem extends SubsystemBase {
       rot /= 18;
     } else if (maxSpeed == SpeedMode.TURBO.getMaxSpeed()) {
       rot /= 4;
-    } // TODO: refactor
+    } // TODO: refactor. Maybe make maxSpeed into a SpeedMode enum and handle logic within?
+
+    ChassisSpeeds chassisSpeeds =
+        fieldRelative
+            ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rot, getHeading())
+            : new ChassisSpeeds(xSpeed, ySpeed, rot);
 
     SwerveModuleState[] swerveModuleStates =
         RobotConstants.DRIVE_KINEMATICS.toSwerveModuleStates(
-            fieldRelative
-                ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rot, getHeading())
-                : new ChassisSpeeds(xSpeed, ySpeed, rot));
+            ChassisSpeeds.discretize(chassisSpeeds, RobotConstants.CYCLE_TIME));
 
     setModuleStates(swerveModuleStates);
   }
