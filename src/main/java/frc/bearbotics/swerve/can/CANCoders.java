@@ -1,4 +1,4 @@
-package frc.robot.subsystems;
+package frc.bearbotics.swerve.can;
 
 import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
@@ -10,7 +10,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.util.CTREUtil;
-import frc.robot.util.ObservedCANCoder;
 import java.util.HashMap;
 import java.util.Map;
 

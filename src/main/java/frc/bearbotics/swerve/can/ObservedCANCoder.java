@@ -1,7 +1,6 @@
-package frc.robot.util;
+package frc.bearbotics.swerve.can;
 
 import com.ctre.phoenix6.hardware.CANcoder;
-import frc.robot.subsystems.CANObserver;
 
 public class ObservedCANCoder {
   private CANcoder cancoder;

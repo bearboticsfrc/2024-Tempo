@@ -1,4 +1,4 @@
-package frc.robot.subsystems;
+package frc.bearbotics.swerve.can;
 
 import com.ctre.phoenix6.Timestamp;
 import com.ctre.phoenix6.hardware.CANcoder;
