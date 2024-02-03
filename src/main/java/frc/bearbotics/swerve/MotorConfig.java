@@ -109,13 +109,12 @@ public class MotorConfig {
     } else if (motorEncoder instanceof AbsoluteEncoder) {
       RevUtil.checkRevError(((AbsoluteEncoder) motorEncoder).setInverted(encoderInverted));
     }
-
-    // Since both relative and absolute encoders
-    // define this method, the cast shouldn't matter.
     if (motor.getPIDController() != null) {
       RevUtil.checkRevError(motor.getPIDController().setFeedbackDevice(motorEncoder));
     }
 
+    // Since both relative and absolute encoders
+    // define this method, the cast shouldn't matter.
     RevUtil.checkRevError(
         ((RelativeEncoder) motorEncoder).setPositionConversionFactor(positionConversionFactor));
     RevUtil.checkRevError(

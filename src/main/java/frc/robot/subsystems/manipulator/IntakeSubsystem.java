@@ -18,6 +18,7 @@ public class IntakeSubsystem {
         new MotorBuilder()
             .setModuleName(IntakeConstants.Motor.MODULE_NAME)
             .setMotorPort(IntakeConstants.Motor.MOTOR_PORT)
+            .setMotorInverted(IntakeConstants.Motor.INVERTED)
             .setCurrentLimit(IntakeConstants.Motor.CURRENT_LIMT);
 
     intakeMotor =
