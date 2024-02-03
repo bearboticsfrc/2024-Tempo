@@ -239,14 +239,12 @@ public class SwerveModule {
    */
   public SwerveModulePosition getPosition() {
     return new SwerveModulePosition(
-        driveMotorEncoder.getPosition(),
-        new Rotation2d(
-            pivotMotorAbsoluteEncoder.getPosition().getValueAsDouble()
-                - chassisAngularOffset.getRadians()));
+        driveMotorEncoder.getPosition(), getAbsoluteAngle().minus(chassisAngularOffset));
   }
 
   public SwerveModuleState getState() {
-    return new SwerveModuleState(getDriveVelocity(), getRelativeAngle());
+    return new SwerveModuleState(
+        getDriveVelocity(), getRelativeAngle().minus(chassisAngularOffset));
   }
 
   /**
