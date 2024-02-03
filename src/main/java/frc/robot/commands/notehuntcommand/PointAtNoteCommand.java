@@ -27,10 +27,7 @@ public class PointAtNoteCommand extends InstantCommand {
       return;
     }
 
-    Transform3d note = visionSubsystem.getNote().getBestCameraToTarget();
-
-    Rotation2d targetRote = note.getRotation().toRotation2d();
-    double rot = targetRote.getDegrees();
+    double rot = visionSubsystem.getNote().getYaw();
 
     rot = rotSpeedController.calculate(rot, 0);
 

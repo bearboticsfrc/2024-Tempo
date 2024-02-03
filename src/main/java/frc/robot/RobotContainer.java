@@ -12,7 +12,7 @@ import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.commands.AlignAmpCommand;
 import frc.robot.commands.AlignSpeakerCommand;
-import frc.robot.commands.notehuntcommand.NoteHuntCommand;
+import frc.robot.commands.notehuntcommand.PointAtNoteCommand;
 import frc.robot.constants.DriveConstants;
 import frc.robot.constants.DriveConstants.SpeedMode;
 import frc.robot.subsystems.DriveSubsystem;
@@ -22,7 +22,7 @@ public class RobotContainer {
   private boolean isTeleop = false;
 
   private DriveSubsystem driveSubsystem = new DriveSubsystem();
-  private VisionSubsystem visionSubsystem = new VisionSubsystem();
+  private VisionSubsystem visionSubsystem = new VisionSubsystem(driveSubsystem);
 
   private SendableChooser<Command> autoCommandChooser = new SendableChooser<>();
   private final CommandXboxController driverController =
@@ -64,7 +64,7 @@ public class RobotContainer {
 
     driverController
         .x()
-        .whileTrue(new NoteHuntCommand(driveSubsystem, visionSubsystem))
+        .whileTrue(new PointAtNoteCommand(driveSubsystem, visionSubsystem))
         .onFalse(new Command() {});
 
     driverController.y().whileTrue(new AlignAmpCommand(driveSubsystem, visionSubsystem));

@@ -4,8 +4,11 @@
 
 package frc.robot.subsystems;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.VisionConstants;
+import frc.robot.location.LocationHelper;
 import java.util.HashMap;
 import java.util.Optional;
 import org.photonvision.PhotonCamera;
@@ -19,10 +22,12 @@ public class VisionSubsystem extends SubsystemBase {
   private final PhotonCamera photonCameraObject;
   private boolean driverCameraMode = false;
   private PhotonTrackedTarget note;
+  private DriveSubsystem driveSubsystem;
 
-  public VisionSubsystem() {
+  public VisionSubsystem(DriveSubsystem driveSubsystem) {
     photonCamera = new PhotonCamera(VisionConstants.CAMERA_1_NAME);
     photonCameraObject = new PhotonCamera(VisionConstants.CAMERA_2_NAME);
+    this.driveSubsystem = driveSubsystem;
   }
 
   @Override
@@ -48,6 +53,18 @@ public class VisionSubsystem extends SubsystemBase {
 
   public PhotonTrackedTarget getNote() {
     return note;
+  }
+
+  public Pose2d getNotePose() {
+    if (note == null) {
+      return driveSubsystem.getPose();
+    }
+
+    double distance = note.getBestCameraToTarget().getX();
+    Rotation2d rotation = Rotation2d.fromDegrees(note.getYaw());
+
+    return LocationHelper.getPoseByDistanceAndAngleToPose(
+        driveSubsystem.getPose(), distance, rotation);
   }
 
   public void toggleDriverCamera() {
