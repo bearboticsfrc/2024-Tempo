@@ -39,7 +39,7 @@ public class SwerveModuleConstants {
     public static class PivotMotor {
       public static final String NAME = MODULE_NAME + " Pivot";
       public static final int MOTOR_PORT = 9;
-      public static final int ABSOLUTE_ENCODER_PORT = 27;
+      public static final int ABSOLUTE_ENCODER_PORT = 22;
       public static final Rotation2d ABSOLUTE_ENCODER_OFFSET = Rotation2d.fromDegrees(1.9);
       public static final int CURRENT_LIMT = 20;
       public static final boolean INVERTED = false;
@@ -79,7 +79,7 @@ public class SwerveModuleConstants {
     public static class PivotMotor {
       public static final String NAME = MODULE_NAME + " Pivot";
       public static final int MOTOR_PORT = 10;
-      public static final int ABSOLUTE_ENCODER_PORT = 26;
+      public static final int ABSOLUTE_ENCODER_PORT = 21;
       public static final Rotation2d ABSOLUTE_ENCODER_OFFSET = Rotation2d.fromDegrees(-82.5);
       public static final int CURRENT_LIMT = 20;
       public static final boolean INVERTED = false;
@@ -119,7 +119,7 @@ public class SwerveModuleConstants {
     public static class PivotMotor {
       public static final String NAME = MODULE_NAME + " Pivot";
       public static final int MOTOR_PORT = 2;
-      public static final int ABSOLUTE_ENCODER_PORT = 25;
+      public static final int ABSOLUTE_ENCODER_PORT = 23;
       public static final Rotation2d ABSOLUTE_ENCODER_OFFSET = Rotation2d.fromDegrees(-56.5);
       public static final int CURRENT_LIMT = 20;
       public static final boolean INVERTED = false;
@@ -160,7 +160,7 @@ public class SwerveModuleConstants {
       public static final String NAME = MODULE_NAME + " Pivot";
       public static final int MOTOR_PORT = 17;
       public static final Rotation2d ABSOLUTE_ENCODER_OFFSET = Rotation2d.fromDegrees(-159.1);
-      public static final int ABSOLUTE_ENCODER_PORT = 28;
+      public static final int ABSOLUTE_ENCODER_PORT = 24;
       public static final int CURRENT_LIMT = 20;
       public static final boolean INVERTED = false;
       public static final boolean ENCODER_INVERTED = true;

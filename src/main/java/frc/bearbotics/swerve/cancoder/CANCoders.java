@@ -17,7 +17,7 @@ public class CANCoders {
   private final double CONFIGURATION_TIMEOUT = 10; // TOOD: Move to constants
 
   private static CANCoders instance;
-  private Map<Double, ObservedCANCoder> cancoders = new HashMap<Double, ObservedCANCoder>();
+  private Map<Integer, ObservedCANCoder> cancoders = new HashMap<Integer, ObservedCANCoder>();
 
   public static CANCoders getInstance() {
     if (instance == null) {
@@ -27,7 +27,7 @@ public class CANCoders {
     return instance;
   }
 
-  public CANcoder configure(CANCoderBuilder cancoderConfiguration) {
+  public void configure(CANCoderBuilder cancoderConfiguration) {
     CANcoder cancoder = new CANcoder(cancoderConfiguration.getId());
     CANcoderConfiguration canCoderConfig =
         new CANcoderConfiguration()
@@ -51,13 +51,18 @@ public class CANCoders {
 
       if (statusCode.isError()) {
         DriverStation.reportError(
-            "[CANCoder]: Configuration errored out on attempt " + attempt, false);
+            "[CANCoder]: Configuration errored out with status code "
+                + statusCode.value
+                + " on attempt "
+                + attempt,
+            false);
       } else {
         break;
       }
     }
 
-    return cancoder;
+    cancoders.put(
+        cancoderConfiguration.getId(), new ObservedCANCoder(cancoder, new CANObserver(cancoder)));
   }
 
   public boolean allHaveBeenInitialized() {
@@ -70,7 +75,7 @@ public class CANCoders {
     return true;
   }
 
-  public ObservedCANCoder get(double canCoderId) {
+  public ObservedCANCoder get(int canCoderId) {
     return cancoders.get(canCoderId);
   }
 
