@@ -23,7 +23,7 @@ import java.util.function.DoubleSupplier;
 
 /** A SwerveModules consists of a drive motor and a pivot motor */
 public class SwerveModule {
-  private final boolean SHUFFLEBOARD_ENABLED = false;
+  private final boolean SHUFFLEBOARD_ENABLED = true;
 
   private String moduleName;
 
@@ -80,7 +80,6 @@ public class SwerveModule {
             swerveModule.getPivotMotor())
         .configureMotor()
         .configureAbsoluteEncoder()
-        .configureEncoder(getAbsoluteAngle())
         .configurePID(swerveModule.getPivotMotor().getMotorPID())
         .burnFlash();
 
@@ -88,6 +87,11 @@ public class SwerveModule {
         CANCoders.getInstance()
             .get(swerveModule.getPivotMotor().getAbsoluteEncoder().getId())
             .getCancoder();
+
+    MotorConfig.fromMotorConstants(
+            pivotMotor, pivotMotorRelativeEncoder, swerveModule.getPivotMotor())
+        .configureEncoder(getAbsoluteAngle())
+        .burnFlash();
 
     this.driveMotorPIDController = driveMotor.getPIDController();
     this.pivotMotorPIDController = pivotMotor.getPIDController();
@@ -219,7 +223,7 @@ public class SwerveModule {
    * @return The angle, wrapped as a Rotation2d.
    */
   public Rotation2d getAbsoluteAngle() {
-    return Rotation2d.fromRadians(pivotMotorAbsoluteEncoder.getPosition().getValueAsDouble());
+    return Rotation2d.fromDegrees(pivotMotorAbsoluteEncoder.getAbsolutePosition().getValue() * 360);
   }
 
   /**

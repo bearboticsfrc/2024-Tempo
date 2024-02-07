@@ -4,7 +4,7 @@
 
 package frc.robot.subsystems;
 
-import com.ctre.phoenix.sensors.WPI_PigeonIMU;
+import com.ctre.phoenix6.hardware.Pigeon2;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -31,7 +31,6 @@ import frc.robot.constants.SwerveModuleConstants.BackLeftConstants;
 import frc.robot.constants.SwerveModuleConstants.BackRightConstants;
 import frc.robot.constants.SwerveModuleConstants.FrontLeftConstants;
 import frc.robot.constants.SwerveModuleConstants.FrontRightConstants;
-import frc.robot.util.CTREUtil;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
@@ -43,7 +42,7 @@ import java.util.stream.DoubleStream;
 public class DriveSubsystem implements Subsystem {
   // Linked to maintain order.
   private final LinkedHashMap<SwerveCorner, SwerveModule> swerveModules = new LinkedHashMap<>();
-  private final WPI_PigeonIMU pigeonImu = new WPI_PigeonIMU(RobotConstants.PIGEON_CAN_ID);
+  private final Pigeon2 pigeonImu = new Pigeon2(RobotConstants.PIGEON_CAN_ID);
 
   private final SwerveDriveOdometry odometry;
   private GenericEntry competitionTabMaxSpeedEntry;
@@ -60,8 +59,6 @@ public class DriveSubsystem implements Subsystem {
       };
 
   public DriveSubsystem() {
-    CTREUtil.checkCtreError(pigeonImu.configFactoryDefault());
-
     for (SwerveCorner corner : SwerveCorner.values()) {
       swerveModules.put(
           corner,
