@@ -128,11 +128,6 @@ public class MotorConfig {
 
   public MotorConfig configureAbsoluteEncoder() {
     CANCoders.getInstance().configure(canCoderBuilder);
-
-    if (!CANCoders.getInstance().isInitalized(canCoderBuilder.getId())) {
-      Timer.delay(0.25);
-    }
-
     return this;
   }
 
