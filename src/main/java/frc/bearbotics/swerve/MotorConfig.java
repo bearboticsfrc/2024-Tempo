@@ -7,6 +7,7 @@ import com.revrobotics.MotorFeedbackSensor;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkPIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.Timer;
 import frc.bearbotics.swerve.cancoder.CANCoders;
 import frc.bearbotics.swerve.cancoder.CANCoders.CANCoderBuilder;
 import frc.robot.util.RevUtil;
@@ -125,6 +126,11 @@ public class MotorConfig {
 
   public MotorConfig configureAbsoluteEncoder() {
     CANCoders.getInstance().configure(canCoderBuilder);
+
+    if (!CANCoders.getInstance().isInitalized(canCoderBuilder.getId())) {
+      Timer.delay(0.25);
+    }
+
     return this;
   }
 
@@ -163,8 +169,9 @@ public class MotorConfig {
   }
 
   public void burnFlash() {
+    Timer.delay(0.25);
     RevUtil.checkRevError(motor.burnFlash());
-
+    Timer.delay(0.25);
     // Burn settings onto motor flash
     // might not work, needs a delay after setting values
   }
