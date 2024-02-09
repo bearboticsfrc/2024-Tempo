@@ -168,7 +168,6 @@ public class DriveSubsystem implements Subsystem {
     SwerveModuleBuilder moduleConfig =
         new SwerveModuleBuilder()
             .setModuleName(FrontLeftConstants.MODULE_NAME)
-            .setParkAngle(FrontLeftConstants.PARK_ANGLE)
             .setDriveMotor(driveConfig)
             .setPivotMotor(pivotConfig);
 
@@ -222,7 +221,6 @@ public class DriveSubsystem implements Subsystem {
     SwerveModuleBuilder moduleConfig =
         new SwerveModuleBuilder()
             .setModuleName(BackLeftConstants.MODULE_NAME)
-            .setParkAngle(BackLeftConstants.PARK_ANGLE)
             .setDriveMotor(driveConfig)
             .setPivotMotor(pivotConfig);
 
@@ -276,7 +274,6 @@ public class DriveSubsystem implements Subsystem {
     SwerveModuleBuilder moduleConfig =
         new SwerveModuleBuilder()
             .setModuleName(FrontRightConstants.MODULE_NAME)
-            .setParkAngle(FrontRightConstants.PARK_ANGLE)
             .setDriveMotor(driveConfig)
             .setPivotMotor(pivotConfig);
 
@@ -330,7 +327,6 @@ public class DriveSubsystem implements Subsystem {
     SwerveModuleBuilder moduleConfig =
         new SwerveModuleBuilder()
             .setModuleName(BackRightConstants.MODULE_NAME)
-            .setParkAngle(BackRightConstants.PARK_ANGLE)
             .setDriveMotor(driveConfig)
             .setPivotMotor(pivotConfig);
 
@@ -346,28 +342,6 @@ public class DriveSubsystem implements Subsystem {
    */
   public Collection<SwerveModule> getSwerveModules() {
     return swerveModules.values();
-  }
-
-  /**
-   * Activates or deactivates the park mode for the robot.
-   *
-   * <p>When park mode is activated, each wheel is locked in an opposing configuration, preventing
-   * any movement.
-   *
-   * @param enabled true to activate park mode, false to deactivate.
-   */
-  public void setParkMode(boolean enabled) {
-    for (SwerveModule module : getSwerveModules()) {
-      if (!enabled) {
-        module.setParked(false);
-        continue;
-      }
-
-      SwerveModuleState state = new SwerveModuleState(0, module.getParkedAngle());
-
-      module.set(state);
-      module.setParked(true);
-    }
   }
 
   /**

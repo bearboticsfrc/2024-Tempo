@@ -39,9 +39,6 @@ public class SwerveModule {
   private SparkPIDController pivotMotorPIDController;
 
   private Rotation2d referenceAngle = new Rotation2d();
-  private Rotation2d parkedAngle;
-
-  private boolean parked = false;
 
   private HashMap<String, DoubleLogEntry> dataLogs = new HashMap<String, DoubleLogEntry>();
 
@@ -53,7 +50,6 @@ public class SwerveModule {
    */
   public SwerveModule(SwerveModuleBuilder swerveModule, ShuffleboardTab shuffleboardTab) {
     this.moduleName = swerveModule.getModuleName();
-    this.parkedAngle = swerveModule.getParkAngle();
 
     this.driveMotor =
         new CANSparkFlex(
@@ -256,33 +252,11 @@ public class SwerveModule {
   }
 
   /**
-   * Get this swerve modules park angle.
-   *
-   * @return The angle, wrapped as a Rotation2d.
-   */
-  public Rotation2d getParkedAngle() {
-    return parkedAngle;
-  }
-
-  /**
-   * Sets the robot in parked mode, where all wheels are apposing.
-   *
-   * @param mode
-   */
-  public void setParked(boolean mode) {
-    parked = mode;
-  }
-
-  /**
    * Sets the relative angle in radians.
    *
    * @param state The state of the swerve module.
    */
   public void set(SwerveModuleState state) {
-    if (parked) {
-      return;
-    }
-
     state = SwerveModuleState.optimize(state, getRelativeAngle());
 
     pivotMotorPIDController.setReference(state.angle.getRadians(), ControlType.kPosition);
@@ -293,7 +267,6 @@ public class SwerveModule {
 
   public static class SwerveModuleBuilder {
     private String moduleName;
-    private Rotation2d parkAngle;
     private MotorBuilder driveMotor;
     private MotorBuilder pivotMotor;
 
@@ -303,15 +276,6 @@ public class SwerveModule {
 
     public SwerveModuleBuilder setModuleName(String moduleName) {
       this.moduleName = moduleName;
-      return this;
-    }
-
-    public Rotation2d getParkAngle() {
-      return parkAngle;
-    }
-
-    public SwerveModuleBuilder setParkAngle(Rotation2d parkAngle) {
-      this.parkAngle = parkAngle;
       return this;
     }
 
