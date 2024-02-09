@@ -17,7 +17,7 @@ import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.Subsystem;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.bearbotics.swerve.MotorConfig.MotorBuilder;
 import frc.bearbotics.swerve.MotorConfig.MotorPIDBuilder;
 import frc.bearbotics.swerve.SwerveModule;
@@ -39,7 +39,7 @@ import java.util.Map;
 import java.util.stream.DoubleStream;
 
 /** Controls the four swerve modules for autonomous and teleoperated modes. */
-public class DriveSubsystem implements Subsystem {
+public class DriveSubsystem extends SubsystemBase {
   // Linked to maintain order.
   private final LinkedHashMap<SwerveCorner, SwerveModule> swerveModules = new LinkedHashMap<>();
   private final Pigeon2 pigeonImu = new Pigeon2(RobotConstants.PIGEON_CAN_ID);

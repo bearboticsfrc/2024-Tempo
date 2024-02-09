@@ -4,14 +4,15 @@ import com.revrobotics.CANSparkLowLevel;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.bearbotics.swerve.MotorConfig;
 import frc.bearbotics.swerve.MotorConfig.MotorBuilder;
 import frc.robot.constants.DriveConstants;
 import frc.robot.constants.manipulator.IntakeConstants;
 
-public class IntakeSubsystem {
-  public final CANSparkMax intakeMotor;
-  public final RelativeEncoder intakeMotorEncoder;
+public class IntakeSubsystem extends SubsystemBase {
+  private final CANSparkMax intakeMotor;
+  private final RelativeEncoder intakeMotorEncoder;
 
   public IntakeSubsystem() {
     MotorBuilder intakeMotorConfig =
@@ -36,5 +37,9 @@ public class IntakeSubsystem {
   public void setupShuffleboardTab() {
     DriveConstants.MANIPULATOR_SYSTEM_TAB.addDouble(
         "Intake Velocity", intakeMotorEncoder::getVelocity);
+  }
+
+  public void set(double speed) {
+    intakeMotor.set(speed);
   }
 }

@@ -14,12 +14,15 @@ import frc.bearbotics.test.DriveSubsystemTest;
 import frc.robot.constants.DriveConstants;
 import frc.robot.constants.DriveConstants.SpeedMode;
 import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.subsystems.manipulator.ManipulatorSubsystem;
+import frc.robot.subsystems.manipulator.ManipulatorSubsystem.ManipulatorState;
 
 public class RobotContainer {
   private final CommandXboxController driverController =
       new CommandXboxController(DriveConstants.DRIVER_CONTROLLER_PORT);
 
   private final DriveSubsystem driveSubsystem = new DriveSubsystem();
+  private final ManipulatorSubsystem manipulatorSubsystem = new ManipulatorSubsystem();
 
   private boolean isTeleop;
 
@@ -52,6 +55,17 @@ public class RobotContainer {
         .rightBumper()
         .whileTrue(new InstantCommand(() -> driveSubsystem.setSpeedMode(SpeedMode.TURTLE)))
         .onFalse(new InstantCommand(() -> driveSubsystem.setSpeedMode(SpeedMode.NORMAL)));
+
+    driverController
+        .x()
+        .whileTrue(
+            new InstantCommand(
+                () -> manipulatorSubsystem.dispatchState(ManipulatorState.PICKUP),
+                manipulatorSubsystem))
+        .onFalse(
+            new InstantCommand(
+                () -> manipulatorSubsystem.dispatchState(ManipulatorState.EMPTY),
+                manipulatorSubsystem));
   }
 
   public void setTeleop(boolean mode) {
