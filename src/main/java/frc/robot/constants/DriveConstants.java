@@ -20,25 +20,25 @@ public class DriveConstants {
   public static final double WHEEL_CIRCUMFERENCE = RobotConstants.WHEEL_DIAMETER * Math.PI;
 
   public static final double DRIVE_GEAR_REDUCTION = (14.0 / 50.0) * (28.0 / 16.0) * (15.0 / 45.0);
-  public static final double DRIVE_WHEEL_FREE_SPEED_RPS =
-      (MAX_MOTOR_FREE_SPEED_RPM / 60 * WHEEL_CIRCUMFERENCE) / DRIVE_GEAR_REDUCTION;
+  public static final double STEER_DRIVE_REDUCTION = (14.0 / 50.0) * (10.0 / 60.0);
+  public static final double DRIVE_WHEEL_FREE_SPEED_MPS =
+      (MAX_MOTOR_FREE_SPEED_RPM / 60 * WHEEL_CIRCUMFERENCE) * DRIVE_GEAR_REDUCTION;
 
   /** Max drive velocity in meters/sec */
   public static final double MAX_VELOCITY =
-      (MAX_MOTOR_FREE_SPEED_RPM / 60.0 * WHEEL_CIRCUMFERENCE) / DRIVE_GEAR_REDUCTION;
+      (MAX_MOTOR_FREE_SPEED_RPM / 60.0 * WHEEL_CIRCUMFERENCE) * DRIVE_GEAR_REDUCTION;
 
   public static final double DRIVE_VELOCITY = MAX_VELOCITY / 2;
 
-  public static final double MAX_ACCELERATION_PER_SECOND = 4;
-  public static final double MAX_DECELERATION_PER_SECOND = 4;
+  public static final double MAX_ACCELERATION_PER_SECOND = 2 * Math.PI;
   public static final double MAX_ANGULAR_ACCELERATION_PER_SECOND = 6 * (Math.PI * 2);
   public static final double MAX_ANGULAR_DECELERATION_PER_SECOND = 20;
 
   public static final RateLimiter X_ACCELERATION_LIMITER =
-      new RateLimiter(MAX_ACCELERATION_PER_SECOND, MAX_DECELERATION_PER_SECOND);
+      new RateLimiter(MAX_ACCELERATION_PER_SECOND, MAX_ACCELERATION_PER_SECOND);
 
   public static final RateLimiter Y_ACCELERATION_LIMITER =
-      new RateLimiter(MAX_ACCELERATION_PER_SECOND, MAX_DECELERATION_PER_SECOND);
+      new RateLimiter(MAX_ACCELERATION_PER_SECOND, MAX_ACCELERATION_PER_SECOND);
 
   public static final RateLimiter TURNING_ACCELERATION_LIMITER =
       new RateLimiter(MAX_ANGULAR_ACCELERATION_PER_SECOND, MAX_ANGULAR_DECELERATION_PER_SECOND);

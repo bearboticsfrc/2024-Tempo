@@ -5,13 +5,15 @@ import edu.wpi.first.math.geometry.Rotation2d;
 public class SwerveModuleConstants {
 
   public static final double DRIVE_POSITION_CONVERSION_FACTOR =
-      (RobotConstants.WHEEL_DIAMETER * Math.PI) / DriveConstants.DRIVE_GEAR_REDUCTION; // meters
+      (RobotConstants.WHEEL_DIAMETER * Math.PI) * DriveConstants.DRIVE_GEAR_REDUCTION; // meters
   public static final double DRIVE_VELOCITY_CONVERSION_FACTOR =
-      ((RobotConstants.WHEEL_DIAMETER * Math.PI) / DriveConstants.DRIVE_GEAR_REDUCTION)
+      ((RobotConstants.WHEEL_DIAMETER * Math.PI) * DriveConstants.DRIVE_GEAR_REDUCTION)
           / 60.0; // meters per second
 
-  public static final double PIVOT_POSITION_CONVERSION_FACTOR = 2 * Math.PI;
-  public static final double PIVOT_VELOCITY_CONVERSION_FACTOR = (2 * Math.PI) / 60;
+  public static final double PIVOT_POSITION_CONVERSION_FACTOR =
+      2 * Math.PI * DriveConstants.STEER_DRIVE_REDUCTION;
+  public static final double PIVOT_VELOCITY_CONVERSION_FACTOR =
+      (2 * Math.PI) / 60 * DriveConstants.STEER_DRIVE_REDUCTION;
 
   public static final double TEST_WAIT = 0.75;
   public static final double TEST_TIMEOUT = 1;
@@ -19,20 +21,19 @@ public class SwerveModuleConstants {
   public static class FrontLeftConstants {
     public static final String MODULE_NAME = "FL";
     public static final Rotation2d PARK_ANGLE = Rotation2d.fromDegrees(135);
-    public static final Rotation2d CHASSIS_ANGULAR_OFFSET = Rotation2d.fromRadians(-Math.PI / 2);
 
     public static class DriveMotor {
       public static final String NAME = MODULE_NAME + " Drive";
       public static final int MOTOR_PORT = 31;
-      public static final int CURRENT_LIMT = 50;
+      public static final int CURRENT_LIMT = 40;
       public static final boolean INVERTED = false;
       public static final boolean ENCODER_INVERTED = false;
       public static final double POSITION_CONVERSION_FACTOR = DRIVE_POSITION_CONVERSION_FACTOR;
       public static final double VELOCITY_CONVERSION_FACTOR = DRIVE_VELOCITY_CONVERSION_FACTOR;
 
       public static class MotorPid {
-        public static final double P = 0;
-        public static final double Ff = 1 / DriveConstants.DRIVE_WHEEL_FREE_SPEED_RPS;
+        public static final double P = 0.01;
+        public static final double Ff = 1 / DriveConstants.DRIVE_WHEEL_FREE_SPEED_MPS;
       }
     }
 
@@ -42,13 +43,13 @@ public class SwerveModuleConstants {
       public static final int ABSOLUTE_ENCODER_PORT = 22;
       public static final Rotation2d ABSOLUTE_ENCODER_OFFSET = Rotation2d.fromDegrees(-177.2);
       public static final int CURRENT_LIMT = 20;
-      public static final boolean INVERTED = false;
-      public static final boolean ENCODER_INVERTED = true;
+      public static final boolean INVERTED = true;
+      public static final boolean ENCODER_INVERTED = false;
       public static final double POSITION_CONVERSION_FACTOR = PIVOT_POSITION_CONVERSION_FACTOR;
       public static final double VELOCITY_CONVERSION_FACTOR = PIVOT_VELOCITY_CONVERSION_FACTOR;
 
       public static class MotorPid {
-        public static final double P = 1;
+        public static final double P = 0.9;
         public static final boolean POSITION_PID_WRAPPING_ENABLED = true;
         public static final int POSITION_PID_WRAPPING_MIN = 0;
         public static final double POSITION_PID_WRAPPING_MAX = 2 * Math.PI;
@@ -59,20 +60,19 @@ public class SwerveModuleConstants {
   public static class FrontRightConstants {
     public static final String MODULE_NAME = "FR";
     public static final Rotation2d PARK_ANGLE = Rotation2d.fromDegrees(45);
-    public static final Rotation2d CHASSIS_ANGULAR_OFFSET = Rotation2d.fromRadians(0);
 
     public static class DriveMotor {
       public static final String NAME = MODULE_NAME + " Drive";
       public static final int MOTOR_PORT = 18;
-      public static final int CURRENT_LIMT = 50;
-      public static final boolean INVERTED = false;
+      public static final int CURRENT_LIMT = 40;
+      public static final boolean INVERTED = true;
       public static final boolean ENCODER_INVERTED = false;
       public static final double POSITION_CONVERSION_FACTOR = DRIVE_POSITION_CONVERSION_FACTOR;
       public static final double VELOCITY_CONVERSION_FACTOR = DRIVE_VELOCITY_CONVERSION_FACTOR;
 
       public static class MotorPid {
-        public static final double P = 0;
-        public static final double Ff = 1 / DriveConstants.DRIVE_WHEEL_FREE_SPEED_RPS;
+        public static final double P = 0.01;
+        public static final double Ff = 1 / DriveConstants.DRIVE_WHEEL_FREE_SPEED_MPS;
       }
     }
 
@@ -82,13 +82,13 @@ public class SwerveModuleConstants {
       public static final int ABSOLUTE_ENCODER_PORT = 21;
       public static final Rotation2d ABSOLUTE_ENCODER_OFFSET = Rotation2d.fromDegrees(-82.7);
       public static final int CURRENT_LIMT = 20;
-      public static final boolean INVERTED = false;
-      public static final boolean ENCODER_INVERTED = true;
+      public static final boolean INVERTED = true;
+      public static final boolean ENCODER_INVERTED = false;
       public static final double POSITION_CONVERSION_FACTOR = PIVOT_POSITION_CONVERSION_FACTOR;
       public static final double VELOCITY_CONVERSION_FACTOR = PIVOT_VELOCITY_CONVERSION_FACTOR;
 
       public static class MotorPid {
-        public static final double P = 1;
+        public static final double P = 0.9;
         public static final boolean POSITION_PID_WRAPPING_ENABLED = true;
         public static final int POSITION_PID_WRAPPING_MIN = 0;
         public static final double POSITION_PID_WRAPPING_MAX = 2 * Math.PI;
@@ -99,20 +99,19 @@ public class SwerveModuleConstants {
   public static class BackLeftConstants {
     public static final String MODULE_NAME = "BL";
     public static final Rotation2d PARK_ANGLE = Rotation2d.fromDegrees(225);
-    public static final Rotation2d CHASSIS_ANGULAR_OFFSET = Rotation2d.fromRadians(Math.PI);
 
     public static class DriveMotor {
       public static final String NAME = MODULE_NAME + " Drive";
       public static final int MOTOR_PORT = 30;
-      public static final int CURRENT_LIMT = 50;
+      public static final int CURRENT_LIMT = 40;
       public static final boolean INVERTED = false;
       public static final boolean ENCODER_INVERTED = false;
       public static final double POSITION_CONVERSION_FACTOR = DRIVE_POSITION_CONVERSION_FACTOR;
       public static final double VELOCITY_CONVERSION_FACTOR = DRIVE_VELOCITY_CONVERSION_FACTOR;
 
       public static class MotorPid {
-        public static final double P = 0;
-        public static final double Ff = 1 / DriveConstants.DRIVE_WHEEL_FREE_SPEED_RPS;
+        public static final double P = 0.01;
+        public static final double Ff = 1 / DriveConstants.DRIVE_WHEEL_FREE_SPEED_MPS;
       }
     }
 
@@ -122,13 +121,13 @@ public class SwerveModuleConstants {
       public static final int ABSOLUTE_ENCODER_PORT = 23;
       public static final Rotation2d ABSOLUTE_ENCODER_OFFSET = Rotation2d.fromDegrees(-56.1);
       public static final int CURRENT_LIMT = 20;
-      public static final boolean INVERTED = false;
-      public static final boolean ENCODER_INVERTED = true;
+      public static final boolean INVERTED = true;
+      public static final boolean ENCODER_INVERTED = false;
       public static final double POSITION_CONVERSION_FACTOR = PIVOT_POSITION_CONVERSION_FACTOR;
       public static final double VELOCITY_CONVERSION_FACTOR = PIVOT_VELOCITY_CONVERSION_FACTOR;
 
       public static class MotorPid {
-        public static final double P = 1;
+        public static final double P = 0.9;
         public static final boolean POSITION_PID_WRAPPING_ENABLED = true;
         public static final int POSITION_PID_WRAPPING_MIN = 0;
         public static final double POSITION_PID_WRAPPING_MAX = 2 * Math.PI;
@@ -139,20 +138,19 @@ public class SwerveModuleConstants {
   public static class BackRightConstants {
     public static final String MODULE_NAME = "BR";
     public static final Rotation2d PARK_ANGLE = Rotation2d.fromDegrees(135);
-    public static final Rotation2d CHASSIS_ANGULAR_OFFSET = Rotation2d.fromRadians(Math.PI / 2);
 
     public static class DriveMotor {
       public static final String NAME = MODULE_NAME + " Drive";
       public static final int MOTOR_PORT = 19;
-      public static final int CURRENT_LIMT = 50;
-      public static final boolean INVERTED = false;
+      public static final int CURRENT_LIMT = 40;
+      public static final boolean INVERTED = true;
       public static final boolean ENCODER_INVERTED = false;
       public static final double POSITION_CONVERSION_FACTOR = DRIVE_POSITION_CONVERSION_FACTOR;
       public static final double VELOCITY_CONVERSION_FACTOR = DRIVE_VELOCITY_CONVERSION_FACTOR;
 
       public static class MotorPid {
-        public static final double P = 0;
-        public static final double Ff = 1 / DriveConstants.DRIVE_WHEEL_FREE_SPEED_RPS;
+        public static final double P = 0.01;
+        public static final double Ff = 1 / DriveConstants.DRIVE_WHEEL_FREE_SPEED_MPS;
       }
     }
 
@@ -162,13 +160,13 @@ public class SwerveModuleConstants {
       public static final Rotation2d ABSOLUTE_ENCODER_OFFSET = Rotation2d.fromDegrees(-159.4);
       public static final int ABSOLUTE_ENCODER_PORT = 24;
       public static final int CURRENT_LIMT = 20;
-      public static final boolean INVERTED = false;
-      public static final boolean ENCODER_INVERTED = true;
+      public static final boolean INVERTED = true;
+      public static final boolean ENCODER_INVERTED = false;
       public static final double POSITION_CONVERSION_FACTOR = PIVOT_POSITION_CONVERSION_FACTOR;
       public static final double VELOCITY_CONVERSION_FACTOR = PIVOT_VELOCITY_CONVERSION_FACTOR;
 
       public static class MotorPid {
-        public static final double P = 1;
+        public static final double P = 0.9;
         public static final boolean POSITION_PID_WRAPPING_ENABLED = true;
         public static final int POSITION_PID_WRAPPING_MIN = 0;
         public static final double POSITION_PID_WRAPPING_MAX = 2 * Math.PI;

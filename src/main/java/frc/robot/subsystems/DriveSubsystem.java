@@ -169,7 +169,6 @@ public class DriveSubsystem implements Subsystem {
         new SwerveModuleBuilder()
             .setModuleName(FrontLeftConstants.MODULE_NAME)
             .setParkAngle(FrontLeftConstants.PARK_ANGLE)
-            .setChassisAngularOffset(FrontLeftConstants.CHASSIS_ANGULAR_OFFSET)
             .setDriveMotor(driveConfig)
             .setPivotMotor(pivotConfig);
 
@@ -224,7 +223,6 @@ public class DriveSubsystem implements Subsystem {
         new SwerveModuleBuilder()
             .setModuleName(BackLeftConstants.MODULE_NAME)
             .setParkAngle(BackLeftConstants.PARK_ANGLE)
-            .setChassisAngularOffset(BackLeftConstants.CHASSIS_ANGULAR_OFFSET)
             .setDriveMotor(driveConfig)
             .setPivotMotor(pivotConfig);
 
@@ -279,7 +277,6 @@ public class DriveSubsystem implements Subsystem {
         new SwerveModuleBuilder()
             .setModuleName(FrontRightConstants.MODULE_NAME)
             .setParkAngle(FrontRightConstants.PARK_ANGLE)
-            .setChassisAngularOffset(FrontRightConstants.CHASSIS_ANGULAR_OFFSET)
             .setDriveMotor(driveConfig)
             .setPivotMotor(pivotConfig);
 
@@ -334,7 +331,6 @@ public class DriveSubsystem implements Subsystem {
         new SwerveModuleBuilder()
             .setModuleName(BackRightConstants.MODULE_NAME)
             .setParkAngle(BackRightConstants.PARK_ANGLE)
-            .setChassisAngularOffset(BackRightConstants.CHASSIS_ANGULAR_OFFSET)
             .setDriveMotor(driveConfig)
             .setPivotMotor(pivotConfig);
 

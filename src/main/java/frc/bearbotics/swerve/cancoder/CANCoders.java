@@ -7,18 +7,20 @@ import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.signals.AbsoluteSensorRangeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.DataLogManager;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.util.CTREUtil;
 import java.util.HashMap;
 import java.util.Map;
 
 public class CANCoders {
-  private final double CONFIGURATION_TIMEOUT = 10; // TOOD: Move to constants
+  private final double CONFIGURATION_TIMEOUT =
+      Units.millisecondsToSeconds(10000); // TOOD: Move to constants
+  private final double UPDATE_TIMEOUT = Units.millisecondsToSeconds(1000);
 
   private static CANCoders instance;
 
-  private Map<Integer, ObservedCANCoder> cancoders = new HashMap<Integer, ObservedCANCoder>();
+  private Map<Integer, CANcoder> cancoders = new HashMap<Integer, CANcoder>();
 
   public static CANCoders getInstance() {
     if (instance == null) {
@@ -38,11 +40,10 @@ public class CANCoders {
                     .withMagnetOffset(cancoderConfiguration.getOffsetDegrees().getDegrees() / 360)
                     .withSensorDirection(SensorDirectionValue.CounterClockwise_Positive));
 
-    DataLogManager.log(canCoderConfig.toString());
-
     for (int attempt = 1; attempt < 6; attempt++) {
       StatusCode statusCode =
-          CTREUtil.checkCtreError(cancoder.getConfigurator().apply(canCoderConfig, 10));
+          CTREUtil.checkCtreError(
+              cancoder.getConfigurator().apply(canCoderConfig, CONFIGURATION_TIMEOUT));
 
       if (statusCode == StatusCode.TxTimeout) {
         DriverStation.reportError(
@@ -64,21 +65,14 @@ public class CANCoders {
       }
     }
 
-    cancoders.put(
-        cancoderConfiguration.getId(), new ObservedCANCoder(cancoder, new CANObserver(cancoder)));
+    cancoders.put(cancoderConfiguration.getId(), cancoder);
   }
 
-  public boolean allHaveBeenInitialized() {
-    for (ObservedCANCoder cancoder : cancoders.values()) {
-      if (!cancoder.getObserver().hasUpdate()) {
-        return false;
-      }
-    }
-
-    return true;
+  public boolean isInitalized(int id) {
+    return get(id).getAbsolutePosition().waitForUpdate(UPDATE_TIMEOUT).hasUpdated();
   }
 
-  public ObservedCANCoder get(int canCoderId) {
+  public CANcoder get(int canCoderId) {
     return cancoders.get(canCoderId);
   }
 
