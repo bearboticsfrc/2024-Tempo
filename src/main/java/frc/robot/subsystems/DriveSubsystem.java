@@ -4,7 +4,7 @@
 
 package frc.robot.subsystems;
 
-import com.ctre.phoenix.sensors.WPI_PigeonIMU;
+import com.ctre.phoenix6.hardware.Pigeon2;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -31,7 +31,6 @@ import frc.robot.constants.SwerveModuleConstants.BackLeftConstants;
 import frc.robot.constants.SwerveModuleConstants.BackRightConstants;
 import frc.robot.constants.SwerveModuleConstants.FrontLeftConstants;
 import frc.robot.constants.SwerveModuleConstants.FrontRightConstants;
-import frc.robot.util.CTREUtil;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
@@ -43,7 +42,7 @@ import java.util.stream.DoubleStream;
 public class DriveSubsystem implements Subsystem {
   // Linked to maintain order.
   private final LinkedHashMap<SwerveCorner, SwerveModule> swerveModules = new LinkedHashMap<>();
-  private final WPI_PigeonIMU pigeonImu = new WPI_PigeonIMU(RobotConstants.PIGEON_CAN_ID);
+  private final Pigeon2 pigeonImu = new Pigeon2(RobotConstants.PIGEON_CAN_ID);
 
   private final SwerveDriveOdometry odometry;
   private GenericEntry competitionTabMaxSpeedEntry;
@@ -60,8 +59,6 @@ public class DriveSubsystem implements Subsystem {
       };
 
   public DriveSubsystem() {
-    CTREUtil.checkCtreError(pigeonImu.configFactoryDefault());
-
     for (SwerveCorner corner : SwerveCorner.values()) {
       swerveModules.put(
           corner,
@@ -171,8 +168,6 @@ public class DriveSubsystem implements Subsystem {
     SwerveModuleBuilder moduleConfig =
         new SwerveModuleBuilder()
             .setModuleName(FrontLeftConstants.MODULE_NAME)
-            .setParkAngle(FrontLeftConstants.PARK_ANGLE)
-            .setChassisAngularOffset(FrontLeftConstants.CHASSIS_ANGULAR_OFFSET)
             .setDriveMotor(driveConfig)
             .setPivotMotor(pivotConfig);
 
@@ -226,8 +221,6 @@ public class DriveSubsystem implements Subsystem {
     SwerveModuleBuilder moduleConfig =
         new SwerveModuleBuilder()
             .setModuleName(BackLeftConstants.MODULE_NAME)
-            .setParkAngle(BackLeftConstants.PARK_ANGLE)
-            .setChassisAngularOffset(BackLeftConstants.CHASSIS_ANGULAR_OFFSET)
             .setDriveMotor(driveConfig)
             .setPivotMotor(pivotConfig);
 
@@ -281,8 +274,6 @@ public class DriveSubsystem implements Subsystem {
     SwerveModuleBuilder moduleConfig =
         new SwerveModuleBuilder()
             .setModuleName(FrontRightConstants.MODULE_NAME)
-            .setParkAngle(FrontRightConstants.PARK_ANGLE)
-            .setChassisAngularOffset(FrontRightConstants.CHASSIS_ANGULAR_OFFSET)
             .setDriveMotor(driveConfig)
             .setPivotMotor(pivotConfig);
 
@@ -336,8 +327,6 @@ public class DriveSubsystem implements Subsystem {
     SwerveModuleBuilder moduleConfig =
         new SwerveModuleBuilder()
             .setModuleName(BackRightConstants.MODULE_NAME)
-            .setParkAngle(BackRightConstants.PARK_ANGLE)
-            .setChassisAngularOffset(BackRightConstants.CHASSIS_ANGULAR_OFFSET)
             .setDriveMotor(driveConfig)
             .setPivotMotor(pivotConfig);
 
@@ -353,28 +342,6 @@ public class DriveSubsystem implements Subsystem {
    */
   public Collection<SwerveModule> getSwerveModules() {
     return swerveModules.values();
-  }
-
-  /**
-   * Activates or deactivates the park mode for the robot.
-   *
-   * <p>When park mode is activated, each wheel is locked in an opposing configuration, preventing
-   * any movement.
-   *
-   * @param enabled true to activate park mode, false to deactivate.
-   */
-  public void setParkMode(boolean enabled) {
-    for (SwerveModule module : getSwerveModules()) {
-      if (!enabled) {
-        module.setParked(false);
-        continue;
-      }
-
-      SwerveModuleState state = new SwerveModuleState(0, module.getParkedAngle());
-
-      module.set(state);
-      module.setParked(true);
-    }
   }
 
   /**

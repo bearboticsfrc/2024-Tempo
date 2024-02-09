@@ -7,17 +7,20 @@ import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.signals.AbsoluteSensorRangeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.Timer;
 import frc.robot.util.CTREUtil;
 import java.util.HashMap;
 import java.util.Map;
 
 public class CANCoders {
-  private final double CONFIGURATION_TIMEOUT = 10; // TOOD: Move to constants
+  private final double CONFIGURATION_TIMEOUT =
+      Units.millisecondsToSeconds(10000); // TOOD: Move to constants
+  private final double UPDATE_TIMEOUT = Units.millisecondsToSeconds(1000);
 
   private static CANCoders instance;
-  private Map<Integer, ObservedCANCoder> cancoders = new HashMap<Integer, ObservedCANCoder>();
+
+  private Map<Integer, CANcoder> cancoders = new HashMap<Integer, CANcoder>();
 
   public static CANCoders getInstance() {
     if (instance == null) {
@@ -33,49 +36,43 @@ public class CANCoders {
         new CANcoderConfiguration()
             .withMagnetSensor(
                 new MagnetSensorConfigs()
-                    .withAbsoluteSensorRange(AbsoluteSensorRangeValue.Signed_PlusMinusHalf)
-                    .withMagnetOffset(cancoderConfiguration.getOffsetDegrees().getDegrees())
+                    .withAbsoluteSensorRange(AbsoluteSensorRangeValue.Unsigned_0To1)
+                    .withMagnetOffset(cancoderConfiguration.getOffsetDegrees().getDegrees() / 360)
                     .withSensorDirection(SensorDirectionValue.CounterClockwise_Positive));
-
-    double startTime = Timer.getFPGATimestamp();
 
     for (int attempt = 1; attempt < 6; attempt++) {
       StatusCode statusCode =
-          CTREUtil.checkCtreError(cancoder.getConfigurator().apply(canCoderConfig, 100));
+          CTREUtil.checkCtreError(
+              cancoder.getConfigurator().apply(canCoderConfig, CONFIGURATION_TIMEOUT));
 
-      if ((Timer.getFPGATimestamp()) - startTime >= CONFIGURATION_TIMEOUT) {
+      if (statusCode == StatusCode.TxTimeout) {
         DriverStation.reportError(
-            "[CANCoder]: Configuration timed out on attempt " + attempt, false);
+            String.format(
+                "[CANCoder %s]: Configuration timed out on attempt %s",
+                cancoderConfiguration.getId()),
+            false);
         break;
       }
 
       if (statusCode.isError()) {
         DriverStation.reportError(
-            "[CANCoder]: Configuration errored out with status code "
-                + statusCode.value
-                + " on attempt "
-                + attempt,
+            String.format(
+                "[CANCoder %s]: Configuration errored out with description \"%s\" on attempt %s",
+                cancoderConfiguration.getId(), statusCode.getDescription(), attempt),
             false);
       } else {
         break;
       }
     }
 
-    cancoders.put(
-        cancoderConfiguration.getId(), new ObservedCANCoder(cancoder, new CANObserver(cancoder)));
+    cancoders.put(cancoderConfiguration.getId(), cancoder);
   }
 
-  public boolean allHaveBeenInitialized() {
-    for (ObservedCANCoder cancoder : cancoders.values()) {
-      if (!cancoder.getObserver().hasUpdate()) {
-        return false;
-      }
-    }
-
-    return true;
+  public boolean isInitalized(int id) {
+    return get(id).getAbsolutePosition().waitForUpdate(UPDATE_TIMEOUT).hasUpdated();
   }
 
-  public ObservedCANCoder get(int canCoderId) {
+  public CANcoder get(int canCoderId) {
     return cancoders.get(canCoderId);
   }
 

@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.bearbotics.test.DriveSubsystemTest;
 import frc.robot.constants.DriveConstants;
+import frc.robot.constants.DriveConstants.SpeedMode;
 import frc.robot.subsystems.DriveSubsystem;
 
 public class RobotContainer {
@@ -34,14 +35,23 @@ public class RobotContainer {
     return new RunCommand(
         () ->
             driveSubsystem.drive(
-                -MathUtil.applyDeadband(driverController.getLeftY(), 0.1),
-                -MathUtil.applyDeadband(driverController.getLeftX(), 0.1),
-                -MathUtil.applyDeadband(driverController.getRightX(), 0.1)),
+                -MathUtil.applyDeadband(Math.pow(driverController.getLeftY(), 3), 0.1),
+                -MathUtil.applyDeadband(Math.pow(driverController.getLeftX(), 3), 0.1),
+                -MathUtil.applyDeadband(Math.pow(driverController.getRightX(), 3), 0.1)),
         driveSubsystem);
   }
 
   private void configureBindings() {
     driveSubsystem.setDefaultCommand(getDefaultCommand());
+    driverController
+        .leftBumper()
+        .whileTrue(new InstantCommand(() -> driveSubsystem.setSpeedMode(SpeedMode.TURBO)))
+        .onFalse(new InstantCommand(() -> driveSubsystem.setSpeedMode(SpeedMode.NORMAL)));
+
+    driverController
+        .rightBumper()
+        .whileTrue(new InstantCommand(() -> driveSubsystem.setSpeedMode(SpeedMode.TURTLE)))
+        .onFalse(new InstantCommand(() -> driveSubsystem.setSpeedMode(SpeedMode.NORMAL)));
   }
 
   public void setTeleop(boolean mode) {
