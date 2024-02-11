@@ -2,7 +2,7 @@ package frc.bearbotics.swerve;
 
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.CANSparkBase;
-import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.MotorFeedbackSensor;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkPIDController;
@@ -24,6 +24,7 @@ public class MotorConfig {
   private int currentLimit;
   private double positionConversionFactor;
   private double velocityConversionFactor;
+  private IdleMode idleMode = IdleMode.kBrake;
 
   /**
    * @param motor Specific motor to configure
@@ -53,6 +54,38 @@ public class MotorConfig {
     this.currentLimit = currentLimit;
     this.positionConversionFactor = positionConversionFactor;
     this.velocityConversionFactor = velocityConversionFactor;
+  }
+
+  /**
+   * @param motor Specific motor to configure
+   * @param motorEncoder Motor encoder for this motor
+   * @param inverted Whether this motor should be inverted or not
+   * @param nominalVoltage The nominal voltage compansation for this motor
+   * @param currentLimit The current limit for this motor
+   */
+  public MotorConfig(
+      CANSparkBase motor,
+      MotorFeedbackSensor motorEncoder,
+      String moduleName,
+      String name,
+      boolean motorInverted,
+      boolean encoderInverted,
+      double nominalVoltage,
+      int currentLimit,
+      double positionConversionFactor,
+      double velocityConversionFactor,
+      IdleMode idleMode) {
+    this.motor = motor;
+    this.motorEncoder = motorEncoder;
+    this.moduleName = moduleName;
+    this.name = name;
+    this.motorInverted = motorInverted;
+    this.encoderInverted = encoderInverted;
+    this.nominalVoltage = nominalVoltage;
+    this.currentLimit = currentLimit;
+    this.positionConversionFactor = positionConversionFactor;
+    this.velocityConversionFactor = velocityConversionFactor;
+    this.idleMode = idleMode;
   }
 
   /**
@@ -87,6 +120,34 @@ public class MotorConfig {
     this.velocityConversionFactor = velocityConversionFactor;
   }
 
+  /**
+   * @param motor Specific motor to configure
+   * @param motorEncoder Motor encoder for this motor
+   * @param inverted Whether this motor should be inverted or not
+   * @param nominalVoltage The nominal voltage compansation for this motor
+   * @param currentLimit The current limit for this motor
+   */
+  public MotorConfig(
+      CANSparkBase motor,
+      String moduleName,
+      String name,
+      boolean motorInverted,
+      boolean encoderInverted,
+      double nominalVoltage,
+      int currentLimit,
+      double positionConversionFactor,
+      double velocityConversionFactor) {
+    this.motor = motor;
+    this.moduleName = moduleName;
+    this.name = name;
+    this.motorInverted = motorInverted;
+    this.encoderInverted = encoderInverted;
+    this.nominalVoltage = nominalVoltage;
+    this.currentLimit = currentLimit;
+    this.positionConversionFactor = positionConversionFactor;
+    this.velocityConversionFactor = velocityConversionFactor;
+  }
+
   /*
    * Generic configuration method
    */
@@ -96,7 +157,7 @@ public class MotorConfig {
     String motorDescription =
         name == null ? moduleName : String.format("%s - %s", moduleName, name);
 
-    RevUtil.checkRevError(motor.setIdleMode(CANSparkMax.IdleMode.kBrake));
+    RevUtil.checkRevError(motor.setIdleMode(idleMode));
     RevUtil.checkRevError(motor.enableVoltageCompensation(nominalVoltage));
     RevUtil.checkRevError(motor.setSmartCurrentLimit(currentLimit));
     RevUtil.setPeriodicFramePeriodHigh(motor, motorDescription);
@@ -110,6 +171,7 @@ public class MotorConfig {
     } else if (motorEncoder instanceof AbsoluteEncoder) {
       RevUtil.checkRevError(((AbsoluteEncoder) motorEncoder).setInverted(encoderInverted));
     }
+
     if (motor.getPIDController() != null) {
       RevUtil.checkRevError(motor.getPIDController().setFeedbackDevice(motorEncoder));
     }
@@ -128,7 +190,7 @@ public class MotorConfig {
     CANCoders.getInstance().configure(canCoderBuilder);
 
     if (!CANCoders.getInstance().isInitalized(canCoderBuilder.getId())) {
-      Timer.delay(0.25);
+      Timer.delay(0.1);
     }
 
     return this;
@@ -168,6 +230,11 @@ public class MotorConfig {
     return this;
   }
 
+  public MotorConfig follow(CANSparkBase leaderMotor, boolean inverted) {
+    motor.follow(leaderMotor, inverted);
+    return this;
+  }
+
   public void burnFlash() {
     Timer.delay(0.25);
     RevUtil.checkRevError(motor.burnFlash());
@@ -181,6 +248,19 @@ public class MotorConfig {
     return new MotorConfig(
         motor,
         motorEncoder,
+        constants.getModuleName(),
+        constants.getName(),
+        constants.isMotorInverted(),
+        constants.isEncoderInverted(),
+        constants.getNominalVoltage(),
+        constants.getCurrentLimit(),
+        constants.getPositionConversionFactor(),
+        constants.getVelocityConversionFactor());
+  }
+
+  public static MotorConfig fromMotorConstants(CANSparkBase motor, MotorBuilder constants) {
+    return new MotorConfig(
+        motor,
         constants.getModuleName(),
         constants.getName(),
         constants.isMotorInverted(),
@@ -315,6 +395,17 @@ public class MotorConfig {
     private int currentLimit;
     private double positionConversionFactor = 1;
     private double velocityConversionFactor = 1;
+    private IdleMode idleMode = IdleMode.kBrake;
+
+    public IdleMode getIdleMode() {
+      return idleMode;
+    }
+
+    public MotorBuilder setIdleMode(IdleMode idleMode) {
+      this.idleMode = idleMode;
+      return this;
+    }
+
     private MotorPIDBuilder[] pidSlots = new MotorPIDBuilder[2];
 
     public CANCoderBuilder getAbsoluteEncoder() {

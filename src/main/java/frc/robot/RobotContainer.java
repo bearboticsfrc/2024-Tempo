@@ -5,17 +5,19 @@
 package frc.robot;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.bearbotics.test.DriveSubsystemTest;
 import frc.robot.constants.DriveConstants;
 import frc.robot.constants.DriveConstants.SpeedMode;
 import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.subsystems.manipulator.ClimberSubsystem.ClimberPosition;
 import frc.robot.subsystems.manipulator.ManipulatorSubsystem;
-import frc.robot.subsystems.manipulator.ManipulatorSubsystem.ManipulatorState;
 
 public class RobotContainer {
   private final CommandXboxController driverController =
@@ -56,16 +58,30 @@ public class RobotContainer {
         .whileTrue(new InstantCommand(() -> driveSubsystem.setSpeedMode(SpeedMode.TURTLE)))
         .onFalse(new InstantCommand(() -> driveSubsystem.setSpeedMode(SpeedMode.NORMAL)));
 
+    driverController.b().whileTrue(manipulatorSubsystem.getClimberHomeCommand());
+
     driverController
         .x()
-        .whileTrue(
+        .whileTrue(manipulatorSubsystem.getIntakeRunCommand())
+        .onFalse(manipulatorSubsystem.getIntakeStopCommand());
+
+    driverController
+        .povUp()
+        .onTrue(manipulatorSubsystem.getClimberRunCommand(ClimberPosition.EXTENDED));
+
+    driverController
+        .povDown()
+        .onTrue(manipulatorSubsystem.getClimberRunCommand(ClimberPosition.RETRACTED));
+
+    driverController
+        .a()
+        .whileTrue(manipulatorSubsystem.getShootCommand())
+        .onFalse(manipulatorSubsystem.getShootStopCommand());
+
+    new Trigger(manipulatorSubsystem::isNoteInRoller)
+        .onTrue(
             new InstantCommand(
-                () -> manipulatorSubsystem.dispatchState(ManipulatorState.PICKUP),
-                manipulatorSubsystem))
-        .onFalse(
-            new InstantCommand(
-                () -> manipulatorSubsystem.dispatchState(ManipulatorState.EMPTY),
-                manipulatorSubsystem));
+                () -> driverController.getHID().setRumble(RumbleType.kBothRumble, 0.5)));
   }
 
   public void setTeleop(boolean mode) {
