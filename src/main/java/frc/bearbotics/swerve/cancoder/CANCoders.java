@@ -9,6 +9,7 @@ import com.ctre.phoenix6.signals.SensorDirectionValue;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Timer;
 import frc.robot.util.CTREUtil;
 import java.util.HashMap;
 import java.util.Map;
@@ -51,7 +52,6 @@ public class CANCoders {
                 "[CANCoder %s]: Configuration timed out on attempt %s",
                 cancoderConfiguration.getId()),
             false);
-        break;
       }
 
       if (statusCode.isError()) {
@@ -65,11 +65,16 @@ public class CANCoders {
       }
     }
 
-    cancoders.put(cancoderConfiguration.getId(), cancoder);
-  }
+    while (!cancoder.getAbsolutePosition().waitForUpdate(1).hasUpdated()) {
+      DriverStation.reportError(
+          String.format(
+              "[CANCoder %s]: Timed out while waiting for update... sleeping and retrying",
+              cancoderConfiguration.getId()),
+          false);
+      Timer.delay(0.25); // TOOD: Might need a maximum attempts
+    }
 
-  public boolean isInitalized(int id) {
-    return get(id).getAbsolutePosition().waitForUpdate(UPDATE_TIMEOUT).hasUpdated();
+    cancoders.put(cancoderConfiguration.getId(), cancoder);
   }
 
   public CANcoder get(int canCoderId) {

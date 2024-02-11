@@ -175,7 +175,6 @@ public class MotorConfig {
     if (!CANCoders.getInstance().isInitalized(canCoderBuilder.getId())) {
       Timer.delay(0.1);
     }
-
     return this;
   }
 
