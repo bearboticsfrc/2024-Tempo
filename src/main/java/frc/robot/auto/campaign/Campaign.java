@@ -1,4 +1,4 @@
-package frc.bearbotics.campaign;
+package frc.robot.auto.campaign;
 
 public class Campaign {
   private MissionTree missions;
@@ -13,6 +13,9 @@ public class Campaign {
     this.missions = missions;
     return this;
   }
+
+  /** Schedule the campaign for running. */
+  public void schedule() {}
 
   public String getName() {
     return name;
