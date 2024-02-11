@@ -7,9 +7,9 @@ import com.revrobotics.RelativeEncoder;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.bearbotics.swerve.MotorBuilder;
 import frc.bearbotics.swerve.MotorConfig;
-import frc.bearbotics.swerve.MotorConfig.MotorBuilder;
-import frc.bearbotics.swerve.MotorConfig.MotorPIDBuilder;
+import frc.bearbotics.swerve.MotorPidBuilder;
 import frc.robot.constants.DriveConstants;
 import frc.robot.constants.manipulator.ClimberConstants;
 
@@ -25,26 +25,27 @@ public class ClimberSubsystem extends SubsystemBase {
   }
 
   private void setupMotors() {
-    MotorPIDBuilder climberMotorPid =
-        new MotorPIDBuilder()
-            .setP(ClimberConstants.Motor.MotorPid.P)
-            .setFf(ClimberConstants.Motor.MotorPid.Ff)
-            .setMinOutput(ClimberConstants.Motor.MotorPid.MIN_OUTPUT)
-            .setMaxOutput(ClimberConstants.Motor.MotorPid.MAX_OUTPUT);
+    MotorPidBuilder climberMotorPid =
+        new MotorPidBuilder()
+            .withP(ClimberConstants.Motor.MotorPid.P)
+            .withFf(ClimberConstants.Motor.MotorPid.Ff)
+            .withMinOutput(ClimberConstants.Motor.MotorPid.MIN_OUTPUT)
+            .withMaxOutput(ClimberConstants.Motor.MotorPid.MAX_OUTPUT);
 
     MotorBuilder climberMotorConfig =
         new MotorBuilder()
-            .setModuleName(ClimberConstants.Motor.MODULE_NAME)
-            .setMotorPort(ClimberConstants.Motor.MOTOR_PORT)
-            .setMotorInverted(ClimberConstants.Motor.INVERTED)
-            .setCurrentLimit(ClimberConstants.Motor.CURRENT_LIMT)
-            .setMotorPID(climberMotorPid);
+            .withModuleName(ClimberConstants.Motor.MODULE_NAME)
+            .withMotorPort(ClimberConstants.Motor.MOTOR_PORT)
+            .withMotorInverted(ClimberConstants.Motor.INVERTED)
+            .withCurrentLimit(ClimberConstants.Motor.CURRENT_LIMT)
+            .withMotorPID(climberMotorPid);
 
     MotorBuilder climberMotorFollowerConfig =
         new MotorBuilder()
-            .setModuleName(ClimberConstants.MotorFollower.MODULE_NAME)
-            .setMotorPort(ClimberConstants.MotorFollower.MOTOR_PORT)
-            .setCurrentLimit(ClimberConstants.MotorFollower.CURRENT_LIMT);
+            .withModuleName(ClimberConstants.MotorFollower.MODULE_NAME)
+            .withMotorPort(ClimberConstants.MotorFollower.MOTOR_PORT)
+            .withCurrentLimit(ClimberConstants.MotorFollower.CURRENT_LIMT)
+            .withFollowInverted(ClimberConstants.MotorFollower.FOLLOW_INVERTED);
 
     climberMotor =
         new CANSparkMax(climberMotorConfig.getMotorPort(), CANSparkLowLevel.MotorType.kBrushless);
@@ -61,7 +62,7 @@ public class ClimberSubsystem extends SubsystemBase {
 
     MotorConfig.fromMotorConstants(climberMotorFollower, climberMotorFollowerConfig)
         .configureMotor()
-        .follow(climberMotor, ClimberConstants.MotorFollower.FOLLOW_INVERTED)
+        .follow(climberMotor)
         .burnFlash();
   }
 
@@ -69,24 +70,45 @@ public class ClimberSubsystem extends SubsystemBase {
     shuffleboardTab.addDouble("Climber Pos", climberMotorEncoder::getPosition);
   }
 
+  /**
+   * Set the climber motor to the specified position using closed-loop control.
+   *
+   * @param position The desired climber position.
+   */
   public void set(ClimberPosition position) {
     climberMotor.getPIDController().setReference(position.getPosition(), ControlType.kPosition);
   }
 
+  /**
+   * Set the climber motor to the specified speed using open-loop control.
+   *
+   * @param speed The desired speed for the climber motor.
+   */
   public void set(double speed) {
     climberMotor.set(speed);
   }
 
+  /** Enum representing different positions of the climber. */
   public enum ClimberPosition {
     RETRACTED(0),
     EXTENDED(106);
 
     private final double position;
 
+    /**
+     * Constructor for ClimberPosition.
+     *
+     * @param position The position value associated with the climber position.
+     */
     private ClimberPosition(double position) {
       this.position = position;
     }
 
+    /**
+     * Get the position value associated with the climber position.
+     *
+     * @return The position value.
+     */
     public double getPosition() {
       return position;
     }

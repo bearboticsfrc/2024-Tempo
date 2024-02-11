@@ -26,6 +26,6 @@ public class ArmConstants {
     public static final String MODULE_NAME = "Arm Motor Follower";
     public static final int MOTOR_PORT = 4;
     public static final int CURRENT_LIMT = 20;
-    public static final boolean INVERTED = true;
+    public static final boolean FOLLOW_INVERTED = true;
   }
 }

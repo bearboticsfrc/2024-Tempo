@@ -8,8 +8,8 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.bearbotics.swerve.MotorBuilder;
 import frc.bearbotics.swerve.MotorConfig;
-import frc.bearbotics.swerve.MotorConfig.MotorBuilder;
 import frc.robot.constants.DriveConstants;
 import frc.robot.constants.manipulator.IntakeConstants;
 
@@ -39,18 +39,18 @@ public class IntakeSubsystem extends SubsystemBase {
   private void configureMotors() {
     MotorBuilder rollerMotorBuilder =
         new MotorBuilder()
-            .setModuleName(IntakeConstants.RollerMotor.MODULE_NAME)
-            .setMotorPort(IntakeConstants.RollerMotor.MOTOR_PORT)
-            .setMotorInverted(IntakeConstants.RollerMotor.INVERTED)
-            .setCurrentLimit(IntakeConstants.RollerMotor.CURRENT_LIMT)
-            .setIdleMode(IdleMode.kCoast);
+            .withModuleName(IntakeConstants.RollerMotor.MODULE_NAME)
+            .withMotorPort(IntakeConstants.RollerMotor.MOTOR_PORT)
+            .withMotorInverted(IntakeConstants.RollerMotor.INVERTED)
+            .withCurrentLimit(IntakeConstants.RollerMotor.CURRENT_LIMT)
+            .withIdleMode(IdleMode.kCoast);
 
     MotorBuilder feederMotorBuilder =
         new MotorBuilder()
-            .setModuleName(IntakeConstants.FeederMotor.MODULE_NAME)
-            .setMotorPort(IntakeConstants.FeederMotor.MOTOR_PORT)
-            .setMotorInverted(IntakeConstants.FeederMotor.INVERTED)
-            .setCurrentLimit(IntakeConstants.FeederMotor.CURRENT_LIMT);
+            .withModuleName(IntakeConstants.FeederMotor.MODULE_NAME)
+            .withMotorPort(IntakeConstants.FeederMotor.MOTOR_PORT)
+            .withMotorInverted(IntakeConstants.FeederMotor.INVERTED)
+            .withCurrentLimit(IntakeConstants.FeederMotor.CURRENT_LIMT);
 
     rollerMotor =
         new CANSparkMax(rollerMotorBuilder.getMotorPort(), CANSparkLowLevel.MotorType.kBrushless);
@@ -81,48 +81,64 @@ public class IntakeSubsystem extends SubsystemBase {
     shuffleboardTab.addBoolean("Roller Beam Break", rollerBeamBreak::get);
   }
 
+  /**
+   * Return a boolean whether a note has triggered the roller beam break sensor.
+   *
+   * @return True if a note is not in the roller, false otherwise.
+   */
   public boolean isNoteInRoller() {
     return !rollerBeamBreak.get();
   }
 
+  /**
+   * Return a boolean whether a note has triggered the feeder beam break sensor.
+   *
+   * @return True if a note is not in the feeder, false otherwise.
+   */
   public boolean isNoteInFeeder() {
     return !topBeamBreak.get();
   }
 
-  public void setRoller(RollerIntakeSpeed speed) {
+  /**
+   * Set the roller motor to the specified intake speed.
+   *
+   * @param speed The desired intake speed for the roller.
+   */
+  public void setRoller(IntakeSpeed speed) {
     rollerMotor.set(speed.getSpeed());
   }
 
-  public void setFeeder(FeederIntakeSpeed speed) {
+  /**
+   * Set the feeder motor to the specified intake speed.
+   *
+   * @param speed The desired intake speed for the feeder.
+   */
+  public void setFeeder(IntakeSpeed speed) {
     feederMotor.set(speed.getSpeed());
   }
 
-  public enum RollerIntakeSpeed {
-    OFF(0),
-    HALF(1);
-
-    private final double speed;
-
-    private RollerIntakeSpeed(double speed) {
-      this.speed = speed;
-    }
-
-    public double getSpeed() {
-      return speed;
-    }
-  }
-
-  public enum FeederIntakeSpeed {
+  /** Enum representing different intake speeds. */
+  public enum IntakeSpeed {
     OFF(0),
     HALF(0.5),
     FULL(1);
 
     private final double speed;
 
-    private FeederIntakeSpeed(double speed) {
+    /**
+     * Constructor for IntakeSpeed.
+     *
+     * @param speed The speed value associated with the intake speed.
+     */
+    private IntakeSpeed(double speed) {
       this.speed = speed;
     }
 
+    /**
+     * Get the speed value associated with the intake speed.
+     *
+     * @return The speed value.
+     */
     public double getSpeed() {
       return speed;
     }

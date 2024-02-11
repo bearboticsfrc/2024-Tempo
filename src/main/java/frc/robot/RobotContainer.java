@@ -75,7 +75,7 @@ public class RobotContainer {
 
     driverController
         .a()
-        .whileTrue(manipulatorSubsystem.getShootCommand())
+        .whileTrue(manipulatorSubsystem.getShootCommand(3000))
         .onFalse(manipulatorSubsystem.getShootStopCommand());
 
     new Trigger(manipulatorSubsystem::isNoteInRoller)

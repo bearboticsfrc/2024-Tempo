@@ -24,7 +24,8 @@ public class MotorConfig {
   private int currentLimit;
   private double positionConversionFactor;
   private double velocityConversionFactor;
-  private IdleMode idleMode = IdleMode.kBrake;
+  private IdleMode idleMode;
+  private boolean followInverted;
 
   /**
    * @param motor Specific motor to configure
@@ -36,6 +37,7 @@ public class MotorConfig {
   public MotorConfig(
       CANSparkBase motor,
       MotorFeedbackSensor motorEncoder,
+      CANCoderBuilder canCoderBuilder,
       String moduleName,
       String name,
       boolean motorInverted,
@@ -43,17 +45,23 @@ public class MotorConfig {
       double nominalVoltage,
       int currentLimit,
       double positionConversionFactor,
-      double velocityConversionFactor) {
-    this.motor = motor;
-    this.motorEncoder = motorEncoder;
-    this.moduleName = moduleName;
-    this.name = name;
-    this.motorInverted = motorInverted;
-    this.encoderInverted = encoderInverted;
-    this.nominalVoltage = nominalVoltage;
-    this.currentLimit = currentLimit;
-    this.positionConversionFactor = positionConversionFactor;
-    this.velocityConversionFactor = velocityConversionFactor;
+      double velocityConversionFactor,
+      IdleMode idleMode,
+      boolean followInverted) {
+    this(
+        motor,
+        motorEncoder,
+        moduleName,
+        name,
+        motorInverted,
+        encoderInverted,
+        nominalVoltage,
+        currentLimit,
+        positionConversionFactor,
+        velocityConversionFactor,
+        idleMode,
+        followInverted);
+    this.canCoderBuilder = canCoderBuilder;
   }
 
   /**
@@ -74,9 +82,43 @@ public class MotorConfig {
       int currentLimit,
       double positionConversionFactor,
       double velocityConversionFactor,
-      IdleMode idleMode) {
-    this.motor = motor;
+      IdleMode idleMode,
+      boolean followInverted) {
+    this(
+        motor,
+        moduleName,
+        name,
+        motorInverted,
+        encoderInverted,
+        nominalVoltage,
+        currentLimit,
+        positionConversionFactor,
+        velocityConversionFactor,
+        idleMode,
+        followInverted);
     this.motorEncoder = motorEncoder;
+  }
+
+  /**
+   * @param motor Specific motor to configure
+   * @param motorEncoder Motor encoder for this motor
+   * @param inverted Whether this motor should be inverted or not
+   * @param nominalVoltage The nominal voltage compansation for this motor
+   * @param currentLimit The current limit for this motor
+   */
+  public MotorConfig(
+      CANSparkBase motor,
+      String moduleName,
+      String name,
+      boolean motorInverted,
+      boolean encoderInverted,
+      double nominalVoltage,
+      int currentLimit,
+      double positionConversionFactor,
+      double velocityConversionFactor,
+      IdleMode idleMode,
+      boolean followInverted) {
+    this.motor = motor;
     this.moduleName = moduleName;
     this.name = name;
     this.motorInverted = motorInverted;
@@ -86,66 +128,7 @@ public class MotorConfig {
     this.positionConversionFactor = positionConversionFactor;
     this.velocityConversionFactor = velocityConversionFactor;
     this.idleMode = idleMode;
-  }
-
-  /**
-   * @param motor Specific motor to configure
-   * @param motorEncoder Motor encoder for this motor
-   * @param inverted Whether this motor should be inverted or not
-   * @param nominalVoltage The nominal voltage compansation for this motor
-   * @param currentLimit The current limit for this motor
-   */
-  public MotorConfig(
-      CANSparkBase motor,
-      MotorFeedbackSensor motorEncoder,
-      CANCoderBuilder canCoderBuilder,
-      String moduleName,
-      String name,
-      boolean motorInverted,
-      boolean encoderInverted,
-      double nominalVoltage,
-      int currentLimit,
-      double positionConversionFactor,
-      double velocityConversionFactor) {
-    this.motor = motor;
-    this.motorEncoder = motorEncoder;
-    this.canCoderBuilder = canCoderBuilder;
-    this.moduleName = moduleName;
-    this.name = name;
-    this.motorInverted = motorInverted;
-    this.encoderInverted = encoderInverted;
-    this.nominalVoltage = nominalVoltage;
-    this.currentLimit = currentLimit;
-    this.positionConversionFactor = positionConversionFactor;
-    this.velocityConversionFactor = velocityConversionFactor;
-  }
-
-  /**
-   * @param motor Specific motor to configure
-   * @param motorEncoder Motor encoder for this motor
-   * @param inverted Whether this motor should be inverted or not
-   * @param nominalVoltage The nominal voltage compansation for this motor
-   * @param currentLimit The current limit for this motor
-   */
-  public MotorConfig(
-      CANSparkBase motor,
-      String moduleName,
-      String name,
-      boolean motorInverted,
-      boolean encoderInverted,
-      double nominalVoltage,
-      int currentLimit,
-      double positionConversionFactor,
-      double velocityConversionFactor) {
-    this.motor = motor;
-    this.moduleName = moduleName;
-    this.name = name;
-    this.motorInverted = motorInverted;
-    this.encoderInverted = encoderInverted;
-    this.nominalVoltage = nominalVoltage;
-    this.currentLimit = currentLimit;
-    this.positionConversionFactor = positionConversionFactor;
-    this.velocityConversionFactor = velocityConversionFactor;
+    this.followInverted = followInverted;
   }
 
   /*
@@ -196,12 +179,12 @@ public class MotorConfig {
     return this;
   }
 
-  public MotorConfig configurePID(MotorPIDBuilder motorPid) {
+  public MotorConfig configurePID(MotorPidBuilder motorPid) {
     configurePID(motorPid, 0);
     return this;
   }
 
-  public MotorConfig configurePID(MotorPIDBuilder motorPid, int slot) {
+  public MotorConfig configurePID(MotorPidBuilder motorPid, int slot) {
     SparkPIDController motorPIDController = motor.getPIDController();
     RevUtil.checkRevError(motorPIDController.setP(motorPid.getP(), slot));
     RevUtil.checkRevError(motorPIDController.setI(motorPid.getI(), slot));
@@ -214,7 +197,7 @@ public class MotorConfig {
     return this;
   }
 
-  public MotorConfig configurePositionalPidWrapping(MotorPIDBuilder motorPid) {
+  public MotorConfig configurePositionalPidWrapping(MotorPidBuilder motorPid) {
     SparkPIDController motorPIDController = motor.getPIDController();
     boolean positionPidWrappingEnabled = motorPid.isPositionPidWrappingEnabled();
 
@@ -230,8 +213,8 @@ public class MotorConfig {
     return this;
   }
 
-  public MotorConfig follow(CANSparkBase leaderMotor, boolean inverted) {
-    motor.follow(leaderMotor, inverted);
+  public MotorConfig follow(CANSparkBase leaderMotor) {
+    motor.follow(leaderMotor, followInverted);
     return this;
   }
 
@@ -255,7 +238,9 @@ public class MotorConfig {
         constants.getNominalVoltage(),
         constants.getCurrentLimit(),
         constants.getPositionConversionFactor(),
-        constants.getVelocityConversionFactor());
+        constants.getVelocityConversionFactor(),
+        constants.getIdleMode(),
+        constants.isFollowInverted());
   }
 
   public static MotorConfig fromMotorConstants(CANSparkBase motor, MotorBuilder constants) {
@@ -268,7 +253,9 @@ public class MotorConfig {
         constants.getNominalVoltage(),
         constants.getCurrentLimit(),
         constants.getPositionConversionFactor(),
-        constants.getVelocityConversionFactor());
+        constants.getVelocityConversionFactor(),
+        constants.getIdleMode(),
+        constants.isFollowInverted());
   }
 
   public static MotorConfig fromMotorConstants(
@@ -287,257 +274,8 @@ public class MotorConfig {
         constants.getNominalVoltage(),
         constants.getCurrentLimit(),
         constants.getPositionConversionFactor(),
-        constants.getVelocityConversionFactor());
-  }
-
-  public static class MotorPIDBuilder {
-    private double p = 0;
-    private double i = 0;
-    private double d = 0;
-    private double ff = 0;
-    private double minOutput = -1;
-    private double maxOutput = 1;
-    private boolean positionPidWrappingEnabled = false;
-    private double positionPidWrappingMin = -1;
-    private double positionPidWrappingMax = 1;
-
-    public double getP() {
-      return p;
-    }
-
-    public MotorPIDBuilder setP(double p) {
-      this.p = p;
-      return this;
-    }
-
-    public double getI() {
-      return i;
-    }
-
-    public MotorPIDBuilder setI(double i) {
-      this.i = i;
-      return this;
-    }
-
-    public double getD() {
-      return d;
-    }
-
-    public MotorPIDBuilder setD(double d) {
-      this.d = d;
-      return this;
-    }
-
-    public double getFf() {
-      return ff;
-    }
-
-    public MotorPIDBuilder setFf(double ff) {
-      this.ff = ff;
-      return this;
-    }
-
-    public double getMinOutput() {
-      return minOutput;
-    }
-
-    public MotorPIDBuilder setMinOutput(double minOutput) {
-      this.minOutput = minOutput;
-      return this;
-    }
-
-    public double getMaxOutput() {
-      return maxOutput;
-    }
-
-    public MotorPIDBuilder setMaxOutput(double maxOutput) {
-      this.maxOutput = maxOutput;
-      return this;
-    }
-
-    public boolean isPositionPidWrappingEnabled() {
-      return positionPidWrappingEnabled;
-    }
-
-    public MotorPIDBuilder setPositionPidWrappingEnabled(boolean enabled) {
-      this.positionPidWrappingEnabled = enabled;
-      return this;
-    }
-
-    public double getPositionPidWrappingMin() {
-      return positionPidWrappingMin;
-    }
-
-    public MotorPIDBuilder setPositionPidWrappingMin(double positionPidWrappingMin) {
-      this.positionPidWrappingMin = positionPidWrappingMin;
-      return this;
-    }
-
-    public double getPositionPidWrappingMax() {
-      return positionPidWrappingMax;
-    }
-
-    public MotorPIDBuilder setPositionPidWrappingMax(double positionPidWrappingMax) {
-      this.positionPidWrappingMax = positionPidWrappingMax;
-      return this;
-    }
-  }
-
-  public static class MotorBuilder {
-    private String name;
-    private String moduleName;
-    private int motorPort;
-    private boolean motorInverted;
-    private boolean encoderInverted;
-    private CANCoderBuilder absoluteEncoder;
-    private MotorPIDBuilder motorPID;
-    private double nominalVoltage = 12;
-    private int currentLimit;
-    private double positionConversionFactor = 1;
-    private double velocityConversionFactor = 1;
-    private IdleMode idleMode = IdleMode.kBrake;
-
-    public IdleMode getIdleMode() {
-      return idleMode;
-    }
-
-    public MotorBuilder setIdleMode(IdleMode idleMode) {
-      this.idleMode = idleMode;
-      return this;
-    }
-
-    private MotorPIDBuilder[] pidSlots = new MotorPIDBuilder[2];
-
-    public CANCoderBuilder getAbsoluteEncoder() {
-      return absoluteEncoder;
-    }
-
-    public MotorBuilder setAbsoluteEncoder(CANCoderBuilder canCoder) {
-      this.absoluteEncoder = canCoder;
-      return this;
-    }
-
-    public MotorBuilder setMotorPid(MotorPIDBuilder motorPid, int slot) {
-      pidSlots[slot] = motorPid;
-      return this;
-    }
-
-    public MotorPIDBuilder getMotorPid(int slot) {
-      return pidSlots[slot];
-    }
-
-    /**
-     * @return the positionConversionFactor
-     */
-    public double getPositionConversionFactor() {
-      return positionConversionFactor;
-    }
-
-    /**
-     * @param positionConversionFactor the positionConversionFactor to set
-     */
-    public MotorBuilder setPositionConversionFactor(double positionConversionFactor) {
-      this.positionConversionFactor = positionConversionFactor;
-      return this;
-    }
-
-    /**
-     * @return the velocityConversionFactor
-     */
-    public double getVelocityConversionFactor() {
-      return velocityConversionFactor;
-    }
-
-    /**
-     * @param velocityConversionFactor the velocityConversionFactor to set
-     */
-    public MotorBuilder setVelocityConversionFactor(double velocityConversionFactor) {
-      this.velocityConversionFactor = velocityConversionFactor;
-      return this;
-    }
-
-    public String getName() {
-      return name;
-    }
-
-    public MotorBuilder setName(String name) {
-      this.name = name;
-      return this;
-    }
-
-    public int getMotorPort() {
-      return motorPort;
-    }
-
-    public MotorBuilder setMotorPort(int motorPort) {
-      this.motorPort = motorPort;
-      return this;
-    }
-
-    public MotorPIDBuilder getMotorPID() {
-      return motorPID;
-    }
-
-    public MotorBuilder setMotorPID(MotorPIDBuilder motorPID) {
-      this.motorPID = motorPID;
-      return this;
-    }
-
-    public String getModuleName() {
-      return moduleName;
-    }
-
-    public MotorBuilder setModuleName(String moduleName) {
-      this.moduleName = moduleName;
-      return this;
-    }
-
-    public double getNominalVoltage() {
-      return nominalVoltage;
-    }
-
-    public MotorBuilder setNominalVoltage(double nominalVoltage) {
-      this.nominalVoltage = nominalVoltage;
-      return this;
-    }
-
-    public int getCurrentLimit() {
-      return currentLimit;
-    }
-
-    public MotorBuilder setCurrentLimit(int currentLimit) {
-      this.currentLimit = currentLimit;
-      return this;
-    }
-
-    /**
-     * @return the motorInverted
-     */
-    public boolean isMotorInverted() {
-      return motorInverted;
-    }
-
-    /**
-     * @param motorInverted the motorInverted to set
-     */
-    public MotorBuilder setMotorInverted(boolean motorInverted) {
-      this.motorInverted = motorInverted;
-      return this;
-    }
-
-    /**
-     * @return the encoderInverted
-     */
-    public boolean isEncoderInverted() {
-      return encoderInverted;
-    }
-
-    /**
-     * @param encoderInverted the encoderInverted to set
-     */
-    public MotorBuilder setEncoderInverted(boolean encoderInverted) {
-      this.encoderInverted = encoderInverted;
-      return this;
-    }
+        constants.getVelocityConversionFactor(),
+        constants.getIdleMode(),
+        constants.isFollowInverted());
   }
 }

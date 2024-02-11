@@ -1,14 +1,12 @@
 package frc.robot.subsystems.manipulator;
 
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.subsystems.manipulator.ClimberSubsystem.ClimberPosition;
-import frc.robot.subsystems.manipulator.IntakeSubsystem.FeederIntakeSpeed;
-import frc.robot.subsystems.manipulator.IntakeSubsystem.RollerIntakeSpeed;
+import frc.robot.subsystems.manipulator.IntakeSubsystem.IntakeSpeed;
 
 public class ManipulatorSubsystem extends SubsystemBase {
   private final IntakeSubsystem intakeSubsystem;
@@ -21,32 +19,13 @@ public class ManipulatorSubsystem extends SubsystemBase {
     climberSubsystem = new ClimberSubsystem();
   }
 
-  private void setupShuffleboardTab() {}
-
-  @Override
-  public void periodic() {}
-
+  /**
+   * Check if a note is in the roller.
+   *
+   * @return True if a note is in the roller, false otherwise.
+   */
   public boolean isNoteInRoller() {
     return intakeSubsystem.isNoteInRoller();
-  }
-
-  public Command getShootCommand() {
-    return new SequentialCommandGroup(
-        new InstantCommand(() -> shooterSubsystem.set(3000)),
-        new WaitUntilCommand(shooterSubsystem::atTargetVelocity),
-        getIntakeFeedCommand());
-  }
-
-  public Command getShootStopCommand() {
-    return new InstantCommand(() -> shooterSubsystem.set(0));
-  }
-
-  public Command getClimberRunCommand(ClimberPosition position) {
-    return new InstantCommand(() -> climberSubsystem.set(position));
-  }
-
-  public Command getClimberHomeCommand() {
-    return new InstantCommand(() -> climberSubsystem.set(0.25));
   }
 
   /**
@@ -58,64 +37,102 @@ public class ManipulatorSubsystem extends SubsystemBase {
    *
    * <p>3. Stop roller and feeder motors.
    *
-   * <p>
-   *
    * @return The generated intake command.
    */
   public SequentialCommandGroup getIntakeRunCommand() {
     return new SequentialCommandGroup(
         new ParallelCommandGroup(
-            getRollerRunCommand(RollerIntakeSpeed.HALF),
-            getFeederRunCommand(FeederIntakeSpeed.HALF)),
+            getRollerRunCommand(IntakeSpeed.FULL), getFeederRunCommand(IntakeSpeed.HALF)),
         new WaitUntilCommand(intakeSubsystem::isNoteInFeeder),
         getIntakeStopCommand());
   }
 
-  public InstantCommand getRollerRunCommand(RollerIntakeSpeed speed) {
+  /**
+   * Get a command to run the roller at a specified speed.
+   *
+   * @param speed The desired roller intake speed.
+   * @return The InstantCommand to set the roller speed.
+   */
+  public InstantCommand getRollerRunCommand(IntakeSpeed speed) {
     return new InstantCommand(() -> intakeSubsystem.setRoller(speed));
   }
 
-  public InstantCommand getFeederRunCommand(FeederIntakeSpeed speed) {
+  /**
+   * Get a command to run the feeder at a specified speed.
+   *
+   * @param speed The desired feeder intake speed.
+   * @return The InstantCommand to set the feeder speed.
+   */
+  public InstantCommand getFeederRunCommand(IntakeSpeed speed) {
     return new InstantCommand(() -> intakeSubsystem.setFeeder(speed));
   }
 
+  /**
+   * Get a command to stop both the roller and feeder.
+   *
+   * @return The command to stop the roller and feeder.
+   */
   public ParallelCommandGroup getIntakeStopCommand() {
     return new ParallelCommandGroup(
-        getRollerRunCommand(RollerIntakeSpeed.OFF), getFeederRunCommand(FeederIntakeSpeed.OFF));
+        getRollerRunCommand(IntakeSpeed.OFF), getFeederRunCommand(IntakeSpeed.OFF));
   }
 
+  /**
+   * Get a command to feed the intake:
+   *
+   * <p>1. Start the feeder at full speed.
+   *
+   * <p>2. Wait until the beam break is no longer tripped.
+   *
+   * <p>3. Stop both the roller and feeder.
+   *
+   * @return The SequentialCommandGroup for feeding the intake.
+   */
   public SequentialCommandGroup getIntakeFeedCommand() {
     return new SequentialCommandGroup(
-        getFeederRunCommand(FeederIntakeSpeed.FULL),
+        getFeederRunCommand(IntakeSpeed.FULL),
         new WaitUntilCommand(() -> !intakeSubsystem.isNoteInFeeder()),
         getIntakeStopCommand());
   }
+
   /**
-   * Generates the fancy intake command with the following sequence:
+   * Get a command to shoot the note at a specified velocity.
    *
-   * <p>1. Run intake motor.
-   *
-   * <p>2. Wait until bottom beam break is tripped.
-   *
-   * <p>3. Run feeder motor.
-   *
-   * <p>4. Wait until left and right beam break is tripped.
-   *
-   * <p>5. Stop roller motor.
-   *
-   * <p>6. Wait until top beam break is tripped.
-   *
-   * <p>7. Stop feeder motor.
-   *
-   * <p>
-   *
-   * @return The generated intake command.
-   *     <p>public SequentialCommandGroup getFancyIntakeCommand() { return new
-   *     SequentialCommandGroup( getRollerRunCommand(RollerIntakeSpeed.HALF), new
-   *     WaitUntilCommand(() -> !bottomBeamBreak.get()),
-   *     getFeederRunCommand(FeederIntakeSpeed.FULL), new WaitUntilCommand(() ->
-   *     !leftBeamBreak.get() && !rightBeamBreak.get()), getRollerRunCommand(RollerIntakeSpeed.OFF),
-   *     new WaitUntilCommand(() -> !topBeamBreak.get()),
-   *     getFeederRunCommand(FeederIntakeSpeed.OFF)); }
+   * @param velocity The desired velocity for shooting.
+   * @return The SequentialCommandGroup to shoot the note.
    */
+  public SequentialCommandGroup getShootCommand(int velocity) {
+    return new SequentialCommandGroup(
+        new InstantCommand(() -> shooterSubsystem.set(velocity)),
+        new WaitUntilCommand(shooterSubsystem::atTargetVelocity),
+        getIntakeFeedCommand());
+  }
+
+  /**
+   * Get a command to stop the shooter.
+   *
+   * @return The InstantCommand to stop the shooter.
+   */
+  public InstantCommand getShootStopCommand() {
+    return new InstantCommand(() -> shooterSubsystem.set(0));
+  }
+
+  /**
+   * Get a command to run the climber to a specified position.
+   *
+   * @param position The desired climber position.
+   * @return The InstantCommand to set the climber position.
+   */
+  public InstantCommand getClimberRunCommand(ClimberPosition position) {
+    return new InstantCommand(() -> climberSubsystem.set(position));
+  }
+
+  /**
+   * Get a command to home the climber.
+   *
+   * @return The InstantCommand to home the climber.
+   */
+  public InstantCommand getClimberHomeCommand() {
+    return new InstantCommand(() -> climberSubsystem.set(0.25));
+  }
 }

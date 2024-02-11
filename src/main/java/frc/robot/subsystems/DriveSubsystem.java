@@ -18,8 +18,8 @@ import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.bearbotics.swerve.MotorConfig.MotorBuilder;
-import frc.bearbotics.swerve.MotorConfig.MotorPIDBuilder;
+import frc.bearbotics.swerve.MotorBuilder;
+import frc.bearbotics.swerve.MotorPidBuilder;
 import frc.bearbotics.swerve.SwerveModule;
 import frc.bearbotics.swerve.SwerveModule.SwerveModuleBuilder;
 import frc.bearbotics.swerve.cancoder.CANCoders.CANCoderBuilder;
@@ -122,19 +122,19 @@ public class DriveSubsystem extends SubsystemBase {
   }
 
   private SwerveModuleBuilder getFrontLeftSwerveConfig() {
-    MotorPIDBuilder driveMotorPid =
-        new MotorPIDBuilder()
-            .setP(FrontLeftConstants.DriveMotor.MotorPid.P)
-            .setFf(FrontLeftConstants.DriveMotor.MotorPid.Ff);
+    MotorPidBuilder driveMotorPid =
+        new MotorPidBuilder()
+            .withP(FrontLeftConstants.DriveMotor.MotorPid.P)
+            .withFf(FrontLeftConstants.DriveMotor.MotorPid.Ff);
 
-    MotorPIDBuilder pivotMotorPid =
-        new MotorPIDBuilder()
-            .setP(FrontLeftConstants.PivotMotor.MotorPid.P)
-            .setPositionPidWrappingEnabled(
+    MotorPidBuilder pivotMotorPid =
+        new MotorPidBuilder()
+            .withP(FrontLeftConstants.PivotMotor.MotorPid.P)
+            .withPositionPidWrappingEnabled(
                 FrontLeftConstants.PivotMotor.MotorPid.POSITION_PID_WRAPPING_ENABLED)
-            .setPositionPidWrappingMin(
+            .withPositionPidWrappingMin(
                 FrontLeftConstants.PivotMotor.MotorPid.POSITION_PID_WRAPPING_MIN)
-            .setPositionPidWrappingMax(
+            .withPositionPidWrappingMax(
                 FrontLeftConstants.PivotMotor.MotorPid.POSITION_PID_WRAPPING_MAX);
 
     CANCoderBuilder pivotAbsoluteEncoder =
@@ -144,26 +144,26 @@ public class DriveSubsystem extends SubsystemBase {
 
     MotorBuilder driveConfig =
         new MotorBuilder()
-            .setName(FrontLeftConstants.DriveMotor.NAME)
-            .setMotorPort(FrontLeftConstants.DriveMotor.MOTOR_PORT)
-            .setCurrentLimit(FrontLeftConstants.DriveMotor.CURRENT_LIMT)
-            .setMotorInverted(FrontLeftConstants.DriveMotor.INVERTED)
-            .setEncoderInverted(FrontLeftConstants.DriveMotor.ENCODER_INVERTED)
-            .setPositionConversionFactor(FrontLeftConstants.DriveMotor.POSITION_CONVERSION_FACTOR)
-            .setVelocityConversionFactor(FrontLeftConstants.DriveMotor.VELOCITY_CONVERSION_FACTOR)
-            .setMotorPID(driveMotorPid);
+            .withName(FrontLeftConstants.DriveMotor.NAME)
+            .withMotorPort(FrontLeftConstants.DriveMotor.MOTOR_PORT)
+            .withCurrentLimit(FrontLeftConstants.DriveMotor.CURRENT_LIMT)
+            .withMotorInverted(FrontLeftConstants.DriveMotor.INVERTED)
+            .withEncoderInverted(FrontLeftConstants.DriveMotor.ENCODER_INVERTED)
+            .withPositionConversionFactor(FrontLeftConstants.DriveMotor.POSITION_CONVERSION_FACTOR)
+            .withVelocityConversionFactor(FrontLeftConstants.DriveMotor.VELOCITY_CONVERSION_FACTOR)
+            .withMotorPID(driveMotorPid);
 
     MotorBuilder pivotConfig =
         new MotorBuilder()
-            .setName(FrontLeftConstants.PivotMotor.NAME)
-            .setMotorPort(FrontLeftConstants.PivotMotor.MOTOR_PORT)
-            .setAbsoluteEncoder(pivotAbsoluteEncoder)
-            .setCurrentLimit(FrontLeftConstants.PivotMotor.CURRENT_LIMT)
-            .setMotorInverted(FrontLeftConstants.PivotMotor.INVERTED)
-            .setEncoderInverted(FrontLeftConstants.PivotMotor.ENCODER_INVERTED)
-            .setPositionConversionFactor(FrontLeftConstants.PivotMotor.POSITION_CONVERSION_FACTOR)
-            .setVelocityConversionFactor(FrontLeftConstants.PivotMotor.VELOCITY_CONVERSION_FACTOR)
-            .setMotorPID(pivotMotorPid);
+            .withName(FrontLeftConstants.PivotMotor.NAME)
+            .withMotorPort(FrontLeftConstants.PivotMotor.MOTOR_PORT)
+            .withAbsoluteEncoder(pivotAbsoluteEncoder)
+            .withCurrentLimit(FrontLeftConstants.PivotMotor.CURRENT_LIMT)
+            .withMotorInverted(FrontLeftConstants.PivotMotor.INVERTED)
+            .withEncoderInverted(FrontLeftConstants.PivotMotor.ENCODER_INVERTED)
+            .withPositionConversionFactor(FrontLeftConstants.PivotMotor.POSITION_CONVERSION_FACTOR)
+            .withVelocityConversionFactor(FrontLeftConstants.PivotMotor.VELOCITY_CONVERSION_FACTOR)
+            .withMotorPID(pivotMotorPid);
 
     SwerveModuleBuilder moduleConfig =
         new SwerveModuleBuilder()
@@ -175,19 +175,19 @@ public class DriveSubsystem extends SubsystemBase {
   }
 
   private SwerveModuleBuilder getBackLeftSwerveConfig() {
-    MotorPIDBuilder driveMotorPid =
-        new MotorPIDBuilder()
-            .setP(BackLeftConstants.DriveMotor.MotorPid.P)
-            .setFf(BackLeftConstants.DriveMotor.MotorPid.Ff);
+    MotorPidBuilder driveMotorPid =
+        new MotorPidBuilder()
+            .withP(BackLeftConstants.DriveMotor.MotorPid.P)
+            .withFf(BackLeftConstants.DriveMotor.MotorPid.Ff);
 
-    MotorPIDBuilder pivotMotorPid =
-        new MotorPIDBuilder()
-            .setP(BackLeftConstants.PivotMotor.MotorPid.P)
-            .setPositionPidWrappingEnabled(
+    MotorPidBuilder pivotMotorPid =
+        new MotorPidBuilder()
+            .withP(BackLeftConstants.PivotMotor.MotorPid.P)
+            .withPositionPidWrappingEnabled(
                 BackLeftConstants.PivotMotor.MotorPid.POSITION_PID_WRAPPING_ENABLED)
-            .setPositionPidWrappingMin(
+            .withPositionPidWrappingMin(
                 BackLeftConstants.PivotMotor.MotorPid.POSITION_PID_WRAPPING_MIN)
-            .setPositionPidWrappingMax(
+            .withPositionPidWrappingMax(
                 BackLeftConstants.PivotMotor.MotorPid.POSITION_PID_WRAPPING_MAX);
 
     CANCoderBuilder pivotAbsoluteEncoder =
@@ -197,26 +197,26 @@ public class DriveSubsystem extends SubsystemBase {
 
     MotorBuilder driveConfig =
         new MotorBuilder()
-            .setName(BackLeftConstants.DriveMotor.NAME)
-            .setMotorPort(BackLeftConstants.DriveMotor.MOTOR_PORT)
-            .setCurrentLimit(BackLeftConstants.DriveMotor.CURRENT_LIMT)
-            .setMotorInverted(BackLeftConstants.DriveMotor.INVERTED)
-            .setEncoderInverted(BackLeftConstants.DriveMotor.ENCODER_INVERTED)
-            .setPositionConversionFactor(BackLeftConstants.DriveMotor.POSITION_CONVERSION_FACTOR)
-            .setVelocityConversionFactor(BackLeftConstants.DriveMotor.VELOCITY_CONVERSION_FACTOR)
-            .setMotorPID(driveMotorPid);
+            .withName(BackLeftConstants.DriveMotor.NAME)
+            .withMotorPort(BackLeftConstants.DriveMotor.MOTOR_PORT)
+            .withCurrentLimit(BackLeftConstants.DriveMotor.CURRENT_LIMT)
+            .withMotorInverted(BackLeftConstants.DriveMotor.INVERTED)
+            .withEncoderInverted(BackLeftConstants.DriveMotor.ENCODER_INVERTED)
+            .withPositionConversionFactor(BackLeftConstants.DriveMotor.POSITION_CONVERSION_FACTOR)
+            .withVelocityConversionFactor(BackLeftConstants.DriveMotor.VELOCITY_CONVERSION_FACTOR)
+            .withMotorPID(driveMotorPid);
 
     MotorBuilder pivotConfig =
         new MotorBuilder()
-            .setName(BackLeftConstants.PivotMotor.NAME)
-            .setMotorPort(BackLeftConstants.PivotMotor.MOTOR_PORT)
-            .setAbsoluteEncoder(pivotAbsoluteEncoder)
-            .setCurrentLimit(BackLeftConstants.PivotMotor.CURRENT_LIMT)
-            .setMotorInverted(BackLeftConstants.PivotMotor.INVERTED)
-            .setEncoderInverted(BackLeftConstants.PivotMotor.ENCODER_INVERTED)
-            .setPositionConversionFactor(BackLeftConstants.PivotMotor.POSITION_CONVERSION_FACTOR)
-            .setVelocityConversionFactor(BackLeftConstants.PivotMotor.VELOCITY_CONVERSION_FACTOR)
-            .setMotorPID(pivotMotorPid);
+            .withName(BackLeftConstants.PivotMotor.NAME)
+            .withMotorPort(BackLeftConstants.PivotMotor.MOTOR_PORT)
+            .withAbsoluteEncoder(pivotAbsoluteEncoder)
+            .withCurrentLimit(BackLeftConstants.PivotMotor.CURRENT_LIMT)
+            .withMotorInverted(BackLeftConstants.PivotMotor.INVERTED)
+            .withEncoderInverted(BackLeftConstants.PivotMotor.ENCODER_INVERTED)
+            .withPositionConversionFactor(BackLeftConstants.PivotMotor.POSITION_CONVERSION_FACTOR)
+            .withVelocityConversionFactor(BackLeftConstants.PivotMotor.VELOCITY_CONVERSION_FACTOR)
+            .withMotorPID(pivotMotorPid);
 
     SwerveModuleBuilder moduleConfig =
         new SwerveModuleBuilder()
@@ -228,19 +228,19 @@ public class DriveSubsystem extends SubsystemBase {
   }
 
   private SwerveModuleBuilder getFrontRightSwerveConfig() {
-    MotorPIDBuilder driveMotorPid =
-        new MotorPIDBuilder()
-            .setP(FrontRightConstants.DriveMotor.MotorPid.P)
-            .setFf(FrontRightConstants.DriveMotor.MotorPid.Ff);
+    MotorPidBuilder driveMotorPid =
+        new MotorPidBuilder()
+            .withP(FrontRightConstants.DriveMotor.MotorPid.P)
+            .withFf(FrontRightConstants.DriveMotor.MotorPid.Ff);
 
-    MotorPIDBuilder pivotMotorPid =
-        new MotorPIDBuilder()
-            .setP(FrontRightConstants.PivotMotor.MotorPid.P)
-            .setPositionPidWrappingEnabled(
+    MotorPidBuilder pivotMotorPid =
+        new MotorPidBuilder()
+            .withP(FrontRightConstants.PivotMotor.MotorPid.P)
+            .withPositionPidWrappingEnabled(
                 FrontRightConstants.PivotMotor.MotorPid.POSITION_PID_WRAPPING_ENABLED)
-            .setPositionPidWrappingMin(
+            .withPositionPidWrappingMin(
                 FrontRightConstants.PivotMotor.MotorPid.POSITION_PID_WRAPPING_MIN)
-            .setPositionPidWrappingMax(
+            .withPositionPidWrappingMax(
                 FrontRightConstants.PivotMotor.MotorPid.POSITION_PID_WRAPPING_MAX);
 
     CANCoderBuilder pivotAbsoluteEncoder =
@@ -250,26 +250,26 @@ public class DriveSubsystem extends SubsystemBase {
 
     MotorBuilder driveConfig =
         new MotorBuilder()
-            .setName(FrontRightConstants.DriveMotor.NAME)
-            .setMotorPort(FrontRightConstants.DriveMotor.MOTOR_PORT)
-            .setCurrentLimit(FrontRightConstants.DriveMotor.CURRENT_LIMT)
-            .setMotorInverted(FrontRightConstants.DriveMotor.INVERTED)
-            .setEncoderInverted(FrontRightConstants.DriveMotor.ENCODER_INVERTED)
-            .setPositionConversionFactor(FrontRightConstants.DriveMotor.POSITION_CONVERSION_FACTOR)
-            .setVelocityConversionFactor(FrontRightConstants.DriveMotor.VELOCITY_CONVERSION_FACTOR)
-            .setMotorPID(driveMotorPid);
+            .withName(FrontRightConstants.DriveMotor.NAME)
+            .withMotorPort(FrontRightConstants.DriveMotor.MOTOR_PORT)
+            .withCurrentLimit(FrontRightConstants.DriveMotor.CURRENT_LIMT)
+            .withMotorInverted(FrontRightConstants.DriveMotor.INVERTED)
+            .withEncoderInverted(FrontRightConstants.DriveMotor.ENCODER_INVERTED)
+            .withPositionConversionFactor(FrontRightConstants.DriveMotor.POSITION_CONVERSION_FACTOR)
+            .withVelocityConversionFactor(FrontRightConstants.DriveMotor.VELOCITY_CONVERSION_FACTOR)
+            .withMotorPID(driveMotorPid);
 
     MotorBuilder pivotConfig =
         new MotorBuilder()
-            .setName(FrontRightConstants.PivotMotor.NAME)
-            .setMotorPort(FrontRightConstants.PivotMotor.MOTOR_PORT)
-            .setAbsoluteEncoder(pivotAbsoluteEncoder)
-            .setCurrentLimit(FrontRightConstants.PivotMotor.CURRENT_LIMT)
-            .setMotorInverted(FrontRightConstants.PivotMotor.INVERTED)
-            .setEncoderInverted(FrontRightConstants.PivotMotor.ENCODER_INVERTED)
-            .setPositionConversionFactor(FrontRightConstants.PivotMotor.POSITION_CONVERSION_FACTOR)
-            .setVelocityConversionFactor(FrontRightConstants.PivotMotor.VELOCITY_CONVERSION_FACTOR)
-            .setMotorPID(pivotMotorPid);
+            .withName(FrontRightConstants.PivotMotor.NAME)
+            .withMotorPort(FrontRightConstants.PivotMotor.MOTOR_PORT)
+            .withAbsoluteEncoder(pivotAbsoluteEncoder)
+            .withCurrentLimit(FrontRightConstants.PivotMotor.CURRENT_LIMT)
+            .withMotorInverted(FrontRightConstants.PivotMotor.INVERTED)
+            .withEncoderInverted(FrontRightConstants.PivotMotor.ENCODER_INVERTED)
+            .withPositionConversionFactor(FrontRightConstants.PivotMotor.POSITION_CONVERSION_FACTOR)
+            .withVelocityConversionFactor(FrontRightConstants.PivotMotor.VELOCITY_CONVERSION_FACTOR)
+            .withMotorPID(pivotMotorPid);
 
     SwerveModuleBuilder moduleConfig =
         new SwerveModuleBuilder()
@@ -281,19 +281,19 @@ public class DriveSubsystem extends SubsystemBase {
   }
 
   private SwerveModuleBuilder getBackRightSwerveConfig() {
-    MotorPIDBuilder driveMotorPid =
-        new MotorPIDBuilder()
-            .setP(BackRightConstants.DriveMotor.MotorPid.P)
-            .setFf(BackRightConstants.DriveMotor.MotorPid.Ff);
+    MotorPidBuilder driveMotorPid =
+        new MotorPidBuilder()
+            .withP(BackRightConstants.DriveMotor.MotorPid.P)
+            .withFf(BackRightConstants.DriveMotor.MotorPid.Ff);
 
-    MotorPIDBuilder pivotMotorPid =
-        new MotorPIDBuilder()
-            .setP(BackRightConstants.PivotMotor.MotorPid.P)
-            .setPositionPidWrappingEnabled(
+    MotorPidBuilder pivotMotorPid =
+        new MotorPidBuilder()
+            .withP(BackRightConstants.PivotMotor.MotorPid.P)
+            .withPositionPidWrappingEnabled(
                 BackRightConstants.PivotMotor.MotorPid.POSITION_PID_WRAPPING_ENABLED)
-            .setPositionPidWrappingMin(
+            .withPositionPidWrappingMin(
                 BackRightConstants.PivotMotor.MotorPid.POSITION_PID_WRAPPING_MIN)
-            .setPositionPidWrappingMax(
+            .withPositionPidWrappingMax(
                 BackRightConstants.PivotMotor.MotorPid.POSITION_PID_WRAPPING_MAX);
 
     CANCoderBuilder pivotAbsoluteEncoder =
@@ -303,26 +303,26 @@ public class DriveSubsystem extends SubsystemBase {
 
     MotorBuilder driveConfig =
         new MotorBuilder()
-            .setName(BackRightConstants.DriveMotor.NAME)
-            .setMotorPort(BackRightConstants.DriveMotor.MOTOR_PORT)
-            .setCurrentLimit(BackRightConstants.DriveMotor.CURRENT_LIMT)
-            .setMotorInverted(BackRightConstants.DriveMotor.INVERTED)
-            .setEncoderInverted(BackRightConstants.DriveMotor.ENCODER_INVERTED)
-            .setPositionConversionFactor(BackRightConstants.DriveMotor.POSITION_CONVERSION_FACTOR)
-            .setVelocityConversionFactor(BackRightConstants.DriveMotor.VELOCITY_CONVERSION_FACTOR)
-            .setMotorPID(driveMotorPid);
+            .withName(BackRightConstants.DriveMotor.NAME)
+            .withMotorPort(BackRightConstants.DriveMotor.MOTOR_PORT)
+            .withCurrentLimit(BackRightConstants.DriveMotor.CURRENT_LIMT)
+            .withMotorInverted(BackRightConstants.DriveMotor.INVERTED)
+            .withEncoderInverted(BackRightConstants.DriveMotor.ENCODER_INVERTED)
+            .withPositionConversionFactor(BackRightConstants.DriveMotor.POSITION_CONVERSION_FACTOR)
+            .withVelocityConversionFactor(BackRightConstants.DriveMotor.VELOCITY_CONVERSION_FACTOR)
+            .withMotorPID(driveMotorPid);
 
     MotorBuilder pivotConfig =
         new MotorBuilder()
-            .setName(BackRightConstants.PivotMotor.NAME)
-            .setMotorPort(BackRightConstants.PivotMotor.MOTOR_PORT)
-            .setAbsoluteEncoder(pivotAbsoluteEncoder)
-            .setCurrentLimit(BackRightConstants.PivotMotor.CURRENT_LIMT)
-            .setMotorInverted(BackRightConstants.PivotMotor.INVERTED)
-            .setEncoderInverted(BackRightConstants.PivotMotor.ENCODER_INVERTED)
-            .setPositionConversionFactor(BackRightConstants.PivotMotor.POSITION_CONVERSION_FACTOR)
-            .setVelocityConversionFactor(BackRightConstants.PivotMotor.VELOCITY_CONVERSION_FACTOR)
-            .setMotorPID(pivotMotorPid);
+            .withName(BackRightConstants.PivotMotor.NAME)
+            .withMotorPort(BackRightConstants.PivotMotor.MOTOR_PORT)
+            .withAbsoluteEncoder(pivotAbsoluteEncoder)
+            .withCurrentLimit(BackRightConstants.PivotMotor.CURRENT_LIMT)
+            .withMotorInverted(BackRightConstants.PivotMotor.INVERTED)
+            .withEncoderInverted(BackRightConstants.PivotMotor.ENCODER_INVERTED)
+            .withPositionConversionFactor(BackRightConstants.PivotMotor.POSITION_CONVERSION_FACTOR)
+            .withVelocityConversionFactor(BackRightConstants.PivotMotor.VELOCITY_CONVERSION_FACTOR)
+            .withMotorPID(pivotMotorPid);
 
     SwerveModuleBuilder moduleConfig =
         new SwerveModuleBuilder()

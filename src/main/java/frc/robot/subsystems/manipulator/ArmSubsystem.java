@@ -7,12 +7,10 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.SparkAbsoluteEncoder.Type;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.bearbotics.swerve.MotorBuilder;
 import frc.bearbotics.swerve.MotorConfig;
-import frc.bearbotics.swerve.MotorConfig.MotorBuilder;
-import frc.bearbotics.swerve.MotorConfig.MotorPIDBuilder;
+import frc.bearbotics.swerve.MotorPidBuilder;
 import frc.robot.constants.DriveConstants;
 import frc.robot.constants.manipulator.ArmConstants;
 
@@ -28,35 +26,35 @@ public class ArmSubsystem extends SubsystemBase {
   }
 
   private void setupMotors() {
-    MotorPIDBuilder armMotorLowerPid =
-        new MotorPIDBuilder()
-            .setP(ArmConstants.Motor.MotorLowerPid.P)
-            .setFf(ArmConstants.Motor.MotorLowerPid.Ff)
-            .setMinOutput(ArmConstants.Motor.MotorLowerPid.MIN_OUTPUT)
-            .setMaxOutput(ArmConstants.Motor.MotorLowerPid.MAX_OUTPUT);
+    MotorPidBuilder armMotorLowerPid =
+        new MotorPidBuilder()
+            .withP(ArmConstants.Motor.MotorLowerPid.P)
+            .withFf(ArmConstants.Motor.MotorLowerPid.Ff)
+            .withMinOutput(ArmConstants.Motor.MotorLowerPid.MIN_OUTPUT)
+            .withMaxOutput(ArmConstants.Motor.MotorLowerPid.MAX_OUTPUT);
 
-    MotorPIDBuilder armMotorRaisePid =
-        new MotorPIDBuilder()
-            .setP(ArmConstants.Motor.MotorRaisePid.P)
-            .setFf(ArmConstants.Motor.MotorRaisePid.Ff)
-            .setMinOutput(ArmConstants.Motor.MotorRaisePid.MIN_OUTPUT)
-            .setMaxOutput(ArmConstants.Motor.MotorRaisePid.MAX_OUTPUT);
+    MotorPidBuilder armMotorRaisePid =
+        new MotorPidBuilder()
+            .withP(ArmConstants.Motor.MotorRaisePid.P)
+            .withFf(ArmConstants.Motor.MotorRaisePid.Ff)
+            .withMinOutput(ArmConstants.Motor.MotorRaisePid.MIN_OUTPUT)
+            .withMaxOutput(ArmConstants.Motor.MotorRaisePid.MAX_OUTPUT);
 
     MotorBuilder armMotorConfig =
         new MotorBuilder()
-            .setModuleName(ArmConstants.Motor.MODULE_NAME)
-            .setMotorPort(ArmConstants.Motor.MOTOR_PORT)
-            .setMotorInverted(ArmConstants.Motor.INVERTED)
-            .setCurrentLimit(ArmConstants.Motor.CURRENT_LIMT)
-            .setMotorPid(armMotorLowerPid, 0)
-            .setMotorPid(armMotorRaisePid, 1);
+            .withModuleName(ArmConstants.Motor.MODULE_NAME)
+            .withMotorPort(ArmConstants.Motor.MOTOR_PORT)
+            .withMotorInverted(ArmConstants.Motor.INVERTED)
+            .withCurrentLimit(ArmConstants.Motor.CURRENT_LIMT)
+            .withMotorPid(armMotorLowerPid, 0)
+            .withMotorPid(armMotorRaisePid, 1);
 
     MotorBuilder armMotorFollowerConfig =
         new MotorBuilder()
-            .setModuleName(ArmConstants.MotorFollower.MODULE_NAME)
-            .setMotorPort(ArmConstants.MotorFollower.MOTOR_PORT)
-            .setMotorInverted(ArmConstants.MotorFollower.INVERTED)
-            .setCurrentLimit(ArmConstants.MotorFollower.CURRENT_LIMT);
+            .withModuleName(ArmConstants.MotorFollower.MODULE_NAME)
+            .withMotorPort(ArmConstants.MotorFollower.MOTOR_PORT)
+            .withMotorInverted(ArmConstants.MotorFollower.FOLLOW_INVERTED)
+            .withCurrentLimit(ArmConstants.MotorFollower.CURRENT_LIMT);
 
     armMotor =
         new CANSparkMax(armMotorConfig.getMotorPort(), CANSparkLowLevel.MotorType.kBrushless);
@@ -73,7 +71,7 @@ public class ArmSubsystem extends SubsystemBase {
 
     MotorConfig.fromMotorConstants(armMotorFollower, armMotorFollowerConfig)
         .configureMotor()
-        .follow(armMotor, true)
+        .follow(armMotor)
         .burnFlash();
   }
 
@@ -81,30 +79,21 @@ public class ArmSubsystem extends SubsystemBase {
     shuffleboardTab.addDouble("Arm Pos", armMotorEncoder::getPosition);
   }
 
-  public Command getArmRunCommand(ArmPosition position) {
-    final double angle;
-
-    if (position == ArmPosition.SHOOT) {
-      angle = getShootAngle(getDistance());
-    } else {
-      angle = position.getAngle().getDegrees();
-    }
-
-    return new InstantCommand(
-        () ->
-            armMotor
-                .getPIDController()
-                .setReference(angle, ControlType.kPosition, position.getSlot()));
+  /**
+   * Set the arm motor to the specified position.
+   *
+   * @param position The desired arm position.
+   */
+  public void set(ArmPosition position) {
+    armMotor
+        .getPIDController()
+        .setReference(
+            position == ArmPosition.SHOOT ? 0 : position.getAngle().getDegrees(),
+            ControlType.kPosition,
+            position.getSlot());
   }
 
-  private double getDistance() {
-    return 0;
-  }
-
-  private double getShootAngle(double distance) {
-    return 0;
-  }
-
+  /** Enum representing different positions of the arm. */
   public enum ArmPosition {
     HOME(Rotation2d.fromDegrees(0), 0),
     AMP_SHOOT(Rotation2d.fromDegrees(85), 1),
@@ -113,15 +102,31 @@ public class ArmSubsystem extends SubsystemBase {
     private final Rotation2d angle;
     private final int slot;
 
+    /**
+     * Constructor for ArmPosition.
+     *
+     * @param angle The rotation angle associated with the position.
+     * @param slot The PID slot associated with the position.
+     */
     private ArmPosition(Rotation2d angle, int slot) {
       this.angle = angle;
       this.slot = slot;
     }
 
+    /**
+     * Get the rotation angle associated with the position.
+     *
+     * @return The rotation angle.
+     */
     public Rotation2d getAngle() {
       return angle;
     }
 
+    /**
+     * Get the PID slot associated with the position.
+     *
+     * @return The PID slot.
+     */
     public int getSlot() {
       return slot;
     }
