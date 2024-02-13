@@ -2,6 +2,7 @@ package frc.robot.subsystems.manipulator;
 
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.CANSparkBase.ControlType;
+import com.revrobotics.CANSparkBase.SoftLimitDirection;
 import com.revrobotics.CANSparkLowLevel;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.SparkAbsoluteEncoder.Type;
@@ -11,6 +12,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.bearbotics.motor.MotorBuilder;
 import frc.bearbotics.motor.MotorConfig;
 import frc.bearbotics.motor.MotorPidBuilder;
+import frc.bearbotics.motor.MotorSoftLimit;
 import frc.robot.constants.DriveConstants;
 import frc.robot.constants.manipulator.ArmConstants;
 
@@ -40,12 +42,20 @@ public class ArmSubsystem extends SubsystemBase {
             .withMinOutput(ArmConstants.Motor.MotorRaisePid.MIN_OUTPUT)
             .withMaxOutput(ArmConstants.Motor.MotorRaisePid.MAX_OUTPUT);
 
+    MotorSoftLimit forwardSoftLimit =
+        new MotorSoftLimit().withDirection(SoftLimitDirection.kForward).withLimit(81);
+
+    MotorSoftLimit reverseSoftLimit =
+        new MotorSoftLimit().withDirection(SoftLimitDirection.kReverse).withLimit(0);
+
     MotorBuilder armMotorConfig =
         new MotorBuilder()
             .withModuleName(ArmConstants.Motor.MODULE_NAME)
             .withMotorPort(ArmConstants.Motor.MOTOR_PORT)
             .withMotorInverted(ArmConstants.Motor.INVERTED)
             .withCurrentLimit(ArmConstants.Motor.CURRENT_LIMT)
+            .withReverseSoftLimit(forwardSoftLimit)
+            .withForwardSoftLimit(reverseSoftLimit)
             .withMotorPid(armMotorLowerPid, 0)
             .withMotorPid(armMotorRaisePid, 1);
 

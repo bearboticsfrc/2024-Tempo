@@ -18,8 +18,8 @@ public class MotorBuilder {
   private IdleMode idleMode = IdleMode.kBrake;
   private boolean followInverted;
   private MotorPidBuilder[] pidSlots = new MotorPidBuilder[2];
-  private MotorSoftLimit lowSoftLimit;
-  private MotorSoftLimit highSoftLimit;
+  private MotorSoftLimit reverseSoftLimit;
+  private MotorSoftLimit forwardSoftLimit;
   private CANCoderBuilder canCoderBuilder;
 
   /**
@@ -284,42 +284,42 @@ public class MotorBuilder {
     return this;
   }
   /**
-   * Gets the low soft limit for the motor.
+   * Gets the reverse soft limit for the motor.
    *
-   * @return The low soft limit.
+   * @return The reverse soft limit.
    */
-  public MotorSoftLimit getLowSoftLimit() {
-    return lowSoftLimit;
+  public MotorSoftLimit getReverseSoftLimit() {
+    return reverseSoftLimit;
   }
 
   /**
-   * Sets the low soft limit for the motor.
+   * Sets the reverse soft limit for the motor.
    *
-   * @param softLimit The low soft limit to set.
+   * @param softLimit The reverse soft limit to set.
    * @return The MotorBuilder instance for method chaining.
    */
-  public MotorBuilder withLowSoftLimit(MotorSoftLimit softLimit) {
-    this.lowSoftLimit = softLimit;
+  public MotorBuilder withReverseSoftLimit(MotorSoftLimit softLimit) {
+    this.reverseSoftLimit = softLimit;
     return this;
   }
 
   /**
-   * Gets the high soft limit for the motor.
+   * Gets the forward soft limit for the motor.
    *
-   * @return The high soft limit.
+   * @return The forward soft limit.
    */
-  public MotorSoftLimit getHighSoftLimit() {
-    return highSoftLimit;
+  public MotorSoftLimit getForwardSoftLimit() {
+    return forwardSoftLimit;
   }
 
   /**
-   * Sets the high soft limit for the motor.
+   * Sets the forward soft limit for the motor.
    *
-   * @param highSoftLimit The high soft limit to set.
+   * @param softLimit The forward soft limit to set.
    * @return The MotorBuilder instance for method chaining.
    */
-  public MotorBuilder withHighSoftLimit(MotorSoftLimit highSoftLimit) {
-    this.highSoftLimit = highSoftLimit;
+  public MotorBuilder withForwardSoftLimit(MotorSoftLimit softLimit) {
+    this.forwardSoftLimit = softLimit;
     return this;
   }
 

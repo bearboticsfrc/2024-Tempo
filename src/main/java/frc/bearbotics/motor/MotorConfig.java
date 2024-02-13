@@ -60,16 +60,16 @@ public class MotorConfig {
     RevUtil.checkRevError(motor.setSmartCurrentLimit(motorBuilder.getCurrentLimit()));
     RevUtil.setPeriodicFramePeriodHigh(motor, motorDescription);
 
-    if (motorBuilder.getLowSoftLimit() != null) {
-      MotorSoftLimit lowSoftLimit = motorBuilder.getLowSoftLimit();
+    if (motorBuilder.getReverseSoftLimit() != null) {
+      MotorSoftLimit reverseSoftLimit = motorBuilder.getReverseSoftLimit();
       RevUtil.checkRevError(
-          motor.setSoftLimit(lowSoftLimit.getDirection(), lowSoftLimit.getLimit()));
+          motor.setSoftLimit(reverseSoftLimit.getDirection(), reverseSoftLimit.getLimit()));
     }
 
-    if (motorBuilder.getHighSoftLimit() != null) {
-      MotorSoftLimit highSoftLimit = motorBuilder.getHighSoftLimit();
+    if (motorBuilder.getForwardSoftLimit() != null) {
+      MotorSoftLimit forwardSoftLimit = motorBuilder.getForwardSoftLimit();
       RevUtil.checkRevError(
-          motor.setSoftLimit(highSoftLimit.getDirection(), highSoftLimit.getLimit()));
+          motor.setSoftLimit(forwardSoftLimit.getDirection(), forwardSoftLimit.getLimit()));
     }
 
     return this;
