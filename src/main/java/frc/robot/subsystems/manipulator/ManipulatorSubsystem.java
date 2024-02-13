@@ -142,4 +142,8 @@ public class ManipulatorSubsystem extends SubsystemBase {
   public InstantCommand getArmRunCommand(ArmPosition position) {
     return new InstantCommand(() -> armSubsystem.set(position));
   }
+
+  public InstantCommand getArmStopCommand() {
+    return new InstantCommand(() -> armSubsystem.stop());
+  }
 }

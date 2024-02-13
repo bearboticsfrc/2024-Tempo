@@ -7,6 +7,7 @@ import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkAbsoluteEncoder;
 import com.revrobotics.SparkPIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.Timer;
 import frc.bearbotics.motor.cancoder.CANCoders;
 import frc.robot.util.RevUtil;
@@ -190,6 +191,11 @@ public class MotorConfig {
    * @return This MotorConfig instance for method chaining.
    */
   public MotorConfig follow(CANSparkBase leaderMotor) {
+    DataLogManager.log(
+        "module -> "
+            + motorBuilder.getModuleName()
+            + " inverted -> "
+            + motorBuilder.isFollowInverted());
     motor.follow(leaderMotor, motorBuilder.isFollowInverted());
     return this;
   }

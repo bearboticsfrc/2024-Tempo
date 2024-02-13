@@ -67,7 +67,10 @@ public class RobotContainer {
 
     driverController.povDown().onTrue(manipulatorSubsystem.getArmRunCommand(ArmPosition.HOME));
 
-    driverController.povUp().onTrue(manipulatorSubsystem.getArmRunCommand(ArmPosition.AMP_SHOOT));
+    driverController
+        .povUp()
+        .whileTrue(manipulatorSubsystem.getArmRunCommand(ArmPosition.AMP_SHOOT))
+        .onFalse(manipulatorSubsystem.getArmStopCommand());
 
     driverController
         .a()

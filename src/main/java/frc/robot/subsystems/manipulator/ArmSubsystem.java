@@ -1,6 +1,5 @@
 package frc.robot.subsystems.manipulator;
 
-import com.revrobotics.CANSparkBase.ControlType;
 import com.revrobotics.CANSparkBase.SoftLimitDirection;
 import com.revrobotics.CANSparkLowLevel;
 import com.revrobotics.CANSparkMax;
@@ -68,7 +67,7 @@ public class ArmSubsystem extends SubsystemBase {
         new MotorBuilder()
             .withModuleName(ArmConstants.MotorFollower.MODULE_NAME)
             .withMotorPort(ArmConstants.MotorFollower.MOTOR_PORT)
-            .withMotorInverted(ArmConstants.MotorFollower.FOLLOW_INVERTED)
+            .withFollowInverted(ArmConstants.MotorFollower.FOLLOW_INVERTED)
             .withCurrentLimit(ArmConstants.MotorFollower.CURRENT_LIMT)
             .withReverseSoftLimit(forwardSoftLimit)
             .withForwardSoftLimit(reverseSoftLimit);
@@ -102,6 +101,8 @@ public class ArmSubsystem extends SubsystemBase {
     shuffleboardTab.addDouble("Arm Pos", armMotorEncoder::getPosition);
     shuffleboardTab.addDouble("Arm Cur", armMotor::getOutputCurrent);
     shuffleboardTab.addDouble("Arm Temp", armMotor::getMotorTemperature);
+
+    shuffleboardTab.addDouble("Follower Arm Cur", armMotorFollower::getOutputCurrent);
   }
 
   private Rotation2d getShootAngle() {
@@ -114,14 +115,19 @@ public class ArmSubsystem extends SubsystemBase {
    * @param position The desired arm position.
    */
   public void set(ArmPosition position) {
-    armMotor
-        .getPIDController()
-        .setReference(
-            position == ArmPosition.SHOOT
-                ? getShootAngle().getDegrees()
-                : position.getAngle().getDegrees(),
-            ControlType.kPosition,
-            position.getSlot());
+    armMotor.set(0.2);
+    /*armMotor
+    .getPIDController()
+    .setReference(
+        position == ArmPosition.SHOOT
+            ? getShootAngle().getDegrees()
+            : position.getAngle().getDegrees(),
+        ControlType.kPosition,
+        position.getSlot());*/
+  }
+
+  public void stop() {
+    armMotor.stopMotor();
   }
 
   /** Enum representing different positions of the arm. */
