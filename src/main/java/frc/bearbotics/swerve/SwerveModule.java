@@ -39,8 +39,11 @@ public class SwerveModule {
   private SparkPIDController pivotMotorPIDController;
 
   private Rotation2d referenceAngle = new Rotation2d();
+  private Rotation2d parkedAngle;
 
   private HashMap<String, DoubleLogEntry> dataLogs = new HashMap<String, DoubleLogEntry>();
+
+  private boolean parked;
 
   /**
    * Initalize the swerve module.
@@ -50,6 +53,7 @@ public class SwerveModule {
    */
   public SwerveModule(SwerveModuleBuilder swerveModule, ShuffleboardTab shuffleboardTab) {
     this.moduleName = swerveModule.getModuleName();
+    this.parkedAngle = swerveModule.getParkAngle();
 
     this.driveMotor =
         new CANSparkFlex(
@@ -178,6 +182,10 @@ public class SwerveModule {
     }
   }
 
+  public Rotation2d getParkedAngle() {
+    return parkedAngle;
+  }
+
   /**
    * Returns the respective getter for <b>property</b>.
    *
@@ -247,6 +255,15 @@ public class SwerveModule {
     return new SwerveModulePosition(driveMotorEncoder.getPosition(), getAbsoluteAngle());
   }
 
+  public void setParked(boolean mode) {
+    parked = mode;
+  }
+
+  /**
+   * Sets the steer angle in radians
+   *
+   * @param state The state of the swerve module
+   */
   public SwerveModuleState getState() {
     return new SwerveModuleState(getDriveVelocity(), getRelativeAngle());
   }
@@ -257,6 +274,9 @@ public class SwerveModule {
    * @param state The state of the swerve module.
    */
   public void set(SwerveModuleState state) {
+    if (parked) {
+      return;
+    }
     state = SwerveModuleState.optimize(state, getRelativeAngle());
 
     pivotMotorPIDController.setReference(state.angle.getRadians(), ControlType.kPosition);
@@ -269,6 +289,7 @@ public class SwerveModule {
     private String moduleName;
     private MotorBuilder driveMotor;
     private MotorBuilder pivotMotor;
+    private Rotation2d parkAngle;
 
     public String getModuleName() {
       return moduleName;
@@ -295,6 +316,15 @@ public class SwerveModule {
     public SwerveModuleBuilder setPivotMotor(MotorBuilder pivotMotor) {
       this.pivotMotor = pivotMotor;
       return this;
+    }
+
+    public SwerveModuleBuilder setParkAngle(Rotation2d parkAngle) {
+      this.parkAngle = parkAngle;
+      return this;
+    }
+
+    public Rotation2d getParkAngle() {
+      return parkAngle;
     }
   }
 }

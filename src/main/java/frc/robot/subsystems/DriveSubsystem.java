@@ -354,6 +354,27 @@ public class DriveSubsystem implements Subsystem {
   }
 
   /**
+   * Activates or deactivates the park mode for the robot.
+   *
+   * <p>When park mode is activated, each wheel is locked in an opposing configuration, preventing
+   * any movement.
+   *
+   * @param enabled true to activate park mode, false to deactivate.
+   */
+  public void setParkMode(boolean enabled) {
+    for (SwerveModule module : getSwerveModules()) {
+      if (!enabled) {
+        module.setParked(false);
+        continue;
+      }
+      SwerveModuleState state = new SwerveModuleState(0, module.getParkedAngle());
+
+      module.set(state);
+      module.setParked(true);
+    }
+  }
+
+  /**
    * Sets whether the robot's movement is interpreted as field-relative or robot-relative.
    *
    * <p>{@code true} to enable field-relative mode, where the robot's movement is based on the

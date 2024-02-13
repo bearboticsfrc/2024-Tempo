@@ -19,6 +19,7 @@ public class RobotConstants {
           new Translation2d(WHEEL_BASE / 2, -TRACK_WIDTH / 2), // FR
           new Translation2d(-WHEEL_BASE / 2, TRACK_WIDTH / 2), // BL
           new Translation2d(-WHEEL_BASE / 2, -TRACK_WIDTH / 2)); // BR
+  public static final double ROBOT_RADIUS = 0;
 
   public enum SwerveCorner {
     FRONT_LEFT,
