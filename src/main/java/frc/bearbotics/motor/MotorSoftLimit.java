@@ -1,18 +1,19 @@
 package frc.bearbotics.motor;
 
 import com.revrobotics.CANSparkBase.SoftLimitDirection;
+import edu.wpi.first.math.geometry.Rotation2d;
 
 /** Builder class for configuring motor soft limit parameters. */
 public class MotorSoftLimit {
   private SoftLimitDirection direction;
-  private float limit;
+  private Rotation2d limit;
 
   /**
    * Get the soft limit value.
    *
    * @return The soft limit value.
    */
-  public float getLimit() {
+  public Rotation2d getLimit() {
     return limit;
   }
 
@@ -22,7 +23,7 @@ public class MotorSoftLimit {
    * @param limit The desired soft limit value.
    * @return This MotorSoftLimit instance for method chaining.
    */
-  public MotorSoftLimit withLimit(float limit) {
+  public MotorSoftLimit withLimit(Rotation2d limit) {
     this.limit = limit;
     return this;
   }

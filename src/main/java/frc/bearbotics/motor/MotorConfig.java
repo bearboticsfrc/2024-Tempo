@@ -4,6 +4,7 @@ import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.CANSparkBase;
 import com.revrobotics.MotorFeedbackSensor;
 import com.revrobotics.RelativeEncoder;
+import com.revrobotics.SparkAbsoluteEncoder;
 import com.revrobotics.SparkPIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.Timer;
@@ -42,8 +43,8 @@ public class MotorConfig {
   }
 
   /**
-   * Configures generic motor parameters, including inversion, idle mode, voltage compensation, and
-   * current limit.
+   * Configures generic motor parameters, including inversion, idle mode, voltage compensation,
+   * current limit, or low and high soft limits.
    *
    * @return This MotorConfig instance for method chaining.
    */
@@ -63,13 +64,15 @@ public class MotorConfig {
     if (motorBuilder.getReverseSoftLimit() != null) {
       MotorSoftLimit reverseSoftLimit = motorBuilder.getReverseSoftLimit();
       RevUtil.checkRevError(
-          motor.setSoftLimit(reverseSoftLimit.getDirection(), reverseSoftLimit.getLimit()));
+          motor.setSoftLimit(
+              reverseSoftLimit.getDirection(), (float) reverseSoftLimit.getLimit().getDegrees()));
     }
 
     if (motorBuilder.getForwardSoftLimit() != null) {
       MotorSoftLimit forwardSoftLimit = motorBuilder.getForwardSoftLimit();
       RevUtil.checkRevError(
-          motor.setSoftLimit(forwardSoftLimit.getDirection(), forwardSoftLimit.getLimit()));
+          motor.setSoftLimit(
+              forwardSoftLimit.getDirection(), (float) forwardSoftLimit.getLimit().getDegrees()));
     }
 
     return this;
@@ -85,23 +88,34 @@ public class MotorConfig {
   public MotorConfig configureEncoder(Rotation2d initialPosition) {
     if (motorEncoder instanceof RelativeEncoder) {
       ((RelativeEncoder) motorEncoder).setPosition(initialPosition.getRadians());
+      RevUtil.checkRevError(
+          ((RelativeEncoder) motorEncoder)
+              .setPositionConversionFactor(motorBuilder.getPositionConversionFactor()));
+      RevUtil.checkRevError(
+          ((RelativeEncoder) motorEncoder)
+              .setVelocityConversionFactor(motorBuilder.getVelocityConversionFactor()));
     } else if (motorEncoder instanceof AbsoluteEncoder) {
       RevUtil.checkRevError(
           ((AbsoluteEncoder) motorEncoder).setInverted(motorBuilder.isEncoderInverted()));
+      RevUtil.checkRevError(
+          ((AbsoluteEncoder) motorEncoder)
+              .setPositionConversionFactor(motorBuilder.getPositionConversionFactor()));
+      RevUtil.checkRevError(
+          ((AbsoluteEncoder) motorEncoder)
+              .setVelocityConversionFactor(motorBuilder.getVelocityConversionFactor()));
+    } else if (motorEncoder instanceof SparkAbsoluteEncoder) {
+      ((SparkAbsoluteEncoder) motorEncoder).setInverted(motorBuilder.isEncoderInverted());
+      RevUtil.checkRevError(
+          ((SparkAbsoluteEncoder) motorEncoder)
+              .setPositionConversionFactor(motorBuilder.getPositionConversionFactor()));
+      RevUtil.checkRevError(
+          ((SparkAbsoluteEncoder) motorEncoder)
+              .setVelocityConversionFactor(motorBuilder.getVelocityConversionFactor()));
     }
 
     if (motor.getPIDController() != null) {
       RevUtil.checkRevError(motor.getPIDController().setFeedbackDevice(motorEncoder));
     }
-
-    // Since both relative and absolute encoders
-    // define this method, the cast shouldn't matter.
-    RevUtil.checkRevError(
-        ((RelativeEncoder) motorEncoder)
-            .setPositionConversionFactor(motorBuilder.getPositionConversionFactor()));
-    RevUtil.checkRevError(
-        ((RelativeEncoder) motorEncoder)
-            .setVelocityConversionFactor(motorBuilder.getVelocityConversionFactor()));
 
     return this;
   }
@@ -122,7 +136,7 @@ public class MotorConfig {
    * @param motorPid The MotorPidBuilder containing PID parameters.
    * @return This MotorConfig instance for method chaining.
    */
-  public MotorConfig configurePID(MotorPidBuilder motorPid) {
+  public MotorConfig configurePid(MotorPidBuilder motorPid) {
     return configurePID(motorPid, 0);
   }
 

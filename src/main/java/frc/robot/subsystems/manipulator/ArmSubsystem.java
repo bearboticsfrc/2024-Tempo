@@ -1,11 +1,12 @@
 package frc.robot.subsystems.manipulator;
 
-import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.CANSparkBase.ControlType;
 import com.revrobotics.CANSparkBase.SoftLimitDirection;
 import com.revrobotics.CANSparkLowLevel;
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.SparkAbsoluteEncoder;
 import com.revrobotics.SparkAbsoluteEncoder.Type;
+import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -20,7 +21,9 @@ public class ArmSubsystem extends SubsystemBase {
   private CANSparkMax armMotor;
   private CANSparkMax armMotorFollower;
 
-  private AbsoluteEncoder armMotorEncoder;
+  private SparkAbsoluteEncoder armMotorEncoder;
+
+  private ArmFeedforward armFeedforward;
 
   public ArmSubsystem() {
     setupMotors();
@@ -31,22 +34,24 @@ public class ArmSubsystem extends SubsystemBase {
     MotorPidBuilder armMotorLowerPid =
         new MotorPidBuilder()
             .withP(ArmConstants.Motor.MotorLowerPid.P)
-            .withFf(ArmConstants.Motor.MotorLowerPid.Ff)
             .withMinOutput(ArmConstants.Motor.MotorLowerPid.MIN_OUTPUT)
             .withMaxOutput(ArmConstants.Motor.MotorLowerPid.MAX_OUTPUT);
 
     MotorPidBuilder armMotorRaisePid =
         new MotorPidBuilder()
             .withP(ArmConstants.Motor.MotorRaisePid.P)
-            .withFf(ArmConstants.Motor.MotorRaisePid.Ff)
             .withMinOutput(ArmConstants.Motor.MotorRaisePid.MIN_OUTPUT)
             .withMaxOutput(ArmConstants.Motor.MotorRaisePid.MAX_OUTPUT);
 
     MotorSoftLimit forwardSoftLimit =
-        new MotorSoftLimit().withDirection(SoftLimitDirection.kForward).withLimit(81);
+        new MotorSoftLimit()
+            .withDirection(SoftLimitDirection.kForward)
+            .withLimit(Rotation2d.fromDegrees(81));
 
     MotorSoftLimit reverseSoftLimit =
-        new MotorSoftLimit().withDirection(SoftLimitDirection.kReverse).withLimit(0);
+        new MotorSoftLimit()
+            .withDirection(SoftLimitDirection.kReverse)
+            .withLimit(Rotation2d.fromDegrees(0));
 
     MotorBuilder armMotorConfig =
         new MotorBuilder()
@@ -64,7 +69,9 @@ public class ArmSubsystem extends SubsystemBase {
             .withModuleName(ArmConstants.MotorFollower.MODULE_NAME)
             .withMotorPort(ArmConstants.MotorFollower.MOTOR_PORT)
             .withMotorInverted(ArmConstants.MotorFollower.FOLLOW_INVERTED)
-            .withCurrentLimit(ArmConstants.MotorFollower.CURRENT_LIMT);
+            .withCurrentLimit(ArmConstants.MotorFollower.CURRENT_LIMT)
+            .withReverseSoftLimit(forwardSoftLimit)
+            .withForwardSoftLimit(reverseSoftLimit);
 
     armMotor =
         new CANSparkMax(armMotorConfig.getMotorPort(), CANSparkLowLevel.MotorType.kBrushless);
@@ -73,6 +80,12 @@ public class ArmSubsystem extends SubsystemBase {
             armMotorFollowerConfig.getMotorPort(), CANSparkLowLevel.MotorType.kBrushless);
 
     armMotorEncoder = armMotor.getAbsoluteEncoder(Type.kDutyCycle);
+
+    armFeedforward =
+        new ArmFeedforward(
+            ArmConstants.Motor.FeedForward.STATIC,
+            ArmConstants.Motor.FeedForward.GRAVITY,
+            ArmConstants.Motor.FeedForward.VELOCITY);
 
     MotorConfig.fromMotorConstants(armMotor, armMotorEncoder, armMotorConfig)
         .configureMotor()
@@ -87,6 +100,12 @@ public class ArmSubsystem extends SubsystemBase {
 
   private void setupShuffleboardTab(ShuffleboardTab shuffleboardTab) {
     shuffleboardTab.addDouble("Arm Pos", armMotorEncoder::getPosition);
+    shuffleboardTab.addDouble("Arm Cur", armMotor::getOutputCurrent);
+    shuffleboardTab.addDouble("Arm Temp", armMotor::getMotorTemperature);
+  }
+
+  private Rotation2d getShootAngle() {
+    return new Rotation2d(); // TODO: impl
   }
 
   /**
@@ -98,7 +117,9 @@ public class ArmSubsystem extends SubsystemBase {
     armMotor
         .getPIDController()
         .setReference(
-            position == ArmPosition.SHOOT ? 0 : position.getAngle().getDegrees(),
+            position == ArmPosition.SHOOT
+                ? getShootAngle().getDegrees()
+                : position.getAngle().getDegrees(),
             ControlType.kPosition,
             position.getSlot());
   }
@@ -106,7 +127,7 @@ public class ArmSubsystem extends SubsystemBase {
   /** Enum representing different positions of the arm. */
   public enum ArmPosition {
     HOME(Rotation2d.fromDegrees(0), 0),
-    AMP_SHOOT(Rotation2d.fromDegrees(85), 1),
+    AMP_SHOOT(Rotation2d.fromDegrees(40), 1),
     SHOOT(Rotation2d.fromDegrees(90), 1);
 
     private final Rotation2d angle;

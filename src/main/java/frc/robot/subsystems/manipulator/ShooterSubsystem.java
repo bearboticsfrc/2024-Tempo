@@ -7,6 +7,7 @@ import com.revrobotics.CANSparkLowLevel;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkPIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.bearbotics.motor.MotorBuilder;
@@ -24,6 +25,9 @@ public class ShooterSubsystem extends SubsystemBase {
   private RelativeEncoder shooterMotorEncoder;
 
   private int targetVelocity;
+
+  private Timer DEBUG_TIMER = new Timer();
+  private double debug_setPointDelta;
 
   public ShooterSubsystem() {
     configureMotors();
@@ -65,7 +69,7 @@ public class ShooterSubsystem extends SubsystemBase {
 
     MotorConfig.fromMotorConstants(shooterMotor, shooterMotorEncoder, shooterMotorConfig)
         .configureMotor()
-        .configurePID(shooterMotorPid)
+        .configurePid(shooterMotorPid)
         .configureEncoder(Rotation2d.fromRotations(0))
         .burnFlash();
 
@@ -79,6 +83,7 @@ public class ShooterSubsystem extends SubsystemBase {
     shuffleboardTab.addDouble("Shooter Velocity", shooterMotorEncoder::getVelocity);
     shuffleboardTab.addDouble("Target Velocity", shooterMotorEncoder::getVelocity);
     shuffleboardTab.addBoolean("At Target Velocity?", this::atTargetVelocity);
+    shuffleboardTab.addDouble("Set point delta", this::debug_getSetpointDelta);
   }
 
   /**
@@ -87,7 +92,20 @@ public class ShooterSubsystem extends SubsystemBase {
    * @return True if the shooter motor is at the target velocity, false otherwise.
    */
   public boolean atTargetVelocity() {
-    return Math.abs(targetVelocity - shooterMotorEncoder.getVelocity()) < 20;
+    boolean atTarget =
+        Math.abs(targetVelocity - shooterMotorEncoder.getVelocity())
+            < ShooterConstants.VELOCITY_TOLERANCE;
+
+    if (atTarget) {
+      DEBUG_TIMER.stop();
+      debug_setPointDelta = DEBUG_TIMER.get();
+    }
+
+    return atTarget;
+  }
+
+  public double debug_getSetpointDelta() {
+    return debug_setPointDelta;
   }
 
   /**
@@ -96,7 +114,13 @@ public class ShooterSubsystem extends SubsystemBase {
    * @param velocity The desired velocity for the shooter motor.
    */
   public void set(int velocity) {
+    DEBUG_TIMER.restart();
+
     targetVelocity = velocity;
     shooterMotorPidController.setReference(velocity, ControlType.kVelocity);
+  }
+
+  public void stop() {
+    shooterMotor.stopMotor();
   }
 }

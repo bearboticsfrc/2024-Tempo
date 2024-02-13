@@ -66,14 +66,14 @@ public class SwerveModule {
     MotorConfig.fromMotorConstants(driveMotor, driveMotorEncoder, swerveModule.getDriveMotor())
         .configureMotor()
         .configureEncoder(Rotation2d.fromRadians(0))
-        .configurePID(swerveModule.getDriveMotor().getMotorPID())
+        .configurePid(swerveModule.getDriveMotor().getMotorPID())
         .burnFlash();
 
     MotorConfig.fromMotorConstants(
             pivotMotor, pivotMotorRelativeEncoder, swerveModule.getPivotMotor())
         .configureMotor()
         .configureAbsoluteEncoder()
-        .configurePID(swerveModule.getPivotMotor().getMotorPID())
+        .configurePid(swerveModule.getPivotMotor().getMotorPID())
         .burnFlash();
 
     this.pivotMotorAbsoluteEncoder =

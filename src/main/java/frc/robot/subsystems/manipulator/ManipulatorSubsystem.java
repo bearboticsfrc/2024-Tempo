@@ -5,6 +5,7 @@ import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
+import frc.robot.subsystems.manipulator.ArmSubsystem.ArmPosition;
 import frc.robot.subsystems.manipulator.ClimberSubsystem.ClimberPosition;
 import frc.robot.subsystems.manipulator.IntakeSubsystem.IntakeSpeed;
 
@@ -12,11 +13,13 @@ public class ManipulatorSubsystem extends SubsystemBase {
   private final IntakeSubsystem intakeSubsystem;
   private final ShooterSubsystem shooterSubsystem;
   private final ClimberSubsystem climberSubsystem;
+  private final ArmSubsystem armSubsystem;
 
   public ManipulatorSubsystem() {
     intakeSubsystem = new IntakeSubsystem();
     shooterSubsystem = new ShooterSubsystem();
     climberSubsystem = new ClimberSubsystem();
+    armSubsystem = new ArmSubsystem();
   }
 
   /**
@@ -114,7 +117,7 @@ public class ManipulatorSubsystem extends SubsystemBase {
    * @return The InstantCommand to stop the shooter.
    */
   public InstantCommand getShootStopCommand() {
-    return new InstantCommand(() -> shooterSubsystem.set(0));
+    return new InstantCommand(() -> shooterSubsystem.stop());
   }
 
   /**
@@ -134,5 +137,9 @@ public class ManipulatorSubsystem extends SubsystemBase {
    */
   public InstantCommand getClimberHomeCommand() {
     return new InstantCommand(() -> climberSubsystem.set(0.25));
+  }
+
+  public InstantCommand getArmRunCommand(ArmPosition position) {
+    return new InstantCommand(() -> armSubsystem.set(position));
   }
 }

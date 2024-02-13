@@ -9,16 +9,20 @@ public class ArmConstants {
 
     public static class MotorLowerPid {
       public static final double P = 0;
-      public static final double Ff = 0.1;
-      public static final double MIN_OUTPUT = -0.3;
-      public static final double MAX_OUTPUT = 0.3;
+      public static final double MIN_OUTPUT = -0.1;
+      public static final double MAX_OUTPUT = 0.1;
     }
 
     public static class MotorRaisePid {
       public static final double P = 0;
-      public static final double Ff = 0.1;
-      public static final double MIN_OUTPUT = -0.3;
-      public static final double MAX_OUTPUT = 0.3;
+      public static final double MIN_OUTPUT = -0.1;
+      public static final double MAX_OUTPUT = 0.1;
+    }
+
+    public class FeedForward {
+      public static final double STATIC = 0;
+      public static final double GRAVITY = 0.025;
+      public static final double VELOCITY = 0;
     }
   }
 

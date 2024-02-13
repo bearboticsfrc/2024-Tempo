@@ -16,7 +16,7 @@ import frc.bearbotics.test.DriveSubsystemTest;
 import frc.robot.constants.DriveConstants;
 import frc.robot.constants.DriveConstants.SpeedMode;
 import frc.robot.subsystems.DriveSubsystem;
-import frc.robot.subsystems.manipulator.ClimberSubsystem.ClimberPosition;
+import frc.robot.subsystems.manipulator.ArmSubsystem.ArmPosition;
 import frc.robot.subsystems.manipulator.ManipulatorSubsystem;
 
 public class RobotContainer {
@@ -65,13 +65,9 @@ public class RobotContainer {
         .whileTrue(manipulatorSubsystem.getIntakeRunCommand())
         .onFalse(manipulatorSubsystem.getIntakeStopCommand());
 
-    driverController
-        .povUp()
-        .onTrue(manipulatorSubsystem.getClimberRunCommand(ClimberPosition.EXTENDED));
+    driverController.povDown().onTrue(manipulatorSubsystem.getArmRunCommand(ArmPosition.HOME));
 
-    driverController
-        .povDown()
-        .onTrue(manipulatorSubsystem.getClimberRunCommand(ClimberPosition.RETRACTED));
+    driverController.povUp().onTrue(manipulatorSubsystem.getArmRunCommand(ArmPosition.AMP_SHOOT));
 
     driverController
         .a()
