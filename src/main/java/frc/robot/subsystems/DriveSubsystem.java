@@ -18,11 +18,11 @@ import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.bearbotics.swerve.MotorBuilder;
-import frc.bearbotics.swerve.MotorPidBuilder;
+import frc.bearbotics.motor.MotorBuilder;
+import frc.bearbotics.motor.MotorPidBuilder;
+import frc.bearbotics.motor.cancoder.CANCoders.CANCoderBuilder;
 import frc.bearbotics.swerve.SwerveModule;
 import frc.bearbotics.swerve.SwerveModule.SwerveModuleBuilder;
-import frc.bearbotics.swerve.cancoder.CANCoders.CANCoderBuilder;
 import frc.robot.constants.DriveConstants;
 import frc.robot.constants.DriveConstants.SpeedMode;
 import frc.robot.constants.RobotConstants;
@@ -137,7 +137,7 @@ public class DriveSubsystem extends SubsystemBase {
             .withPositionPidWrappingMax(
                 FrontLeftConstants.PivotMotor.MotorPid.POSITION_PID_WRAPPING_MAX);
 
-    CANCoderBuilder pivotAbsoluteEncoder =
+    CANCoderBuilder pivotCanCoderEncoder =
         new CANCoderBuilder()
             .setId(FrontLeftConstants.PivotMotor.ABSOLUTE_ENCODER_PORT)
             .setOffsetDegrees(FrontLeftConstants.PivotMotor.ABSOLUTE_ENCODER_OFFSET);
@@ -157,7 +157,7 @@ public class DriveSubsystem extends SubsystemBase {
         new MotorBuilder()
             .withName(FrontLeftConstants.PivotMotor.NAME)
             .withMotorPort(FrontLeftConstants.PivotMotor.MOTOR_PORT)
-            .withAbsoluteEncoder(pivotAbsoluteEncoder)
+            .withCanCoderBuilder(pivotCanCoderEncoder)
             .withCurrentLimit(FrontLeftConstants.PivotMotor.CURRENT_LIMT)
             .withMotorInverted(FrontLeftConstants.PivotMotor.INVERTED)
             .withEncoderInverted(FrontLeftConstants.PivotMotor.ENCODER_INVERTED)
@@ -190,7 +190,7 @@ public class DriveSubsystem extends SubsystemBase {
             .withPositionPidWrappingMax(
                 BackLeftConstants.PivotMotor.MotorPid.POSITION_PID_WRAPPING_MAX);
 
-    CANCoderBuilder pivotAbsoluteEncoder =
+    CANCoderBuilder pivotCanCoderEncoder =
         new CANCoderBuilder()
             .setId(BackLeftConstants.PivotMotor.ABSOLUTE_ENCODER_PORT)
             .setOffsetDegrees(BackLeftConstants.PivotMotor.ABSOLUTE_ENCODER_OFFSET);
@@ -210,7 +210,7 @@ public class DriveSubsystem extends SubsystemBase {
         new MotorBuilder()
             .withName(BackLeftConstants.PivotMotor.NAME)
             .withMotorPort(BackLeftConstants.PivotMotor.MOTOR_PORT)
-            .withAbsoluteEncoder(pivotAbsoluteEncoder)
+            .withCanCoderBuilder(pivotCanCoderEncoder)
             .withCurrentLimit(BackLeftConstants.PivotMotor.CURRENT_LIMT)
             .withMotorInverted(BackLeftConstants.PivotMotor.INVERTED)
             .withEncoderInverted(BackLeftConstants.PivotMotor.ENCODER_INVERTED)
@@ -243,7 +243,7 @@ public class DriveSubsystem extends SubsystemBase {
             .withPositionPidWrappingMax(
                 FrontRightConstants.PivotMotor.MotorPid.POSITION_PID_WRAPPING_MAX);
 
-    CANCoderBuilder pivotAbsoluteEncoder =
+    CANCoderBuilder pivotCanCoderEncoder =
         new CANCoderBuilder()
             .setId(FrontRightConstants.PivotMotor.ABSOLUTE_ENCODER_PORT)
             .setOffsetDegrees(FrontRightConstants.PivotMotor.ABSOLUTE_ENCODER_OFFSET);
@@ -263,7 +263,7 @@ public class DriveSubsystem extends SubsystemBase {
         new MotorBuilder()
             .withName(FrontRightConstants.PivotMotor.NAME)
             .withMotorPort(FrontRightConstants.PivotMotor.MOTOR_PORT)
-            .withAbsoluteEncoder(pivotAbsoluteEncoder)
+            .withCanCoderBuilder(pivotCanCoderEncoder)
             .withCurrentLimit(FrontRightConstants.PivotMotor.CURRENT_LIMT)
             .withMotorInverted(FrontRightConstants.PivotMotor.INVERTED)
             .withEncoderInverted(FrontRightConstants.PivotMotor.ENCODER_INVERTED)
@@ -296,7 +296,7 @@ public class DriveSubsystem extends SubsystemBase {
             .withPositionPidWrappingMax(
                 BackRightConstants.PivotMotor.MotorPid.POSITION_PID_WRAPPING_MAX);
 
-    CANCoderBuilder pivotAbsoluteEncoder =
+    CANCoderBuilder pivotCanCoderEncoder =
         new CANCoderBuilder()
             .setId(BackRightConstants.PivotMotor.ABSOLUTE_ENCODER_PORT)
             .setOffsetDegrees(BackRightConstants.PivotMotor.ABSOLUTE_ENCODER_OFFSET);
@@ -316,7 +316,7 @@ public class DriveSubsystem extends SubsystemBase {
         new MotorBuilder()
             .withName(BackRightConstants.PivotMotor.NAME)
             .withMotorPort(BackRightConstants.PivotMotor.MOTOR_PORT)
-            .withAbsoluteEncoder(pivotAbsoluteEncoder)
+            .withCanCoderBuilder(pivotCanCoderEncoder)
             .withCurrentLimit(BackRightConstants.PivotMotor.CURRENT_LIMT)
             .withMotorInverted(BackRightConstants.PivotMotor.INVERTED)
             .withEncoderInverted(BackRightConstants.PivotMotor.ENCODER_INVERTED)

@@ -8,7 +8,9 @@ public class ShooterConstants {
     public static final boolean INVERTED = false;
 
     public static class MotorPid {
-      public static final double P = 0;
+      public static final double P = 0.0001;
+      public static final double I = 0.000002;
+      public static final double I_ZONE = 100;
       public static final double Ff = 0.00015;
     }
   }

@@ -1,4 +1,4 @@
-package frc.bearbotics.swerve.cancoder;
+package frc.bearbotics.motor.cancoder;
 
 import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
@@ -65,7 +65,7 @@ public class CANCoders {
       }
     }
 
-    while (!cancoder.getAbsolutePosition().waitForUpdate(1).hasUpdated()) {
+    while (!cancoder.getAbsolutePosition().waitForUpdate(UPDATE_TIMEOUT).hasUpdated()) {
       DriverStation.reportError(
           String.format(
               "[CANCoder %s]: Timed out while waiting for update... sleeping and retrying",

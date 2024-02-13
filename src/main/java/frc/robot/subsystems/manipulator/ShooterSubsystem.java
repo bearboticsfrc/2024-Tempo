@@ -9,9 +9,9 @@ import com.revrobotics.SparkPIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.bearbotics.swerve.MotorBuilder;
-import frc.bearbotics.swerve.MotorConfig;
-import frc.bearbotics.swerve.MotorPidBuilder;
+import frc.bearbotics.motor.MotorBuilder;
+import frc.bearbotics.motor.MotorConfig;
+import frc.bearbotics.motor.MotorPidBuilder;
 import frc.robot.constants.DriveConstants;
 import frc.robot.constants.manipulator.ShooterConstants;
 
@@ -34,6 +34,8 @@ public class ShooterSubsystem extends SubsystemBase {
     MotorPidBuilder shooterMotorPid =
         new MotorPidBuilder()
             .withP(ShooterConstants.Motor.MotorPid.P)
+            .withI(ShooterConstants.Motor.MotorPid.I)
+            .withIZone(ShooterConstants.Motor.MotorPid.I_ZONE)
             .withFf(ShooterConstants.Motor.MotorPid.Ff);
 
     MotorBuilder shooterMotorConfig =

@@ -16,7 +16,9 @@ import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.util.datalog.DoubleLogEntry;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
-import frc.bearbotics.swerve.cancoder.CANCoders;
+import frc.bearbotics.motor.MotorBuilder;
+import frc.bearbotics.motor.MotorConfig;
+import frc.bearbotics.motor.cancoder.CANCoders;
 import java.util.HashMap;
 import java.util.Map.Entry;
 import java.util.function.DoubleSupplier;
@@ -68,17 +70,14 @@ public class SwerveModule {
         .burnFlash();
 
     MotorConfig.fromMotorConstants(
-            pivotMotor,
-            pivotMotorRelativeEncoder,
-            swerveModule.getPivotMotor().getAbsoluteEncoder(),
-            swerveModule.getPivotMotor())
+            pivotMotor, pivotMotorRelativeEncoder, swerveModule.getPivotMotor())
         .configureMotor()
         .configureAbsoluteEncoder()
         .configurePID(swerveModule.getPivotMotor().getMotorPID())
         .burnFlash();
 
     this.pivotMotorAbsoluteEncoder =
-        CANCoders.getInstance().get(swerveModule.getPivotMotor().getAbsoluteEncoder().getId());
+        CANCoders.getInstance().get(swerveModule.getPivotMotor().getCanCoderBuilder().getId());
 
     MotorConfig.fromMotorConstants(
             pivotMotor, pivotMotorRelativeEncoder, swerveModule.getPivotMotor())

@@ -1,14 +1,15 @@
-package frc.bearbotics.swerve;
+package frc.bearbotics.motor;
 
 /** Builder class for configuring motor PID parameters. */
 public class MotorPidBuilder {
-  private double p = 0;
-  private double i = 0;
-  private double d = 0;
-  private double ff = 0;
+  private double p;
+  private double i;
+  private double iZone;
+  private double d;
+  private double ff;
   private double minOutput = -1;
   private double maxOutput = 1;
-  private boolean positionPidWrappingEnabled = false;
+  private boolean positionPidWrappingEnabled;
   private double positionPidWrappingMin = -1;
   private double positionPidWrappingMax = 1;
 
@@ -47,8 +48,28 @@ public class MotorPidBuilder {
    * @param i The desired I value.
    * @return This MotorPidBuilder instance for method chaining.
    */
-  public MotorPidBuilder withI(double i) {
-    this.i = i;
+  public MotorPidBuilder withI(double iZone) {
+    this.iZone = iZone;
+    return this;
+  }
+
+  /**
+   * Get the integral zone (I zone) value.
+   *
+   * @return The I zone value.
+   */
+  public double getIZone() {
+    return iZone;
+  }
+
+  /**
+   * Set the integral zone gain (I zone) value.
+   *
+   * @param iZone The desired I zone value.
+   * @return This MotorPidBuilder instance for method chaining.
+   */
+  public MotorPidBuilder withIZone(double iZone) {
+    this.iZone = iZone;
     return this;
   }
 

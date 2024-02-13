@@ -1,7 +1,7 @@
-package frc.bearbotics.swerve;
+package frc.bearbotics.motor;
 
 import com.revrobotics.CANSparkBase.IdleMode;
-import frc.bearbotics.swerve.cancoder.CANCoders.CANCoderBuilder;
+import frc.bearbotics.motor.cancoder.CANCoders.CANCoderBuilder;
 
 /** Builder class for configuring motor parameters. */
 public class MotorBuilder {
@@ -10,7 +10,6 @@ public class MotorBuilder {
   private int motorPort;
   private boolean motorInverted;
   private boolean encoderInverted;
-  private CANCoderBuilder absoluteEncoder;
   private MotorPidBuilder motorPID;
   private double nominalVoltage = 12;
   private int currentLimit;
@@ -19,6 +18,9 @@ public class MotorBuilder {
   private IdleMode idleMode = IdleMode.kBrake;
   private boolean followInverted;
   private MotorPidBuilder[] pidSlots = new MotorPidBuilder[2];
+  private MotorSoftLimit lowSoftLimit;
+  private MotorSoftLimit highSoftLimit;
+  private CANCoderBuilder canCoderBuilder;
 
   /**
    * Get the configured name of the motor.
@@ -121,7 +123,7 @@ public class MotorBuilder {
   }
 
   /**
-   * Get the current idle mode setting.
+   * Get the current idle mode parameter.
    *
    * @return The current idle mode.
    */
@@ -137,26 +139,6 @@ public class MotorBuilder {
    */
   public MotorBuilder withIdleMode(IdleMode idleMode) {
     this.idleMode = idleMode;
-    return this;
-  }
-
-  /**
-   * Get the configured absolute encoder for the motor.
-   *
-   * @return The configured CANCoder for absolute encoding.
-   */
-  public CANCoderBuilder getAbsoluteEncoder() {
-    return absoluteEncoder;
-  }
-
-  /**
-   * Set the absolute encoder for the motor.
-   *
-   * @param canCoder The CANCoderBuilder for configuring the absolute encoder.
-   * @return This MotorBuilder instance for method chaining.
-   */
-  public MotorBuilder withAbsoluteEncoder(CANCoderBuilder canCoder) {
-    this.absoluteEncoder = canCoder;
     return this;
   }
 
@@ -299,6 +281,66 @@ public class MotorBuilder {
    */
   public MotorBuilder withVelocityConversionFactor(double velocityConversionFactor) {
     this.velocityConversionFactor = velocityConversionFactor;
+    return this;
+  }
+  /**
+   * Gets the low soft limit for the motor.
+   *
+   * @return The low soft limit.
+   */
+  public MotorSoftLimit getLowSoftLimit() {
+    return lowSoftLimit;
+  }
+
+  /**
+   * Sets the low soft limit for the motor.
+   *
+   * @param softLimit The low soft limit to set.
+   * @return The MotorBuilder instance for method chaining.
+   */
+  public MotorBuilder withLowSoftLimit(MotorSoftLimit softLimit) {
+    this.lowSoftLimit = softLimit;
+    return this;
+  }
+
+  /**
+   * Gets the high soft limit for the motor.
+   *
+   * @return The high soft limit.
+   */
+  public MotorSoftLimit getHighSoftLimit() {
+    return highSoftLimit;
+  }
+
+  /**
+   * Sets the high soft limit for the motor.
+   *
+   * @param highSoftLimit The high soft limit to set.
+   * @return The MotorBuilder instance for method chaining.
+   */
+  public MotorBuilder withHighSoftLimit(MotorSoftLimit highSoftLimit) {
+    this.highSoftLimit = highSoftLimit;
+    return this;
+  }
+
+  /**
+   * Gets the CANCoderBuilder associated with this MotorBuilder.
+   *
+   * @return The CANCoderBuilder for configuring CANCoder parameters.
+   */
+  public CANCoderBuilder getCanCoderBuilder() {
+    return canCoderBuilder;
+  }
+
+  /**
+   * Sets the CANCoderBuilder for configuring CANCoder parameters and returns the updated
+   * MotorBuilder instance.
+   *
+   * @param canCoderBuilder The CANCoderBuilder to be associated with this MotorBuilder.
+   * @return This MotorBuilder instance for method chaining.
+   */
+  public MotorBuilder withCanCoderBuilder(CANCoderBuilder canCoderBuilder) {
+    this.canCoderBuilder = canCoderBuilder;
     return this;
   }
 }
