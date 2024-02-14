@@ -47,11 +47,6 @@ public class MotorConfig {
     this.motorBuilder = motorBuilder;
   }
 
-  private String getMotorDescription() {
-    return motorBuilder.getName() == null
-        ? motorBuilder.getModuleName()
-        : String.format("%s - %s", motorBuilder.getModuleName(), motorBuilder.getName());
-  }
   /**
    * Configures generic motor parameters, including inversion, idle mode, voltage compensation,
    * current limit, or low and high soft limits.
@@ -61,7 +56,7 @@ public class MotorConfig {
   public MotorConfig configureMotor() {
     motor.setInverted(motorBuilder.isMotorInverted());
 
-    String motorDescription = getMotorDescription();
+    String motorDescription = motorBuilder.getName();
     RevUtil.checkRevError(motor.setIdleMode(motorBuilder.getIdleMode()));
     RevUtil.checkRevError(motor.enableVoltageCompensation(motorBuilder.getNominalVoltage()));
     RevUtil.checkRevError(motor.setSmartCurrentLimit(motorBuilder.getCurrentLimit()));
@@ -113,7 +108,7 @@ public class MotorConfig {
     String message =
         String.format(
             "[MotorConfig.configureEncoder] %s - %s:\n\t",
-            getMotorDescription(), motorEncoder.getClass());
+            motorBuilder.getName(), motorEncoder.getClass());
 
     if (motorEncoder instanceof RelativeEncoder) {
       ((RelativeEncoder) motorEncoder).setPosition(initialPosition.getRadians());
@@ -169,7 +164,7 @@ public class MotorConfig {
     String message =
         String.format(
             "[MotorConfig.configureCanCoder] %s:\n\tSet ID -> %s\n\tSet offset angle (degrees) -> %s\n",
-            getMotorDescription(),
+            motorBuilder.getName(),
             motorBuilder.getCanCoderBuilder().getId(),
             motorBuilder.getCanCoderBuilder().getOffsetDegrees().getDegrees());
     logEntry.append(message);
@@ -211,7 +206,7 @@ public class MotorConfig {
     String message =
         String.format(
             "[MotorConfig.configurePid] %s:\n\tSet P -> %s\n\tSet I -> %s\n\tSet I Zone -> %s\n\tSet D -> %s\n\tSet FF -> %s\n\tSet min output -> %s\n\tSet max output -> %s\n",
-            getMotorDescription(),
+            motorBuilder.getName(),
             motorPid.getP(),
             motorPid.getI(),
             motorPid.getIZone(),
@@ -244,7 +239,7 @@ public class MotorConfig {
     String message =
         String.format(
             "[MotorConfig.configurePositionalPidWrapping] %s:\n\tSet positional PID wrapping enabled -> true\n\tSet positional PID wrapping min input -> %s\n\tSet positional PID wrapping max input -> %s\n",
-            getMotorDescription(),
+            motorBuilder.getName(),
             motorPid.getPositionPidWrappingMin(),
             motorPid.getPositionPidWrappingMax());
     logEntry.append(message);
@@ -264,7 +259,7 @@ public class MotorConfig {
     String message =
         String.format(
             "[MotorConfig.follow] %s:\n\tSet follow -> true\n\tSet leader (ID) -> %s\n\tSet follow inverted -> %s\n",
-            getMotorDescription(), leaderMotor.getDeviceId(), motorBuilder.isFollowInverted());
+            motorBuilder.getName(), leaderMotor.getDeviceId(), motorBuilder.isFollowInverted());
     logEntry.append(message);
 
     return this;
@@ -275,7 +270,7 @@ public class MotorConfig {
     String message =
         String.format(
             "[MotorConfig.burnFlash] %s:\n\tBurn flash delay (seconds) -> 0.25\n",
-            getMotorDescription(), 0.25);
+            motorBuilder.getName(), 0.25);
     logEntry.append(message);
 
     Timer.delay(0.25);

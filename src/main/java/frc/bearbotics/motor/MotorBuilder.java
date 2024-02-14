@@ -6,7 +6,6 @@ import frc.bearbotics.motor.cancoder.CANCoders.CANCoderBuilder;
 /** Builder class for configuring motor parameters. */
 public class MotorBuilder {
   private String name;
-  private String moduleName;
   private int motorPort;
   private boolean motorInverted;
   private boolean encoderInverted;
@@ -38,26 +37,6 @@ public class MotorBuilder {
    */
   public MotorBuilder withName(String name) {
     this.name = name;
-    return this;
-  }
-
-  /**
-   * Get the configured module name of the motor.
-   *
-   * @return The motor module name.
-   */
-  public String getModuleName() {
-    return moduleName;
-  }
-
-  /**
-   * Set the module name of the motor.
-   *
-   * @param moduleName The desired motor module name.
-   * @return This MotorBuilder instance for method chaining.
-   */
-  public MotorBuilder withModuleName(String moduleName) {
-    this.moduleName = moduleName;
     return this;
   }
 

@@ -44,7 +44,7 @@ public class ShooterSubsystem extends SubsystemBase {
 
     MotorBuilder shooterMotorConfig =
         new MotorBuilder()
-            .withModuleName(ShooterConstants.Motor.MODULE_NAME)
+            .withName(ShooterConstants.Motor.MODULE_NAME)
             .withMotorPort(ShooterConstants.Motor.MOTOR_PORT)
             .withMotorInverted(ShooterConstants.Motor.INVERTED)
             .withCurrentLimit(ShooterConstants.Motor.CURRENT_LIMT)
@@ -53,7 +53,7 @@ public class ShooterSubsystem extends SubsystemBase {
 
     MotorBuilder shooterMotorFollowerConfig =
         new MotorBuilder()
-            .withModuleName(ShooterConstants.MotorFollower.MODULE_NAME)
+            .withName(ShooterConstants.MotorFollower.MODULE_NAME)
             .withMotorPort(ShooterConstants.MotorFollower.MOTOR_PORT)
             .withCurrentLimit(ShooterConstants.MotorFollower.CURRENT_LIMT)
             .withFollowInverted(ShooterConstants.MotorFollower.FOLLOW_INVERTED);

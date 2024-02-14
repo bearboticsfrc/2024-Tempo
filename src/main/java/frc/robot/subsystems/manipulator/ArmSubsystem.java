@@ -69,7 +69,7 @@ public class ArmSubsystem extends SubsystemBase {
 
     MotorBuilder armMotorConfig =
         new MotorBuilder()
-            .withModuleName(ArmConstants.Motor.MODULE_NAME)
+            .withName(ArmConstants.Motor.MODULE_NAME)
             .withMotorPort(ArmConstants.Motor.MOTOR_PORT)
             .withMotorInverted(ArmConstants.Motor.INVERTED)
             .withCurrentLimit(ArmConstants.Motor.CURRENT_LIMT)
@@ -80,7 +80,7 @@ public class ArmSubsystem extends SubsystemBase {
 
     MotorBuilder armMotorFollowerConfig =
         new MotorBuilder()
-            .withModuleName(ArmConstants.MotorFollower.MODULE_NAME)
+            .withName(ArmConstants.MotorFollower.MODULE_NAME)
             .withMotorPort(ArmConstants.MotorFollower.MOTOR_PORT)
             .withFollowInverted(ArmConstants.MotorFollower.FOLLOW_INVERTED)
             .withCurrentLimit(ArmConstants.MotorFollower.CURRENT_LIMT)

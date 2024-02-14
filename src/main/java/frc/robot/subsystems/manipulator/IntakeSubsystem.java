@@ -39,7 +39,7 @@ public class IntakeSubsystem extends SubsystemBase {
   private void configureMotors() {
     MotorBuilder rollerMotorBuilder =
         new MotorBuilder()
-            .withModuleName(IntakeConstants.RollerMotor.MODULE_NAME)
+            .withName(IntakeConstants.RollerMotor.MODULE_NAME)
             .withMotorPort(IntakeConstants.RollerMotor.MOTOR_PORT)
             .withMotorInverted(IntakeConstants.RollerMotor.INVERTED)
             .withCurrentLimit(IntakeConstants.RollerMotor.CURRENT_LIMT)
@@ -47,7 +47,7 @@ public class IntakeSubsystem extends SubsystemBase {
 
     MotorBuilder feederMotorBuilder =
         new MotorBuilder()
-            .withModuleName(IntakeConstants.FeederMotor.MODULE_NAME)
+            .withName(IntakeConstants.FeederMotor.MODULE_NAME)
             .withMotorPort(IntakeConstants.FeederMotor.MOTOR_PORT)
             .withMotorInverted(IntakeConstants.FeederMotor.INVERTED)
             .withCurrentLimit(IntakeConstants.FeederMotor.CURRENT_LIMT);

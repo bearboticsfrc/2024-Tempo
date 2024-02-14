@@ -35,7 +35,7 @@ public class ClimberSubsystem extends SubsystemBase {
 
     MotorBuilder climberMotorConfig =
         new MotorBuilder()
-            .withModuleName(ClimberConstants.Motor.MODULE_NAME)
+            .withName(ClimberConstants.Motor.MODULE_NAME)
             .withMotorPort(ClimberConstants.Motor.MOTOR_PORT)
             .withMotorInverted(ClimberConstants.Motor.INVERTED)
             .withCurrentLimit(ClimberConstants.Motor.CURRENT_LIMT)
@@ -43,7 +43,7 @@ public class ClimberSubsystem extends SubsystemBase {
 
     MotorBuilder climberMotorFollowerConfig =
         new MotorBuilder()
-            .withModuleName(ClimberConstants.MotorFollower.MODULE_NAME)
+            .withName(ClimberConstants.MotorFollower.MODULE_NAME)
             .withMotorPort(ClimberConstants.MotorFollower.MOTOR_PORT)
             .withCurrentLimit(ClimberConstants.MotorFollower.CURRENT_LIMT)
             .withFollowInverted(ClimberConstants.MotorFollower.FOLLOW_INVERTED);

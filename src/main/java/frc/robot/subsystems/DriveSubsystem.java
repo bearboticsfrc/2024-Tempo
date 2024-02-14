@@ -144,6 +144,7 @@ public class DriveSubsystem extends SubsystemBase {
 
     MotorBuilder driveConfig =
         new MotorBuilder()
+            .withName(FrontLeftConstants.MODULE_NAME)
             .withName(FrontLeftConstants.DriveMotor.NAME)
             .withMotorPort(FrontLeftConstants.DriveMotor.MOTOR_PORT)
             .withCurrentLimit(FrontLeftConstants.DriveMotor.CURRENT_LIMT)
@@ -155,6 +156,7 @@ public class DriveSubsystem extends SubsystemBase {
 
     MotorBuilder pivotConfig =
         new MotorBuilder()
+            .withName(FrontLeftConstants.MODULE_NAME)
             .withName(FrontLeftConstants.PivotMotor.NAME)
             .withMotorPort(FrontLeftConstants.PivotMotor.MOTOR_PORT)
             .withCanCoderBuilder(pivotCanCoderEncoder)
@@ -197,6 +199,7 @@ public class DriveSubsystem extends SubsystemBase {
 
     MotorBuilder driveConfig =
         new MotorBuilder()
+            .withName(BackLeftConstants.MODULE_NAME)
             .withName(BackLeftConstants.DriveMotor.NAME)
             .withMotorPort(BackLeftConstants.DriveMotor.MOTOR_PORT)
             .withCurrentLimit(BackLeftConstants.DriveMotor.CURRENT_LIMT)
@@ -208,6 +211,7 @@ public class DriveSubsystem extends SubsystemBase {
 
     MotorBuilder pivotConfig =
         new MotorBuilder()
+            .withName(BackLeftConstants.MODULE_NAME)
             .withName(BackLeftConstants.PivotMotor.NAME)
             .withMotorPort(BackLeftConstants.PivotMotor.MOTOR_PORT)
             .withCanCoderBuilder(pivotCanCoderEncoder)
@@ -250,6 +254,7 @@ public class DriveSubsystem extends SubsystemBase {
 
     MotorBuilder driveConfig =
         new MotorBuilder()
+            .withName(FrontRightConstants.MODULE_NAME)
             .withName(FrontRightConstants.DriveMotor.NAME)
             .withMotorPort(FrontRightConstants.DriveMotor.MOTOR_PORT)
             .withCurrentLimit(FrontRightConstants.DriveMotor.CURRENT_LIMT)
@@ -261,6 +266,7 @@ public class DriveSubsystem extends SubsystemBase {
 
     MotorBuilder pivotConfig =
         new MotorBuilder()
+            .withName(FrontRightConstants.MODULE_NAME)
             .withName(FrontRightConstants.PivotMotor.NAME)
             .withMotorPort(FrontRightConstants.PivotMotor.MOTOR_PORT)
             .withCanCoderBuilder(pivotCanCoderEncoder)
@@ -303,6 +309,7 @@ public class DriveSubsystem extends SubsystemBase {
 
     MotorBuilder driveConfig =
         new MotorBuilder()
+            .withName(BackRightConstants.MODULE_NAME)
             .withName(BackRightConstants.DriveMotor.NAME)
             .withMotorPort(BackRightConstants.DriveMotor.MOTOR_PORT)
             .withCurrentLimit(BackRightConstants.DriveMotor.CURRENT_LIMT)
@@ -314,6 +321,7 @@ public class DriveSubsystem extends SubsystemBase {
 
     MotorBuilder pivotConfig =
         new MotorBuilder()
+            .withName(BackRightConstants.MODULE_NAME)
             .withName(BackRightConstants.PivotMotor.NAME)
             .withMotorPort(BackRightConstants.PivotMotor.MOTOR_PORT)
             .withCanCoderBuilder(pivotCanCoderEncoder)
