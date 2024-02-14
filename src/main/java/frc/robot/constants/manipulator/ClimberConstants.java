@@ -8,7 +8,7 @@ public class ClimberConstants {
     public static final int MOTOR_PORT = 14;
     public static final int CURRENT_LIMT = 40;
     public static final boolean INVERTED = true;
-    public static final float FORWARD_SOFT_LIMIT = 110;
+    public static final float FORWARD_SOFT_LIMIT = 105;
   }
 
   public class MotorFollower {

@@ -48,8 +48,8 @@ public class MotorPidBuilder {
    * @param i The desired I value.
    * @return This MotorPidBuilder instance for method chaining.
    */
-  public MotorPidBuilder withI(double iZone) {
-    this.iZone = iZone;
+  public MotorPidBuilder withI(double i) {
+    this.i = i;
     return this;
   }
 
