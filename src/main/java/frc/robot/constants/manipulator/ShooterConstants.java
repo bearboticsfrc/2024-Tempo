@@ -4,7 +4,7 @@ public class ShooterConstants {
   public static final double VELOCITY_TOLERANCE = 25;
 
   public static class Motor {
-    public static final String MODULE_NAME = "Shooter Motor";
+    public static final String NAME = "Shooter Motor";
     public static final int MOTOR_PORT = 11;
     public static final int CURRENT_LIMT = 40;
     public static final boolean INVERTED = false;
@@ -18,7 +18,7 @@ public class ShooterConstants {
   }
 
   public static class MotorFollower {
-    public static final String MODULE_NAME = "Shooter Motor Follower";
+    public static final String NAME = "Shooter Motor Follower";
     public static final int MOTOR_PORT = 7;
     public static final int CURRENT_LIMT = 40;
     public static final boolean INVERTED = false;

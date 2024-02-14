@@ -13,7 +13,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.bearbotics.motor.MotorBuilder;
 import frc.bearbotics.motor.MotorConfig;
 import frc.bearbotics.motor.MotorPidBuilder;
-import frc.robot.constants.DriveConstants;
+import frc.robot.constants.RobotConstants;
 import frc.robot.constants.manipulator.ShooterConstants;
 
 public class ShooterSubsystem extends SubsystemBase {
@@ -31,7 +31,7 @@ public class ShooterSubsystem extends SubsystemBase {
 
   public ShooterSubsystem() {
     configureMotors();
-    setupShuffleboardTab(DriveConstants.MANIPULATOR_SYSTEM_TAB);
+    setupShuffleboardTab(RobotConstants.MANIPULATOR_SYSTEM_TAB);
   }
 
   private void configureMotors() {
@@ -44,7 +44,7 @@ public class ShooterSubsystem extends SubsystemBase {
 
     MotorBuilder shooterMotorConfig =
         new MotorBuilder()
-            .withName(ShooterConstants.Motor.MODULE_NAME)
+            .withName(ShooterConstants.Motor.NAME)
             .withMotorPort(ShooterConstants.Motor.MOTOR_PORT)
             .withMotorInverted(ShooterConstants.Motor.INVERTED)
             .withCurrentLimit(ShooterConstants.Motor.CURRENT_LIMT)
@@ -53,7 +53,7 @@ public class ShooterSubsystem extends SubsystemBase {
 
     MotorBuilder shooterMotorFollowerConfig =
         new MotorBuilder()
-            .withName(ShooterConstants.MotorFollower.MODULE_NAME)
+            .withName(ShooterConstants.MotorFollower.NAME)
             .withMotorPort(ShooterConstants.MotorFollower.MOTOR_PORT)
             .withCurrentLimit(ShooterConstants.MotorFollower.CURRENT_LIMT)
             .withFollowInverted(ShooterConstants.MotorFollower.FOLLOW_INVERTED);

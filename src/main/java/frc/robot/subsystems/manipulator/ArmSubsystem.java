@@ -15,7 +15,7 @@ import frc.bearbotics.motor.MotorBuilder;
 import frc.bearbotics.motor.MotorConfig;
 import frc.bearbotics.motor.MotorPidBuilder;
 import frc.bearbotics.motor.MotorSoftLimit;
-import frc.robot.constants.DriveConstants;
+import frc.robot.constants.RobotConstants;
 import frc.robot.constants.manipulator.ArmConstants;
 
 public class ArmSubsystem extends SubsystemBase {
@@ -27,16 +27,16 @@ public class ArmSubsystem extends SubsystemBase {
   private ArmFeedforward armFeedforward;
 
   private GenericEntry debug_setPoint =
-      DriveConstants.MANIPULATOR_SYSTEM_TAB.add("Arm Set Point", this.setPoint).getEntry();
+      RobotConstants.MANIPULATOR_SYSTEM_TAB.add("Arm Set Point", this.setPoint).getEntry();
 
   private GenericEntry debug_FfG =
-      DriveConstants.MANIPULATOR_SYSTEM_TAB.add("Arm FF G", this.ffG).getEntry();
+      RobotConstants.MANIPULATOR_SYSTEM_TAB.add("Arm FF G", this.ffG).getEntry();
 
   private GenericEntry debug_P =
-      DriveConstants.MANIPULATOR_SYSTEM_TAB.add("Arm P", this.p).getEntry();
+      RobotConstants.MANIPULATOR_SYSTEM_TAB.add("Arm P", this.p).getEntry();
 
   private GenericEntry debug_D =
-      DriveConstants.MANIPULATOR_SYSTEM_TAB.add("Arm D", this.d).getEntry();
+      RobotConstants.MANIPULATOR_SYSTEM_TAB.add("Arm D", this.d).getEntry();
 
   private double setPoint = 0;
   private double ffG = 0;
@@ -45,7 +45,7 @@ public class ArmSubsystem extends SubsystemBase {
 
   public ArmSubsystem() {
     setupMotors();
-    setupShuffleboardTab(DriveConstants.MANIPULATOR_SYSTEM_TAB);
+    setupShuffleboardTab(RobotConstants.MANIPULATOR_SYSTEM_TAB);
   }
 
   private void setupMotors() {
@@ -69,7 +69,7 @@ public class ArmSubsystem extends SubsystemBase {
 
     MotorBuilder armMotorConfig =
         new MotorBuilder()
-            .withName(ArmConstants.Motor.MODULE_NAME)
+            .withName(ArmConstants.Motor.NAME)
             .withMotorPort(ArmConstants.Motor.MOTOR_PORT)
             .withMotorInverted(ArmConstants.Motor.INVERTED)
             .withCurrentLimit(ArmConstants.Motor.CURRENT_LIMT)
@@ -80,7 +80,7 @@ public class ArmSubsystem extends SubsystemBase {
 
     MotorBuilder armMotorFollowerConfig =
         new MotorBuilder()
-            .withName(ArmConstants.MotorFollower.MODULE_NAME)
+            .withName(ArmConstants.MotorFollower.NAME)
             .withMotorPort(ArmConstants.MotorFollower.MOTOR_PORT)
             .withFollowInverted(ArmConstants.MotorFollower.FOLLOW_INVERTED)
             .withCurrentLimit(ArmConstants.MotorFollower.CURRENT_LIMT)

@@ -11,7 +11,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.bearbotics.motor.MotorBuilder;
 import frc.bearbotics.motor.MotorConfig;
 import frc.bearbotics.motor.MotorSoftLimit;
-import frc.robot.constants.DriveConstants;
+import frc.robot.constants.RobotConstants;
 import frc.robot.constants.manipulator.ClimberConstants;
 
 public class ClimberSubsystem extends SubsystemBase {
@@ -24,7 +24,7 @@ public class ClimberSubsystem extends SubsystemBase {
 
   public ClimberSubsystem() {
     setupMotors();
-    setupShuffleboardTab(DriveConstants.MANIPULATOR_SYSTEM_TAB);
+    setupShuffleboardTab(RobotConstants.MANIPULATOR_SYSTEM_TAB);
   }
 
   private void setupMotors() {
@@ -35,7 +35,7 @@ public class ClimberSubsystem extends SubsystemBase {
 
     MotorBuilder climberMotorConfig =
         new MotorBuilder()
-            .withName(ClimberConstants.Motor.MODULE_NAME)
+            .withName(ClimberConstants.Motor.NAME)
             .withMotorPort(ClimberConstants.Motor.MOTOR_PORT)
             .withMotorInverted(ClimberConstants.Motor.INVERTED)
             .withCurrentLimit(ClimberConstants.Motor.CURRENT_LIMT)
@@ -43,7 +43,7 @@ public class ClimberSubsystem extends SubsystemBase {
 
     MotorBuilder climberMotorFollowerConfig =
         new MotorBuilder()
-            .withName(ClimberConstants.MotorFollower.MODULE_NAME)
+            .withName(ClimberConstants.MotorFollower.NAME)
             .withMotorPort(ClimberConstants.MotorFollower.MOTOR_PORT)
             .withCurrentLimit(ClimberConstants.MotorFollower.CURRENT_LIMT)
             .withFollowInverted(ClimberConstants.MotorFollower.FOLLOW_INVERTED);

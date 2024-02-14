@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.bearbotics.test.DriveSubsystemTest;
 import frc.robot.constants.DriveConstants;
 import frc.robot.constants.DriveConstants.SpeedMode;
+import frc.robot.constants.RobotConstants;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.manipulator.ArmSubsystem.ArmPosition;
 import frc.robot.subsystems.manipulator.ManipulatorSubsystem;
@@ -39,7 +40,7 @@ public class RobotContainer {
     configureDriverBindings();
     configureOperatorBindings();
 
-    DriveConstants.COMPETITION_TAB.add(
+    RobotConstants.COMPETITION_TAB.add(
         "Home Climber", manipulatorSubsystem.getClimberHomeCommand());
   }
 
@@ -103,16 +104,16 @@ public class RobotContainer {
   private void buildAutoList() {
     autoCommandChooser.addOption("0 - NoOp", new InstantCommand());
 
-    DriveConstants.COMPETITION_TAB
+    RobotConstants.COMPETITION_TAB
         .add("Auto Command", autoCommandChooser)
         .withSize(4, 1)
         .withPosition(0, 1);
   }
 
   private void buildTestList() {
-    DriveConstants.TEST_TAB
+    RobotConstants.TEST_TAB
         .add(
-            "Drive Subsystem Test", new DriveSubsystemTest(driveSubsystem, DriveConstants.TEST_TAB))
+            "Drive Subsystem Test", new DriveSubsystemTest(driveSubsystem, RobotConstants.TEST_TAB))
         .withPosition(2, 1)
         .withSize(2, 1);
   }

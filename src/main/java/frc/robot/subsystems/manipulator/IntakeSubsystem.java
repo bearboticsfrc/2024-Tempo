@@ -10,7 +10,7 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.bearbotics.motor.MotorBuilder;
 import frc.bearbotics.motor.MotorConfig;
-import frc.robot.constants.DriveConstants;
+import frc.robot.constants.RobotConstants;
 import frc.robot.constants.manipulator.IntakeConstants;
 
 public class IntakeSubsystem extends SubsystemBase {
@@ -33,13 +33,13 @@ public class IntakeSubsystem extends SubsystemBase {
 
   public IntakeSubsystem() {
     configureMotors();
-    setupShuffleboardTab(DriveConstants.MANIPULATOR_SYSTEM_TAB);
+    setupShuffleboardTab(RobotConstants.MANIPULATOR_SYSTEM_TAB);
   }
 
   private void configureMotors() {
     MotorBuilder rollerMotorBuilder =
         new MotorBuilder()
-            .withName(IntakeConstants.RollerMotor.MODULE_NAME)
+            .withName(IntakeConstants.RollerMotor.NAME)
             .withMotorPort(IntakeConstants.RollerMotor.MOTOR_PORT)
             .withMotorInverted(IntakeConstants.RollerMotor.INVERTED)
             .withCurrentLimit(IntakeConstants.RollerMotor.CURRENT_LIMT)
@@ -47,7 +47,7 @@ public class IntakeSubsystem extends SubsystemBase {
 
     MotorBuilder feederMotorBuilder =
         new MotorBuilder()
-            .withName(IntakeConstants.FeederMotor.MODULE_NAME)
+            .withName(IntakeConstants.FeederMotor.NAME)
             .withMotorPort(IntakeConstants.FeederMotor.MOTOR_PORT)
             .withMotorInverted(IntakeConstants.FeederMotor.INVERTED)
             .withCurrentLimit(IntakeConstants.FeederMotor.CURRENT_LIMT);

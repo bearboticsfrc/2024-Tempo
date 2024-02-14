@@ -62,7 +62,7 @@ public class DriveSubsystem extends SubsystemBase {
     for (SwerveCorner corner : SwerveCorner.values()) {
       swerveModules.put(
           corner,
-          new SwerveModule(getSwerveConfigForCorner(corner), DriveConstants.DRIVE_SYSTEM_TAB));
+          new SwerveModule(getSwerveConfigForCorner(corner), RobotConstants.DRIVE_SYSTEM_TAB));
     }
 
     odometry =
@@ -79,7 +79,7 @@ public class DriveSubsystem extends SubsystemBase {
 
   private void setupShuffleboardTab() {
     competitionTabMaxSpeedEntry =
-        DriveConstants.COMPETITION_TAB
+        RobotConstants.COMPETITION_TAB
             .add("Maximum Drive Speed", maxSpeed)
             .withWidget(BuiltInWidgets.kNumberSlider)
             .withSize(2, 1)
@@ -87,11 +87,11 @@ public class DriveSubsystem extends SubsystemBase {
             .withProperties(Map.of("min", 0, "max", maxSpeed * 2))
             .getEntry();
 
-    DriveConstants.COMPETITION_TAB.addNumber("Pigeon Heading", () -> getHeading().getDegrees());
-    DriveConstants.DRIVE_SYSTEM_TAB.addBoolean("Field Relative?", () -> fieldRelativeMode);
-    DriveConstants.DRIVE_SYSTEM_TAB.addDoubleArray(
+    RobotConstants.COMPETITION_TAB.addNumber("Pigeon Heading", () -> getHeading().getDegrees());
+    RobotConstants.DRIVE_SYSTEM_TAB.addBoolean("Field Relative?", () -> fieldRelativeMode);
+    RobotConstants.DRIVE_SYSTEM_TAB.addDoubleArray(
         "MeasuredStates", this::getMeasuredSwerveModuleStates);
-    DriveConstants.DRIVE_SYSTEM_TAB.addDoubleArray(
+    RobotConstants.DRIVE_SYSTEM_TAB.addDoubleArray(
         "DesiredStates", this::getDesiredSwerveModuleStates);
   }
 
