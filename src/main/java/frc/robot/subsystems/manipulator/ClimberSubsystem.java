@@ -1,15 +1,16 @@
 package frc.robot.subsystems.manipulator;
 
-import com.revrobotics.CANSparkBase.ControlType;
+import com.revrobotics.CANSparkBase.SoftLimitDirection;
 import com.revrobotics.CANSparkLowLevel;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.bearbotics.motor.MotorBuilder;
 import frc.bearbotics.motor.MotorConfig;
-import frc.bearbotics.motor.MotorPidBuilder;
+import frc.bearbotics.motor.MotorSoftLimit;
 import frc.robot.constants.DriveConstants;
 import frc.robot.constants.manipulator.ClimberConstants;
 
@@ -19,18 +20,18 @@ public class ClimberSubsystem extends SubsystemBase {
 
   private RelativeEncoder climberMotorEncoder;
 
+  private DigitalInput climberLimitSwitch = new DigitalInput(ClimberConstants.LIMIT_SWITCH_CHANNEL);
+
   public ClimberSubsystem() {
     setupMotors();
     setupShuffleboardTab(DriveConstants.MANIPULATOR_SYSTEM_TAB);
   }
 
   private void setupMotors() {
-    MotorPidBuilder climberMotorPid =
-        new MotorPidBuilder()
-            .withP(ClimberConstants.Motor.MotorPid.P)
-            .withFf(ClimberConstants.Motor.MotorPid.Ff)
-            .withMinOutput(ClimberConstants.Motor.MotorPid.MIN_OUTPUT)
-            .withMaxOutput(ClimberConstants.Motor.MotorPid.MAX_OUTPUT);
+    MotorSoftLimit climbeSoftLimit =
+        new MotorSoftLimit()
+            .withDirection(SoftLimitDirection.kForward)
+            .withLimit(ClimberConstants.Motor.FORWARD_SOFT_LIMIT);
 
     MotorBuilder climberMotorConfig =
         new MotorBuilder()
@@ -38,7 +39,7 @@ public class ClimberSubsystem extends SubsystemBase {
             .withMotorPort(ClimberConstants.Motor.MOTOR_PORT)
             .withMotorInverted(ClimberConstants.Motor.INVERTED)
             .withCurrentLimit(ClimberConstants.Motor.CURRENT_LIMT)
-            .withMotorPID(climberMotorPid);
+            .withForwardSoftLimit(climbeSoftLimit);
 
     MotorBuilder climberMotorFollowerConfig =
         new MotorBuilder()
@@ -67,16 +68,20 @@ public class ClimberSubsystem extends SubsystemBase {
   }
 
   private void setupShuffleboardTab(ShuffleboardTab shuffleboardTab) {
-    shuffleboardTab.addDouble("Climber Pos", climberMotorEncoder::getPosition);
+    shuffleboardTab.addDouble("Climber Position", climberMotorEncoder::getPosition);
+    shuffleboardTab.addDouble("Climber Current", climberMotor::getOutputCurrent);
+    shuffleboardTab.addBoolean("Climber Limit Switch", climberLimitSwitch::get);
   }
 
-  /**
-   * Set the climber motor to the specified position using closed-loop control.
-   *
-   * @param position The desired climber position.
-   */
-  public void set(ClimberPosition position) {
-    climberMotor.getPIDController().setReference(position.getPosition(), ControlType.kPosition);
+  @Override
+  public void periodic() {
+    if (isClimberHome() && climberMotorEncoder.getPosition() != 0) {
+      climberMotorEncoder.setPosition(0);
+    }
+  }
+
+  public boolean isClimberHome() {
+    return climberLimitSwitch.get();
   }
 
   /**
@@ -85,32 +90,16 @@ public class ClimberSubsystem extends SubsystemBase {
    * @param speed The desired speed for the climber motor.
    */
   public void set(double speed) {
+    if (isClimberHome() && speed < 0) {
+      stop();
+      return;
+    }
+
     climberMotor.set(speed);
   }
 
-  /** Enum representing different positions of the climber. */
-  public enum ClimberPosition {
-    RETRACTED(0),
-    EXTENDED(106);
-
-    private final double position;
-
-    /**
-     * Constructor for ClimberPosition.
-     *
-     * @param position The position value associated with the climber position.
-     */
-    private ClimberPosition(double position) {
-      this.position = position;
-    }
-
-    /**
-     * Get the position value associated with the climber position.
-     *
-     * @return The position value.
-     */
-    public double getPosition() {
-      return position;
-    }
+  /** Stop the climber motor. */
+  public void stop() {
+    climberMotor.stopMotor();
   }
 }

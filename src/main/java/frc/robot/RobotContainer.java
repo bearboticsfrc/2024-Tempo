@@ -23,6 +23,9 @@ public class RobotContainer {
   private final CommandXboxController driverController =
       new CommandXboxController(DriveConstants.DRIVER_CONTROLLER_PORT);
 
+  private final CommandXboxController operatorController =
+      new CommandXboxController(DriveConstants.OPERATOR_CONTROLLER_PORT);
+
   private final DriveSubsystem driveSubsystem = new DriveSubsystem();
   private final ManipulatorSubsystem manipulatorSubsystem = new ManipulatorSubsystem();
 
@@ -33,7 +36,11 @@ public class RobotContainer {
   public RobotContainer() {
     buildAutoList();
     buildTestList();
-    configureBindings();
+    configureDriverBindings();
+    configureOperatorBindings();
+
+    DriveConstants.COMPETITION_TAB.add(
+        "Home Climber", manipulatorSubsystem.getClimberHomeCommand());
   }
 
   private RunCommand getDefaultCommand() {
@@ -46,7 +53,7 @@ public class RobotContainer {
         driveSubsystem);
   }
 
-  private void configureBindings() {
+  private void configureDriverBindings() {
     driveSubsystem.setDefaultCommand(getDefaultCommand());
     driverController
         .leftBumper()
@@ -81,6 +88,12 @@ public class RobotContainer {
         .onTrue(
             new InstantCommand(
                 () -> driverController.getHID().setRumble(RumbleType.kBothRumble, 0.5)));
+  }
+
+  private void configureOperatorBindings() {
+    manipulatorSubsystem.setDefaultCommand(
+        manipulatorSubsystem.getClimberRunCommand(
+            () -> -MathUtil.applyDeadband(operatorController.getRightY(), 0.1)));
   }
 
   public void setTeleop(boolean mode) {

@@ -12,6 +12,7 @@ public class ArmConstants {
       public static final double MIN_OUTPUT = -0.1;
       public static final double MAX_OUTPUT = 0.1;
       public static final double POSITION_CONVERSION_FACTOR = 360;
+      public static final double D = 0;
     }
 
     public static class MotorRaisePid {

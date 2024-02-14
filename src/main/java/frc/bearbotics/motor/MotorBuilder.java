@@ -10,7 +10,6 @@ public class MotorBuilder {
   private int motorPort;
   private boolean motorInverted;
   private boolean encoderInverted;
-  private MotorPidBuilder motorPID;
   private double nominalVoltage = 12;
   private int currentLimit;
   private double positionConversionFactor = 1;
@@ -147,19 +146,18 @@ public class MotorBuilder {
    *
    * @return The configured MotorPidBuilder.
    */
-  public MotorPidBuilder getMotorPID() {
-    return motorPID;
+  public MotorPidBuilder getMotorPid() {
+    return getMotorPid(0);
   }
 
   /**
    * Set the MotorPidBuilder for the motor.
    *
-   * @param motorPID The desired MotorPidBuilder.
+   * @param motorPid The desired MotorPidBuilder.
    * @return This MotorBuilder instance for method chaining.
    */
-  public MotorBuilder withMotorPID(MotorPidBuilder motorPID) {
-    this.motorPID = motorPID;
-    return this;
+  public MotorBuilder withMotorPid(MotorPidBuilder motorPid) {
+    return withMotorPid(motorPid, 0);
   }
 
   /**

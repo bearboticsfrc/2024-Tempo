@@ -151,7 +151,7 @@ public class DriveSubsystem extends SubsystemBase {
             .withEncoderInverted(FrontLeftConstants.DriveMotor.ENCODER_INVERTED)
             .withPositionConversionFactor(FrontLeftConstants.DriveMotor.POSITION_CONVERSION_FACTOR)
             .withVelocityConversionFactor(FrontLeftConstants.DriveMotor.VELOCITY_CONVERSION_FACTOR)
-            .withMotorPID(driveMotorPid);
+            .withMotorPid(driveMotorPid);
 
     MotorBuilder pivotConfig =
         new MotorBuilder()
@@ -163,7 +163,7 @@ public class DriveSubsystem extends SubsystemBase {
             .withEncoderInverted(FrontLeftConstants.PivotMotor.ENCODER_INVERTED)
             .withPositionConversionFactor(FrontLeftConstants.PivotMotor.POSITION_CONVERSION_FACTOR)
             .withVelocityConversionFactor(FrontLeftConstants.PivotMotor.VELOCITY_CONVERSION_FACTOR)
-            .withMotorPID(pivotMotorPid);
+            .withMotorPid(pivotMotorPid);
 
     SwerveModuleBuilder moduleConfig =
         new SwerveModuleBuilder()
@@ -204,7 +204,7 @@ public class DriveSubsystem extends SubsystemBase {
             .withEncoderInverted(BackLeftConstants.DriveMotor.ENCODER_INVERTED)
             .withPositionConversionFactor(BackLeftConstants.DriveMotor.POSITION_CONVERSION_FACTOR)
             .withVelocityConversionFactor(BackLeftConstants.DriveMotor.VELOCITY_CONVERSION_FACTOR)
-            .withMotorPID(driveMotorPid);
+            .withMotorPid(driveMotorPid);
 
     MotorBuilder pivotConfig =
         new MotorBuilder()
@@ -216,7 +216,7 @@ public class DriveSubsystem extends SubsystemBase {
             .withEncoderInverted(BackLeftConstants.PivotMotor.ENCODER_INVERTED)
             .withPositionConversionFactor(BackLeftConstants.PivotMotor.POSITION_CONVERSION_FACTOR)
             .withVelocityConversionFactor(BackLeftConstants.PivotMotor.VELOCITY_CONVERSION_FACTOR)
-            .withMotorPID(pivotMotorPid);
+            .withMotorPid(pivotMotorPid);
 
     SwerveModuleBuilder moduleConfig =
         new SwerveModuleBuilder()
@@ -257,7 +257,7 @@ public class DriveSubsystem extends SubsystemBase {
             .withEncoderInverted(FrontRightConstants.DriveMotor.ENCODER_INVERTED)
             .withPositionConversionFactor(FrontRightConstants.DriveMotor.POSITION_CONVERSION_FACTOR)
             .withVelocityConversionFactor(FrontRightConstants.DriveMotor.VELOCITY_CONVERSION_FACTOR)
-            .withMotorPID(driveMotorPid);
+            .withMotorPid(driveMotorPid);
 
     MotorBuilder pivotConfig =
         new MotorBuilder()
@@ -269,7 +269,7 @@ public class DriveSubsystem extends SubsystemBase {
             .withEncoderInverted(FrontRightConstants.PivotMotor.ENCODER_INVERTED)
             .withPositionConversionFactor(FrontRightConstants.PivotMotor.POSITION_CONVERSION_FACTOR)
             .withVelocityConversionFactor(FrontRightConstants.PivotMotor.VELOCITY_CONVERSION_FACTOR)
-            .withMotorPID(pivotMotorPid);
+            .withMotorPid(pivotMotorPid);
 
     SwerveModuleBuilder moduleConfig =
         new SwerveModuleBuilder()
@@ -310,7 +310,7 @@ public class DriveSubsystem extends SubsystemBase {
             .withEncoderInverted(BackRightConstants.DriveMotor.ENCODER_INVERTED)
             .withPositionConversionFactor(BackRightConstants.DriveMotor.POSITION_CONVERSION_FACTOR)
             .withVelocityConversionFactor(BackRightConstants.DriveMotor.VELOCITY_CONVERSION_FACTOR)
-            .withMotorPID(driveMotorPid);
+            .withMotorPid(driveMotorPid);
 
     MotorBuilder pivotConfig =
         new MotorBuilder()
@@ -322,7 +322,7 @@ public class DriveSubsystem extends SubsystemBase {
             .withEncoderInverted(BackRightConstants.PivotMotor.ENCODER_INVERTED)
             .withPositionConversionFactor(BackRightConstants.PivotMotor.POSITION_CONVERSION_FACTOR)
             .withVelocityConversionFactor(BackRightConstants.PivotMotor.VELOCITY_CONVERSION_FACTOR)
-            .withMotorPID(pivotMotorPid);
+            .withMotorPid(pivotMotorPid);
 
     SwerveModuleBuilder moduleConfig =
         new SwerveModuleBuilder()

@@ -2,12 +2,13 @@ package frc.robot.subsystems.manipulator;
 
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.subsystems.manipulator.ArmSubsystem.ArmPosition;
-import frc.robot.subsystems.manipulator.ClimberSubsystem.ClimberPosition;
 import frc.robot.subsystems.manipulator.IntakeSubsystem.IntakeSpeed;
+import java.util.function.DoubleSupplier;
 
 public class ManipulatorSubsystem extends SubsystemBase {
   private final IntakeSubsystem intakeSubsystem;
@@ -121,22 +122,25 @@ public class ManipulatorSubsystem extends SubsystemBase {
   }
 
   /**
-   * Get a command to run the climber to a specified position.
+   * Get a command to run the climber to a specified speed.
    *
-   * @param position The desired climber position.
-   * @return The InstantCommand to set the climber position.
+   * @param speedSupplier The desired climber speed supplier.
+   * @return The RunCommand to set the climber speed.
    */
-  public InstantCommand getClimberRunCommand(ClimberPosition position) {
-    return new InstantCommand(() -> climberSubsystem.set(position));
+  public RunCommand getClimberRunCommand(DoubleSupplier speedSupplier) {
+    return new RunCommand(() -> climberSubsystem.set(speedSupplier.getAsDouble()), this);
   }
 
   /**
    * Get a command to home the climber.
    *
-   * @return The InstantCommand to home the climber.
+   * @return The SequentialCommandGroup to home the climber.
    */
-  public InstantCommand getClimberHomeCommand() {
-    return new InstantCommand(() -> climberSubsystem.set(0.25));
+  public SequentialCommandGroup getClimberHomeCommand() {
+    return new SequentialCommandGroup(
+        new InstantCommand(() -> climberSubsystem.set(-0.5), this),
+        new WaitUntilCommand(climberSubsystem::isClimberHome),
+        new InstantCommand(() -> climberSubsystem.stop()));
   }
 
   public InstantCommand getArmRunCommand(ArmPosition position) {

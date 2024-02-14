@@ -48,7 +48,7 @@ public class ShooterSubsystem extends SubsystemBase {
             .withMotorPort(ShooterConstants.Motor.MOTOR_PORT)
             .withMotorInverted(ShooterConstants.Motor.INVERTED)
             .withCurrentLimit(ShooterConstants.Motor.CURRENT_LIMT)
-            .withMotorPID(shooterMotorPid)
+            .withMotorPid(shooterMotorPid)
             .withIdleMode(IdleMode.kCoast);
 
     MotorBuilder shooterMotorFollowerConfig =
@@ -69,7 +69,7 @@ public class ShooterSubsystem extends SubsystemBase {
 
     MotorConfig.fromMotorConstants(shooterMotor, shooterMotorEncoder, shooterMotorConfig)
         .configureMotor()
-        .configurePid(shooterMotorPid)
+        .configurePid()
         .configureEncoder(Rotation2d.fromRotations(0))
         .burnFlash();
 
@@ -81,7 +81,7 @@ public class ShooterSubsystem extends SubsystemBase {
 
   private void setupShuffleboardTab(ShuffleboardTab shuffleboardTab) {
     shuffleboardTab.addDouble("Shooter Velocity", shooterMotorEncoder::getVelocity);
-    shuffleboardTab.addDouble("Target Velocity", shooterMotorEncoder::getVelocity);
+    shuffleboardTab.addDouble("Target Velocity", () -> targetVelocity);
     shuffleboardTab.addBoolean("At Target Velocity?", this::atTargetVelocity);
     shuffleboardTab.addDouble("Set point delta", this::debug_getSetpointDelta);
   }

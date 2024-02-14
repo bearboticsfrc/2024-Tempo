@@ -7,6 +7,7 @@ import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkAbsoluteEncoder;
 import com.revrobotics.SparkPIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.util.datalog.StringLogEntry;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.Timer;
 import frc.bearbotics.motor.cancoder.CANCoders;
@@ -14,6 +15,9 @@ import frc.robot.util.RevUtil;
 
 /** Configuration class for motor parameters, including feedback sensors and builders. */
 public class MotorConfig {
+
+  private StringLogEntry logEntry =
+      new StringLogEntry(DataLogManager.getLog(), "MotorConfig/Config");
 
   private CANSparkBase motor;
   private MotorFeedbackSensor motorEncoder;
@@ -43,6 +47,11 @@ public class MotorConfig {
     this.motorBuilder = motorBuilder;
   }
 
+  private String getMotorDescription() {
+    return motorBuilder.getName() == null
+        ? motorBuilder.getModuleName()
+        : String.format("%s - %s", motorBuilder.getModuleName(), motorBuilder.getName());
+  }
   /**
    * Configures generic motor parameters, including inversion, idle mode, voltage compensation,
    * current limit, or low and high soft limits.
@@ -52,29 +61,43 @@ public class MotorConfig {
   public MotorConfig configureMotor() {
     motor.setInverted(motorBuilder.isMotorInverted());
 
-    String motorDescription =
-        motorBuilder.getName() == null
-            ? motorBuilder.getModuleName()
-            : String.format("%s - %s", motorBuilder.getModuleName(), motorBuilder.getName());
-
+    String motorDescription = getMotorDescription();
     RevUtil.checkRevError(motor.setIdleMode(motorBuilder.getIdleMode()));
     RevUtil.checkRevError(motor.enableVoltageCompensation(motorBuilder.getNominalVoltage()));
     RevUtil.checkRevError(motor.setSmartCurrentLimit(motorBuilder.getCurrentLimit()));
     RevUtil.setPeriodicFramePeriodHigh(motor, motorDescription);
 
+    String message =
+        String.format(
+            "[MotorConfig.configureMotor] %s:\n\tSet idle mode -> %s.\n\tSet voltage compensation -> %s.\n\tSet smart current limit -> %s.\n\t",
+            motorDescription,
+            motorBuilder.getIdleMode(),
+            motorBuilder.getNominalVoltage(),
+            motorBuilder.getCurrentLimit());
+
     if (motorBuilder.getReverseSoftLimit() != null) {
       MotorSoftLimit reverseSoftLimit = motorBuilder.getReverseSoftLimit();
       RevUtil.checkRevError(
-          motor.setSoftLimit(
-              reverseSoftLimit.getDirection(), (float) reverseSoftLimit.getLimit().getDegrees()));
+          motor.setSoftLimit(reverseSoftLimit.getDirection(), reverseSoftLimit.getLimit()));
+
+      message +=
+          String.format(
+              "Reverse soft limit -> true\n\t\tReverse soft limit direction -> %s\n\t\tReverse soft limit -> %s\n\t",
+              reverseSoftLimit.getDirection(), reverseSoftLimit.getLimit());
     }
 
     if (motorBuilder.getForwardSoftLimit() != null) {
       MotorSoftLimit forwardSoftLimit = motorBuilder.getForwardSoftLimit();
       RevUtil.checkRevError(
-          motor.setSoftLimit(
-              forwardSoftLimit.getDirection(), (float) forwardSoftLimit.getLimit().getDegrees()));
+          motor.setSoftLimit(forwardSoftLimit.getDirection(), forwardSoftLimit.getLimit()));
+
+      message +=
+          String.format(
+              "Forward soft limit -> true\n\t\tForward soft limit direction -> %s\n\t\tForward soft limit -> %s\n\t",
+              forwardSoftLimit.getDirection(), forwardSoftLimit.getLimit());
     }
+
+    logEntry.append(message);
 
     return this;
   }
@@ -87,6 +110,11 @@ public class MotorConfig {
    * @return This MotorConfig instance for method chaining.
    */
   public MotorConfig configureEncoder(Rotation2d initialPosition) {
+    String message =
+        String.format(
+            "[MotorConfig.configureEncoder] %s - %s:\n\t",
+            getMotorDescription(), motorEncoder.getClass());
+
     if (motorEncoder instanceof RelativeEncoder) {
       ((RelativeEncoder) motorEncoder).setPosition(initialPosition.getRadians());
       RevUtil.checkRevError(
@@ -114,42 +142,60 @@ public class MotorConfig {
               .setVelocityConversionFactor(motorBuilder.getVelocityConversionFactor()));
     }
 
+    message +=
+        String.format(
+            "Inital position -> %s\n\tPosition conversion factor -> %s\n\tVelocity conversion factor -> %s\n\t",
+            initialPosition.getDegrees(),
+            motorBuilder.getPositionConversionFactor(),
+            motorBuilder.getVelocityConversionFactor());
+
     if (motor.getPIDController() != null) {
+      message += String.format("Set feedback device -> %s\n", motorEncoder.getClass());
       RevUtil.checkRevError(motor.getPIDController().setFeedbackDevice(motorEncoder));
     }
 
+    logEntry.append(message);
     return this;
   }
 
   /**
-   * Configures the absolute encoder parameters using CANCoders.
+   * Configures the can coder parameters using CANCoders.
    *
    * @return This MotorConfig instance for method chaining.
    */
-  public MotorConfig configureAbsoluteEncoder() {
+  public MotorConfig configureCanCoder() {
     CANCoders.getInstance().configure(motorBuilder.getCanCoderBuilder());
+
+    String message =
+        String.format(
+            "[MotorConfig.configureCanCoder] %s:\n\tSet ID -> %s\n\tSet offset angle (degrees) -> %s\n",
+            getMotorDescription(),
+            motorBuilder.getCanCoderBuilder().getId(),
+            motorBuilder.getCanCoderBuilder().getOffsetDegrees().getDegrees());
+    logEntry.append(message);
+
     return this;
   }
 
   /**
    * Configures the PID parameters for the motor.
    *
-   * @param motorPid The MotorPidBuilder containing PID parameters.
    * @return This MotorConfig instance for method chaining.
    */
-  public MotorConfig configurePid(MotorPidBuilder motorPid) {
-    return configurePID(motorPid, 0);
+  public MotorConfig configurePid() {
+    return configurePid(0);
   }
 
   /**
    * Configures the PID parameters for the motor in a specific slot.
    *
-   * @param motorPid The MotorPidBuilder containing PID parameters.
    * @param slot The PID slot to configure.
    * @return This MotorConfig instance for method chaining.
    */
-  public MotorConfig configurePID(MotorPidBuilder motorPid, int slot) {
+  public MotorConfig configurePid(int slot) {
+    MotorPidBuilder motorPid = motorBuilder.getMotorPid(slot);
     SparkPIDController motorPIDController = motor.getPIDController();
+
     RevUtil.checkRevError(motorPIDController.setP(motorPid.getP(), slot));
     RevUtil.checkRevError(motorPIDController.setI(motorPid.getI(), slot));
     RevUtil.checkRevError(motorPIDController.setI(motorPid.getIZone(), slot));
@@ -157,7 +203,23 @@ public class MotorConfig {
     RevUtil.checkRevError(motorPIDController.setFF(motorPid.getFf(), slot));
     RevUtil.checkRevError(
         motorPIDController.setOutputRange(motorPid.getMinOutput(), motorPid.getMaxOutput(), slot));
-    configurePositionalPidWrapping(motorPid);
+
+    if (motorPid.isPositionPidWrappingEnabled()) {
+      configurePositionalPidWrapping(motorPid);
+    }
+
+    String message =
+        String.format(
+            "[MotorConfig.configurePid] %s:\n\tSet P -> %s\n\tSet I -> %s\n\tSet I Zone -> %s\n\tSet D -> %s\n\tSet FF -> %s\n\tSet min output -> %s\n\tSet max output -> %s\n",
+            getMotorDescription(),
+            motorPid.getP(),
+            motorPid.getI(),
+            motorPid.getIZone(),
+            motorPid.getD(),
+            motorPid.getFf(),
+            motorPid.getMinOutput(),
+            motorPid.getMaxOutput());
+    logEntry.append(message);
 
     return this;
   }
@@ -172,14 +234,20 @@ public class MotorConfig {
     SparkPIDController motorPIDController = motor.getPIDController();
     boolean positionPidWrappingEnabled = motorPid.isPositionPidWrappingEnabled();
 
-    if (positionPidWrappingEnabled) {
-      RevUtil.checkRevError(
-          motorPIDController.setPositionPIDWrappingEnabled(positionPidWrappingEnabled));
-      RevUtil.checkRevError(
-          motorPIDController.setPositionPIDWrappingMinInput(motorPid.getPositionPidWrappingMin()));
-      RevUtil.checkRevError(
-          motorPIDController.setPositionPIDWrappingMaxInput(motorPid.getPositionPidWrappingMax()));
-    }
+    RevUtil.checkRevError(
+        motorPIDController.setPositionPIDWrappingEnabled(positionPidWrappingEnabled));
+    RevUtil.checkRevError(
+        motorPIDController.setPositionPIDWrappingMinInput(motorPid.getPositionPidWrappingMin()));
+    RevUtil.checkRevError(
+        motorPIDController.setPositionPIDWrappingMaxInput(motorPid.getPositionPidWrappingMax()));
+
+    String message =
+        String.format(
+            "[MotorConfig.configurePositionalPidWrapping] %s:\n\tSet positional PID wrapping enabled -> true\n\tSet positional PID wrapping min input -> %s\n\tSet positional PID wrapping max input -> %s\n",
+            getMotorDescription(),
+            motorPid.getPositionPidWrappingMin(),
+            motorPid.getPositionPidWrappingMax());
+    logEntry.append(message);
 
     return this;
   }
@@ -191,17 +259,25 @@ public class MotorConfig {
    * @return This MotorConfig instance for method chaining.
    */
   public MotorConfig follow(CANSparkBase leaderMotor) {
-    DataLogManager.log(
-        "module -> "
-            + motorBuilder.getModuleName()
-            + " inverted -> "
-            + motorBuilder.isFollowInverted());
     motor.follow(leaderMotor, motorBuilder.isFollowInverted());
+
+    String message =
+        String.format(
+            "[MotorConfig.follow] %s:\n\tSet follow -> true\n\tSet leader (ID) -> %s\n\tSet follow inverted -> %s\n",
+            getMotorDescription(), leaderMotor.getDeviceId(), motorBuilder.isFollowInverted());
+    logEntry.append(message);
+
     return this;
   }
 
   /** Burns parameters onto the motor flash. */
   public void burnFlash() {
+    String message =
+        String.format(
+            "[MotorConfig.burnFlash] %s:\n\tBurn flash delay (seconds) -> 0.25\n",
+            getMotorDescription(), 0.25);
+    logEntry.append(message);
+
     Timer.delay(0.25);
     RevUtil.checkRevError(motor.burnFlash());
     Timer.delay(0.25);
