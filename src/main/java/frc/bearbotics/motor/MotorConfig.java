@@ -72,6 +72,7 @@ public class MotorConfig {
 
     if (motorBuilder.getReverseSoftLimit() != null) {
       MotorSoftLimit reverseSoftLimit = motorBuilder.getReverseSoftLimit();
+      RevUtil.checkRevError(motor.enableSoftLimit(reverseSoftLimit.getDirection(), true));
       RevUtil.checkRevError(
           motor.setSoftLimit(reverseSoftLimit.getDirection(), reverseSoftLimit.getLimit()));
 
@@ -83,6 +84,7 @@ public class MotorConfig {
 
     if (motorBuilder.getForwardSoftLimit() != null) {
       MotorSoftLimit forwardSoftLimit = motorBuilder.getForwardSoftLimit();
+      RevUtil.checkRevError(motor.enableSoftLimit(forwardSoftLimit.getDirection(), true));
       RevUtil.checkRevError(
           motor.setSoftLimit(forwardSoftLimit.getDirection(), forwardSoftLimit.getLimit()));
 
