@@ -195,7 +195,7 @@ public class MotorConfig {
 
     RevUtil.checkRevError(motorPIDController.setP(motorPid.getP(), slot));
     RevUtil.checkRevError(motorPIDController.setI(motorPid.getI(), slot));
-    RevUtil.checkRevError(motorPIDController.setI(motorPid.getIZone(), slot));
+    RevUtil.checkRevError(motorPIDController.setIZone(motorPid.getIZone(), slot));
     RevUtil.checkRevError(motorPIDController.setD(motorPid.getD(), slot));
     RevUtil.checkRevError(motorPIDController.setFF(motorPid.getFf(), slot));
     RevUtil.checkRevError(
