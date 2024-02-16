@@ -1,12 +1,12 @@
-package frc.robot.auto.campaign;
+package frc.bearbotics.campaign;
 
 /* A binary tree containing a success node and a failure node. */
 public class MissionTree {
-  private Mission node;
+  private AbstractMission node;
   private MissionTree successNode = null;
   private MissionTree failureNode = null;
 
-  public MissionTree(Mission node) {
+  public MissionTree(AbstractMission node) {
     this.node = node;
   }
 
@@ -43,14 +43,14 @@ public class MissionTree {
   /**
    * @return the node
    */
-  public Mission getNode() {
+  public AbstractMission getNode() {
     return node;
   }
 
   /**
    * @param node the node to set
    */
-  public void setNode(Mission node) {
+  public void setNode(AbstractMission node) {
     this.node = node;
   }
 }
