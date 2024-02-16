@@ -6,24 +6,23 @@ public class ArmConstants {
     public static final int MOTOR_PORT = 3;
     public static final int CURRENT_LIMT = 40;
     public static final boolean INVERTED = false;
+    public static final double POSITION_CONVERSION_FACTOR = 360;
 
     public static class MotorLowerPid {
-      public static final double P = 0;
+      public static final double P = 0.02;
       public static final double MIN_OUTPUT = -0.1;
-      public static final double MAX_OUTPUT = 0.1;
-      public static final double POSITION_CONVERSION_FACTOR = 360;
+      public static final double MAX_OUTPUT = 0.5;
       public static final double D = 0;
     }
 
     public static class MotorRaisePid {
-      public static final double P = 0;
       public static final double MIN_OUTPUT = -0.1;
-      public static final double MAX_OUTPUT = 0.1;
+      public static final double MAX_OUTPUT = 0.5;
     }
 
     public class FeedForward {
       public static final double STATIC = 0;
-      public static final double GRAVITY = 0.025;
+      public static final double GRAVITY = 0.25;
       public static final double VELOCITY = 0;
     }
   }

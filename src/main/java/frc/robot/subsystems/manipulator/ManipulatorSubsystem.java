@@ -1,5 +1,6 @@
 package frc.robot.subsystems.manipulator;
 
+import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.RunCommand;
@@ -33,23 +34,34 @@ public class ManipulatorSubsystem extends SubsystemBase {
     return intakeSubsystem.isNoteInRoller();
   }
 
+  public InstantCommand getShooterRunCommand(int velocity) {
+    return new InstantCommand(() -> shooterSubsystem.set(velocity));
+  }
+
   /**
    * Generates the generic intake command with the following sequence:
    *
    * <p>1. Start roller and feeder motors.
    *
-   * <p>2. Wait for the top beam break to be tripped.
+   * <p>2. Wait for the side beam breaks to be tripped.
    *
-   * <p>3. Stop roller and feeder motors.
+   * <p>3. Run feeder motor at slower speed.
+   *
+   * <p>4. Stop roller and feeder motors.
    *
    * @return The generated intake command.
    */
-  public SequentialCommandGroup getIntakeCommand() {
-    return new SequentialCommandGroup(
-        new ParallelCommandGroup(
-            getRollerRunCommand(IntakeSpeed.FULL), getFeederRunCommand(IntakeSpeed.FEED)),
-        new WaitUntilCommand(intakeSubsystem::isNoteInFeeder),
-        getIntakeStopCommand());
+  public ConditionalCommand getIntakeCommand() {
+    return new ConditionalCommand(
+        new InstantCommand(),
+        new SequentialCommandGroup(
+            new ParallelCommandGroup(
+                getRollerRunCommand(IntakeSpeed.FULL), getFeederRunCommand(IntakeSpeed.QUARTER)),
+            new WaitUntilCommand(intakeSubsystem::isNoteInSide),
+            getFeederRunCommand(IntakeSpeed.TENTH),
+            new WaitUntilCommand(intakeSubsystem::isNoteInFeeder),
+            getIntakeStopCommand()),
+        intakeSubsystem::isNoteInFeeder);
   }
 
   /**

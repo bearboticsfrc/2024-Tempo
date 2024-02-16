@@ -59,7 +59,7 @@ public class RobotContainer {
 
     driverController
         .leftBumper()
-        .whileTrue(manipulatorSubsystem.getShootCommand(3000))
+        .whileTrue(manipulatorSubsystem.getShootCommand(2500))
         .onFalse(manipulatorSubsystem.getShootStopCommand());
 
     driverController
@@ -79,10 +79,10 @@ public class RobotContainer {
 
     driverController.a().onTrue(new InstantCommand(() -> driveSubsystem.resetImu()));
 
-    new Trigger(manipulatorSubsystem::isNoteInRoller)
+    new Trigger(() -> manipulatorSubsystem.isNoteInRoller() && isTeleop)
         .onTrue(
             new InstantCommand(
-                () -> driverController.getHID().setRumble(RumbleType.kBothRumble, 0.5)))
+                () -> driverController.getHID().setRumble(RumbleType.kBothRumble, 1)))
         .onFalse(
             new InstantCommand(
                 () -> driverController.getHID().setRumble(RumbleType.kBothRumble, 0)));

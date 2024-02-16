@@ -91,12 +91,21 @@ public class IntakeSubsystem extends SubsystemBase {
   }
 
   /**
-   * Return a boolean whether a note has triggered the feeder beam break sensor.
+   * Return a boolean whether a note has triggered the top and two side beam break sensors.
    *
    * @return True if a note is not in the feeder, false otherwise.
    */
   public boolean isNoteInFeeder() {
     return !topBeamBreak.get() && !leftBeamBreak.get() && !rightBeamBreak.get();
+  }
+
+  /**
+   * Return a boolean whether a note has triggered the two side beam break sensors.
+   *
+   * @return True if a note is not in the feeder, false otherwise.
+   */
+  public boolean isNoteInSide() {
+    return !leftBeamBreak.get() && !rightBeamBreak.get();
   }
 
   /**
@@ -121,7 +130,9 @@ public class IntakeSubsystem extends SubsystemBase {
   public enum IntakeSpeed {
     REVERSE(-1),
     OFF(0),
-    FEED(0.4),
+    TENTH(0.1),
+    QUARTER(0.25),
+    HALF(0.5),
     FULL(1);
 
     private final double speed;

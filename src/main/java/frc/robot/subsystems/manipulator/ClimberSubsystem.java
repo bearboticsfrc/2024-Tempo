@@ -70,6 +70,7 @@ public class ClimberSubsystem extends SubsystemBase {
   private void setupShuffleboardTab(ShuffleboardTab shuffleboardTab) {
     shuffleboardTab.addDouble("Climber Position", climberMotorEncoder::getPosition);
     shuffleboardTab.addDouble("Climber Current", climberMotor::getOutputCurrent);
+    shuffleboardTab.addDouble("Climber Temp", climberMotor::getMotorTemperature);
     shuffleboardTab.addBoolean("Climber Limit Switch", climberLimitSwitch::get);
   }
 

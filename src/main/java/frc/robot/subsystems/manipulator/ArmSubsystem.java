@@ -55,7 +55,6 @@ public class ArmSubsystem extends SubsystemBase {
 
     MotorPidBuilder armMotorRaisePid =
         new MotorPidBuilder()
-            .withP(ArmConstants.Motor.MotorRaisePid.P)
             .withMinOutput(ArmConstants.Motor.MotorRaisePid.MIN_OUTPUT)
             .withMaxOutput(ArmConstants.Motor.MotorRaisePid.MAX_OUTPUT);
 
@@ -73,6 +72,7 @@ public class ArmSubsystem extends SubsystemBase {
             .withCurrentLimit(ArmConstants.Motor.CURRENT_LIMT)
             .withReverseSoftLimit(forwardSoftLimit)
             .withForwardSoftLimit(reverseSoftLimit)
+            .withPositionConversionFactor(ArmConstants.Motor.POSITION_CONVERSION_FACTOR)
             .withMotorPid(armMotorLowerPid, 0)
             .withMotorPid(armMotorRaisePid, 1);
 
@@ -128,6 +128,11 @@ public class ArmSubsystem extends SubsystemBase {
         && debug_FfG.getDouble(ffG) == ffG
         && debug_setPoint.getDouble(setPoint) == setPoint) {
       return;
+    } else {
+      d = debug_D.getDouble(d);
+      p = debug_P.getDouble(p);
+      ffG = debug_FfG.getDouble(ffG);
+      setPoint = debug_setPoint.getDouble(setPoint);
     }
 
     MotorPidBuilder armMotorPid =
@@ -151,15 +156,22 @@ public class ArmSubsystem extends SubsystemBase {
         .getPIDController()
         .setReference(debug_setPoint.getDouble(setPoint), ControlType.kPosition);
   }
+
+  private Rotation2d getPosition() {
+    return Rotation2d.fromDegrees(armMotorEncoder.getPosition());
+  }
+
   /**
    * Set the arm motor to the specified position.
    *
    * @param position The desired arm position.
    */
   public void set(ArmPosition position) {
-    armMotor
-        .getPIDController()
-        .setReference(debug_setPoint.getDouble(setPoint), ControlType.kPosition);
+    double feedForward =
+        armFeedforward.calculate(getPosition().getRotations(), armMotorEncoder.getVelocity());
+    double targetPosition = debug_setPoint.getDouble(feedForward);
+
+    armMotor.getPIDController().setReference(targetPosition, ControlType.kPosition);
   }
 
   public void stop() {
