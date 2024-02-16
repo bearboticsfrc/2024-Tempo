@@ -14,7 +14,7 @@ import java.util.function.BooleanSupplier;
 public class ExitCommunityRight {
 
   public static final String NAME = "Shoot Note Exit Community Right";
-  private BooleanSupplier isBlue = () -> (AllianceColor.alliance == Alliance.Blue) ? true : false;
+  private static BooleanSupplier isBlue = () -> (AllianceColor.alliance == Alliance.Blue) ? true : false;
 
   public static Campaign get(DriveSubsystem driveSubsystem) {
 
@@ -24,7 +24,11 @@ public class ExitCommunityRight {
   }
 
   public static CommandMission getPathMission(DriveSubsystem driveSubsystem) {
+    
     PathPlannerPath path = PathPlannerPath.fromPathFile("ShootNoteExitCommunityRight");
+
+
+    path = isBlue()?path:path.flipPath();
 
     return new CommandMission(
         new SequentialCommandGroup(
