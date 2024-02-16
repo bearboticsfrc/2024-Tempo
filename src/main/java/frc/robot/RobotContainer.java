@@ -78,7 +78,6 @@ public class RobotContainer {
         .onFalse(manipulatorSubsystem.getIntakeStopCommand());
 
     driverController.a().onTrue(new InstantCommand(() -> driveSubsystem.resetImu()));
-    driverController.b().whileTrue(manipulatorSubsystem.getClimberHomeCommand());
 
     new Trigger(manipulatorSubsystem::isNoteInRoller)
         .onTrue(
