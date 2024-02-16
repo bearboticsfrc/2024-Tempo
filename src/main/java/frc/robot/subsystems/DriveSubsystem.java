@@ -523,7 +523,11 @@ public class DriveSubsystem extends SubsystemBase {
    */
   public void resetOdometry(Pose2d pose) {
     odometry.resetPosition(getHeading(), getModulePositions(), pose);
-    // pigeon2.addYaw(pose.getRotation().getDegrees());
+  }
+
+  /** Resets the IMU to a heading of zero. */
+  public void resetImu() {
+    pigeonImu.reset();
   }
 
   public ChassisSpeeds getRobotRelativeSpeeds() {

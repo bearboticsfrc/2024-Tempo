@@ -44,7 +44,7 @@ public class ManipulatorSubsystem extends SubsystemBase {
    *
    * @return The generated intake command.
    */
-  public SequentialCommandGroup getIntakeRunCommand() {
+  public SequentialCommandGroup getIntakeCommand() {
     return new SequentialCommandGroup(
         new ParallelCommandGroup(
             getRollerRunCommand(IntakeSpeed.FULL), getFeederRunCommand(IntakeSpeed.FEED)),

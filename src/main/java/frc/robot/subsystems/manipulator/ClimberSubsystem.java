@@ -24,7 +24,7 @@ public class ClimberSubsystem extends SubsystemBase {
 
   public ClimberSubsystem() {
     setupMotors();
-    setupShuffleboardTab(RobotConstants.MANIPULATOR_SYSTEM_TAB);
+    setupShuffleboardTab(RobotConstants.CLIMBER_SYSTEM_TAB);
   }
 
   private void setupMotors() {

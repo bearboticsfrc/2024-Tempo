@@ -33,7 +33,7 @@ public class IntakeSubsystem extends SubsystemBase {
 
   public IntakeSubsystem() {
     configureMotors();
-    setupShuffleboardTab(RobotConstants.MANIPULATOR_SYSTEM_TAB);
+    setupShuffleboardTab(RobotConstants.INTAKE_SYSTEM_TAB);
   }
 
   private void configureMotors() {
@@ -119,6 +119,7 @@ public class IntakeSubsystem extends SubsystemBase {
 
   /** Enum representing different intake speeds. */
   public enum IntakeSpeed {
+    REVERSE(-1),
     OFF(0),
     FEED(0.4),
     FULL(1);

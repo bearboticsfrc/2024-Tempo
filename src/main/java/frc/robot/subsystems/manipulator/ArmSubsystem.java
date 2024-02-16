@@ -27,16 +27,14 @@ public class ArmSubsystem extends SubsystemBase {
   private ArmFeedforward armFeedforward;
 
   private GenericEntry debug_setPoint =
-      RobotConstants.MANIPULATOR_SYSTEM_TAB.add("Arm Set Point", this.setPoint).getEntry();
+      RobotConstants.ARM_SYSTEM_TAB.add("Arm Set Point", this.setPoint).getEntry();
 
   private GenericEntry debug_FfG =
-      RobotConstants.MANIPULATOR_SYSTEM_TAB.add("Arm FF G", this.ffG).getEntry();
+      RobotConstants.ARM_SYSTEM_TAB.add("Arm FF G", this.ffG).getEntry();
 
-  private GenericEntry debug_P =
-      RobotConstants.MANIPULATOR_SYSTEM_TAB.add("Arm P", this.p).getEntry();
+  private GenericEntry debug_P = RobotConstants.ARM_SYSTEM_TAB.add("Arm P", this.p).getEntry();
 
-  private GenericEntry debug_D =
-      RobotConstants.MANIPULATOR_SYSTEM_TAB.add("Arm D", this.d).getEntry();
+  private GenericEntry debug_D = RobotConstants.ARM_SYSTEM_TAB.add("Arm D", this.d).getEntry();
 
   private double setPoint = 0;
   private double ffG = 0;
@@ -45,7 +43,7 @@ public class ArmSubsystem extends SubsystemBase {
 
   public ArmSubsystem() {
     setupMotors();
-    setupShuffleboardTab(RobotConstants.MANIPULATOR_SYSTEM_TAB);
+    setupShuffleboardTab(RobotConstants.ARM_SYSTEM_TAB);
   }
 
   private void setupMotors() {

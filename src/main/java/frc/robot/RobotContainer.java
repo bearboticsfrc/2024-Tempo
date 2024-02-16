@@ -17,7 +17,7 @@ import frc.robot.constants.DriveConstants;
 import frc.robot.constants.DriveConstants.SpeedMode;
 import frc.robot.constants.RobotConstants;
 import frc.robot.subsystems.DriveSubsystem;
-import frc.robot.subsystems.manipulator.ArmSubsystem.ArmPosition;
+import frc.robot.subsystems.manipulator.IntakeSubsystem.IntakeSpeed;
 import frc.robot.subsystems.manipulator.ManipulatorSubsystem;
 
 public class RobotContainer {
@@ -44,46 +44,41 @@ public class RobotContainer {
         "Home Climber", manipulatorSubsystem.getClimberHomeCommand());
   }
 
-  private RunCommand getDefaultCommand() {
-    return new RunCommand(
-        () ->
-            driveSubsystem.drive(
-                -MathUtil.applyDeadband(Math.pow(driverController.getLeftY(), 3), 0.1),
-                -MathUtil.applyDeadband(Math.pow(driverController.getLeftX(), 3), 0.1),
-                -MathUtil.applyDeadband(Math.pow(driverController.getRightX(), 3), 0.1)),
-        driveSubsystem);
-  }
-
   private void configureDriverBindings() {
-    driveSubsystem.setDefaultCommand(getDefaultCommand());
+    driveSubsystem.setDefaultCommand(getDefaultDriveSubsystemCommand());
+
     driverController
-        .leftBumper()
+        .leftStick()
         .whileTrue(new InstantCommand(() -> driveSubsystem.setSpeedMode(SpeedMode.TURBO)))
         .onFalse(new InstantCommand(() -> driveSubsystem.setSpeedMode(SpeedMode.NORMAL)));
 
     driverController
-        .rightBumper()
+        .rightStick()
         .whileTrue(new InstantCommand(() -> driveSubsystem.setSpeedMode(SpeedMode.TURTLE)))
         .onFalse(new InstantCommand(() -> driveSubsystem.setSpeedMode(SpeedMode.NORMAL)));
 
-    driverController.b().whileTrue(manipulatorSubsystem.getClimberHomeCommand());
-
     driverController
-        .x()
-        .whileTrue(manipulatorSubsystem.getIntakeRunCommand())
-        .onFalse(manipulatorSubsystem.getIntakeStopCommand());
-
-    driverController.povDown().onTrue(manipulatorSubsystem.getArmRunCommand(ArmPosition.HOME));
-
-    driverController
-        .povUp()
-        .whileTrue(manipulatorSubsystem.getArmRunCommand(ArmPosition.AMP_SHOOT))
-        .onFalse(manipulatorSubsystem.getArmStopCommand());
-
-    driverController
-        .a()
+        .leftBumper()
         .whileTrue(manipulatorSubsystem.getShootCommand(3000))
         .onFalse(manipulatorSubsystem.getShootStopCommand());
+
+    driverController
+        .rightBumper()
+        .onTrue(new InstantCommand(() -> driveSubsystem.setFieldRelative(false)))
+        .onFalse(new InstantCommand(() -> driveSubsystem.setFieldRelative(true)));
+
+    driverController
+        .leftTrigger()
+        .whileTrue(manipulatorSubsystem.getIntakeCommand())
+        .onFalse(manipulatorSubsystem.getIntakeStopCommand());
+
+    driverController
+        .rightTrigger()
+        .whileTrue(manipulatorSubsystem.getRollerRunCommand(IntakeSpeed.REVERSE))
+        .onFalse(manipulatorSubsystem.getIntakeStopCommand());
+
+    driverController.a().onTrue(new InstantCommand(() -> driveSubsystem.resetImu()));
+    driverController.b().whileTrue(manipulatorSubsystem.getClimberHomeCommand());
 
     new Trigger(manipulatorSubsystem::isNoteInRoller)
         .onTrue(
@@ -94,14 +89,20 @@ public class RobotContainer {
                 () -> driverController.getHID().setRumble(RumbleType.kBothRumble, 0)));
   }
 
+  private RunCommand getDefaultDriveSubsystemCommand() {
+    return new RunCommand(
+        () ->
+            driveSubsystem.drive(
+                -MathUtil.applyDeadband(Math.pow(driverController.getLeftY(), 3), 0.01),
+                -MathUtil.applyDeadband(Math.pow(driverController.getLeftX(), 3), 0.01),
+                -MathUtil.applyDeadband(Math.pow(driverController.getRightX(), 3), 0.01)),
+        driveSubsystem);
+  }
+
   private void configureOperatorBindings() {
     manipulatorSubsystem.setDefaultCommand(
         manipulatorSubsystem.getClimberRunCommand(
-            () -> -MathUtil.applyDeadband(operatorController.getRightY(), 0.1)));
-  }
-
-  public void setTeleop(boolean mode) {
-    isTeleop = mode;
+            () -> -MathUtil.applyDeadband(operatorController.getRightY(), 0.01)));
   }
 
   private void buildAutoList() {
@@ -123,5 +124,9 @@ public class RobotContainer {
 
   public Command getAutonomousCommand() {
     return autoCommandChooser.getSelected();
+  }
+
+  public void setTeleop(boolean mode) {
+    isTeleop = mode;
   }
 }
