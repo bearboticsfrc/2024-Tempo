@@ -7,7 +7,6 @@ import com.revrobotics.CANSparkLowLevel;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkPIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.bearbotics.motor.MotorBuilder;
@@ -17,73 +16,87 @@ import frc.robot.constants.RobotConstants;
 import frc.robot.constants.manipulator.ShooterConstants;
 
 public class ShooterSubsystem extends SubsystemBase {
-  private CANSparkFlex shooterMotor;
-  private CANSparkFlex shooterMotorFollower;
+  private CANSparkFlex upperShooterMotor;
+  private CANSparkFlex lowerShooterMotor;
 
-  private SparkPIDController shooterMotorPidController;
+  private SparkPIDController upperShooterMotorPidController;
+  private SparkPIDController lowerShooterMotorPidController;
 
-  private RelativeEncoder shooterMotorEncoder;
+  private RelativeEncoder upperShooterMotorEncoder;
+  private RelativeEncoder lowerShooterMotorEncoder;
 
   private int targetVelocity;
 
-  private Timer DEBUG_TIMER = new Timer();
-  private double debug_setPointDelta;
-
   public ShooterSubsystem() {
     configureMotors();
-    setupShuffleboardTab(RobotConstants.MANIPULATOR_SYSTEM_TAB);
+    setupShuffleboardTab(RobotConstants.SHOOTER_SYSTEM_TAB);
   }
 
   private void configureMotors() {
-    MotorPidBuilder shooterMotorPid =
-        new MotorPidBuilder()
-            .withP(ShooterConstants.Motor.MotorPid.P)
-            .withI(ShooterConstants.Motor.MotorPid.I)
-            .withIZone(ShooterConstants.Motor.MotorPid.I_ZONE)
-            .withFf(ShooterConstants.Motor.MotorPid.Ff);
+    MotorPidBuilder upperShooterMotorPidConfig =
+        new MotorPidBuilder().withFf(ShooterConstants.UpperMotor.MotorPid.Ff);
 
-    MotorBuilder shooterMotorConfig =
+    MotorBuilder upperShooterMotorConfig =
         new MotorBuilder()
-            .withName(ShooterConstants.Motor.NAME)
-            .withMotorPort(ShooterConstants.Motor.MOTOR_PORT)
-            .withMotorInverted(ShooterConstants.Motor.INVERTED)
-            .withCurrentLimit(ShooterConstants.Motor.CURRENT_LIMT)
-            .withMotorPid(shooterMotorPid)
+            .withName(ShooterConstants.UpperMotor.NAME)
+            .withMotorPort(ShooterConstants.UpperMotor.MOTOR_PORT)
+            .withMotorInverted(ShooterConstants.UpperMotor.INVERTED)
+            .withCurrentLimit(ShooterConstants.UpperMotor.CURRENT_LIMT)
+            .withMotorPid(upperShooterMotorPidConfig)
             .withIdleMode(IdleMode.kCoast);
 
-    MotorBuilder shooterMotorFollowerConfig =
+    MotorPidBuilder lowerShooterMotorPid =
+        new MotorPidBuilder().withFf(ShooterConstants.LowerMotor.MotorPid.Ff);
+
+    MotorBuilder lowerShooterMotorConfig =
         new MotorBuilder()
-            .withName(ShooterConstants.MotorFollower.NAME)
-            .withMotorPort(ShooterConstants.MotorFollower.MOTOR_PORT)
-            .withCurrentLimit(ShooterConstants.MotorFollower.CURRENT_LIMT)
-            .withFollowInverted(ShooterConstants.MotorFollower.FOLLOW_INVERTED);
+            .withName(ShooterConstants.LowerMotor.NAME)
+            .withMotorPort(ShooterConstants.LowerMotor.MOTOR_PORT)
+            .withMotorInverted(ShooterConstants.LowerMotor.INVERTED)
+            .withCurrentLimit(ShooterConstants.LowerMotor.CURRENT_LIMT)
+            .withMotorPid(lowerShooterMotorPid)
+            .withIdleMode(IdleMode.kCoast);
 
-    shooterMotor =
-        new CANSparkFlex(shooterMotorConfig.getMotorPort(), CANSparkLowLevel.MotorType.kBrushless);
-    shooterMotorFollower =
+    upperShooterMotor =
         new CANSparkFlex(
-            shooterMotorFollowerConfig.getMotorPort(), CANSparkLowLevel.MotorType.kBrushless);
+            upperShooterMotorConfig.getMotorPort(), CANSparkLowLevel.MotorType.kBrushless);
+    lowerShooterMotor =
+        new CANSparkFlex(
+            lowerShooterMotorConfig.getMotorPort(), CANSparkLowLevel.MotorType.kBrushless);
 
-    shooterMotorEncoder = shooterMotor.getEncoder();
-    shooterMotorPidController = shooterMotor.getPIDController();
+    upperShooterMotorEncoder = upperShooterMotor.getEncoder();
+    lowerShooterMotorEncoder = lowerShooterMotor.getEncoder();
 
-    MotorConfig.fromMotorConstants(shooterMotor, shooterMotorEncoder, shooterMotorConfig)
+    upperShooterMotorPidController = upperShooterMotor.getPIDController();
+    lowerShooterMotorPidController = lowerShooterMotor.getPIDController();
+
+    MotorConfig.fromMotorConstants(
+            upperShooterMotor, upperShooterMotorEncoder, upperShooterMotorConfig)
         .configureMotor()
         .configurePid()
         .configureEncoder(Rotation2d.fromRotations(0))
         .burnFlash();
 
-    MotorConfig.fromMotorConstants(shooterMotorFollower, shooterMotorFollowerConfig)
+    MotorConfig.fromMotorConstants(
+            lowerShooterMotor, lowerShooterMotorEncoder, lowerShooterMotorConfig)
         .configureMotor()
-        .follow(shooterMotor)
+        .configurePid()
+        .configureEncoder(Rotation2d.fromRotations(0))
         .burnFlash();
   }
 
   private void setupShuffleboardTab(ShuffleboardTab shuffleboardTab) {
-    shuffleboardTab.addDouble("Shooter Velocity", shooterMotorEncoder::getVelocity);
+    shuffleboardTab.addDouble("Upper Shooter Vel", upperShooterMotorEncoder::getVelocity);
+    shuffleboardTab.addDouble("Lower Shooter Vel", lowerShooterMotorEncoder::getVelocity);
+
+    shuffleboardTab.addDouble("Upper Shooter Cur", upperShooterMotor::getOutputCurrent);
+    shuffleboardTab.addDouble("Lower Shooter Cur", lowerShooterMotor::getOutputCurrent);
+
+    shuffleboardTab.addDouble("Upper Shooter Temp", upperShooterMotor::getMotorTemperature);
+    shuffleboardTab.addDouble("Lower Shooter Temp", lowerShooterMotor::getMotorTemperature);
+
     shuffleboardTab.addDouble("Target Velocity", () -> targetVelocity);
     shuffleboardTab.addBoolean("At Target Velocity?", this::atTargetVelocity);
-    shuffleboardTab.addDouble("Set point delta", this::debug_getSetpointDelta);
   }
 
   /**
@@ -92,20 +105,8 @@ public class ShooterSubsystem extends SubsystemBase {
    * @return True if the shooter motor is at the target velocity, false otherwise.
    */
   public boolean atTargetVelocity() {
-    boolean atTarget =
-        Math.abs(targetVelocity - shooterMotorEncoder.getVelocity())
-            < ShooterConstants.VELOCITY_TOLERANCE;
-
-    if (atTarget) {
-      DEBUG_TIMER.stop();
-      debug_setPointDelta = DEBUG_TIMER.get();
-    }
-
-    return atTarget;
-  }
-
-  public double debug_getSetpointDelta() {
-    return debug_setPointDelta;
+    return Math.abs(targetVelocity - lowerShooterMotorEncoder.getVelocity())
+        < ShooterConstants.VELOCITY_TOLERANCE;
   }
 
   /**
@@ -114,13 +115,15 @@ public class ShooterSubsystem extends SubsystemBase {
    * @param velocity The desired velocity for the shooter motor.
    */
   public void set(int velocity) {
-    DEBUG_TIMER.restart();
-
     targetVelocity = velocity;
-    shooterMotorPidController.setReference(velocity, ControlType.kVelocity);
+
+    upperShooterMotorPidController.setReference(velocity, ControlType.kVelocity);
+    lowerShooterMotorPidController.setReference(velocity, ControlType.kVelocity);
   }
 
+  /** Stop both shooter motors. */
   public void stop() {
-    shooterMotor.stopMotor();
+    upperShooterMotor.stopMotor();
+    lowerShooterMotor.stopMotor();
   }
 }

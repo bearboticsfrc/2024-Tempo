@@ -96,7 +96,7 @@ public class IntakeSubsystem extends SubsystemBase {
    * @return True if a note is not in the feeder, false otherwise.
    */
   public boolean isNoteInFeeder() {
-    return !topBeamBreak.get();
+    return !topBeamBreak.get() && !leftBeamBreak.get() && !rightBeamBreak.get();
   }
 
   /**
@@ -120,7 +120,7 @@ public class IntakeSubsystem extends SubsystemBase {
   /** Enum representing different intake speeds. */
   public enum IntakeSpeed {
     OFF(0),
-    HALF(0.5),
+    FEED(0.4),
     FULL(1);
 
     private final double speed;

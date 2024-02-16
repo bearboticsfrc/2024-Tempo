@@ -88,7 +88,10 @@ public class RobotContainer {
     new Trigger(manipulatorSubsystem::isNoteInRoller)
         .onTrue(
             new InstantCommand(
-                () -> driverController.getHID().setRumble(RumbleType.kBothRumble, 0.5)));
+                () -> driverController.getHID().setRumble(RumbleType.kBothRumble, 0.5)))
+        .onFalse(
+            new InstantCommand(
+                () -> driverController.getHID().setRumble(RumbleType.kBothRumble, 0)));
   }
 
   private void configureOperatorBindings() {

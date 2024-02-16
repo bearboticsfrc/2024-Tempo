@@ -5,6 +5,7 @@ import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.subsystems.manipulator.ArmSubsystem.ArmPosition;
 import frc.robot.subsystems.manipulator.IntakeSubsystem.IntakeSpeed;
@@ -46,7 +47,7 @@ public class ManipulatorSubsystem extends SubsystemBase {
   public SequentialCommandGroup getIntakeRunCommand() {
     return new SequentialCommandGroup(
         new ParallelCommandGroup(
-            getRollerRunCommand(IntakeSpeed.FULL), getFeederRunCommand(IntakeSpeed.HALF)),
+            getRollerRunCommand(IntakeSpeed.FULL), getFeederRunCommand(IntakeSpeed.FEED)),
         new WaitUntilCommand(intakeSubsystem::isNoteInFeeder),
         getIntakeStopCommand());
   }
@@ -96,6 +97,7 @@ public class ManipulatorSubsystem extends SubsystemBase {
     return new SequentialCommandGroup(
         getFeederRunCommand(IntakeSpeed.FULL),
         new WaitUntilCommand(() -> !intakeSubsystem.isNoteInFeeder()),
+        new WaitCommand(0.02), // Waits until feeder motors are not holding a note anymore.
         getIntakeStopCommand());
   }
 
