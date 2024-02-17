@@ -59,6 +59,7 @@ public class DriveSubsystem implements Subsystem {
       };
 
   public DriveSubsystem() {
+    setDefaultCommand(getDefaultCommand());
     for (SwerveCorner corner : SwerveCorner.values()) {
       swerveModules.put(
           corner,

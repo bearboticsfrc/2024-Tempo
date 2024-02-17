@@ -5,24 +5,19 @@
 package frc.robot;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.bearbotics.test.DriveSubsystemTest;
 import frc.robot.commands.AlignAmpCommand;
 import frc.robot.commands.AlignSpeakerCommand;
 import frc.robot.commands.notehuntcommand.PointAtNoteCommand;
-import edu.wpi.first.wpilibj2.command.RunCommand;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import frc.bearbotics.test.DriveSubsystemTest;
 import frc.robot.constants.DriveConstants;
 import frc.robot.constants.DriveConstants.SpeedMode;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
-import frc.robot.constants.DriveConstants.SpeedMode;
-import frc.robot.subsystems.DriveSubsystem;
 
 public class RobotContainer {
   private final CommandXboxController driverController =
@@ -32,15 +27,15 @@ public class RobotContainer {
 
   private boolean isTeleop = false;
 
-  private DriveSubsystem driveSubsystem = new DriveSubsystem();
   private VisionSubsystem visionSubsystem = new VisionSubsystem(driveSubsystem);
 
   private SendableChooser<Command> autoCommandChooser = new SendableChooser<>();
+
   public RobotContainer() {
     configureBindings();
   }
 
-  private RunCommand getDefaultCommand() {
+  public RunCommand getDefaultCommand() {
     return new RunCommand(
         () ->
             driveSubsystem.drive(
@@ -48,22 +43,10 @@ public class RobotContainer {
                 -MathUtil.applyDeadband(Math.pow(driverController.getLeftX(), 3), 0.1),
                 -MathUtil.applyDeadband(Math.pow(driverController.getRightX(), 3), 0.1)),
         driveSubsystem);
-    driveSubsystem.setDefaultCommand(getDefaultCommand());
-  }
-
-  private RunCommand getDefaultCommand() {
-    return new RunCommand(
-        () ->
-            driveSubsystem.drive(
-                -MathUtil.applyDeadband(driverController.getLeftY(), 0.1),
-                -MathUtil.applyDeadband(driverController.getLeftX(), 0.1),
-                -MathUtil.applyDeadband(driverController.getRightX(), 0.1),
-                driveSubsystem.getFieldRelative()),
-        driveSubsystem);
   }
 
   public void teleopInit() {
-    driveSubsystem.setParkMode(false);
+
     driveSubsystem.setSpeedMode(SpeedMode.NORMAL);
   }
 
@@ -73,11 +56,6 @@ public class RobotContainer {
 
   private void configureDriverController() {
     driverController.a().onTrue(new InstantCommand(driveSubsystem::zeroHeading));
-
-    driverController
-        .b()
-        .onTrue(new InstantCommand(() -> driveSubsystem.setParkMode(true)))
-        .onFalse(new InstantCommand(() -> driveSubsystem.setParkMode(false)));
 
     driverController
         .x()
@@ -117,6 +95,7 @@ public class RobotContainer {
         .withPosition(0, 1);
   }
 
+  public void buildTestList() {
     DriveConstants.TEST_TAB
         .add(
             "Drive Subsystem Test", new DriveSubsystemTest(driveSubsystem, DriveConstants.TEST_TAB))
