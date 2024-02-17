@@ -34,6 +34,15 @@ public class ManipulatorSubsystem extends SubsystemBase {
   }
 
   /**
+   * Check if a note is in the feeder.
+   *
+   * @return True if a note is in the feeder, false otherwise.
+   */
+  public boolean isNoteInFeeder() {
+    return intakeSubsystem.isNoteInFeeder();
+  }
+
+  /**
    * Get a command to run the climber to a specified speed.
    *
    * @param speedSupplier The desired climber speed supplier.
@@ -89,6 +98,16 @@ public class ManipulatorSubsystem extends SubsystemBase {
    */
   public InstantCommand getRollerRunCommand(IntakeSpeed speed) {
     return new InstantCommand(() -> intakeSubsystem.setRoller(speed));
+  }
+
+  public SequentialCommandGroup getSpecialIntakeCommand() {
+    return new SequentialCommandGroup(
+        getIntakeCommand(),
+        new WaitCommand(1),
+        new ConditionalCommand(
+            new InstantCommand(),
+            getIntakeStopCommand(),
+            () -> isNoteInRoller() || isNoteInFeeder()));
   }
 
   /**

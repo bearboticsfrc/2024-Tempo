@@ -19,6 +19,7 @@ import frc.robot.constants.RobotConstants;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.manipulator.IntakeSubsystem.IntakeSpeed;
 import frc.robot.subsystems.manipulator.ManipulatorSubsystem;
+import frc.robot.subsystems.vision.ObjectDetectionSubsystem;
 
 public class RobotContainer {
   private final CommandXboxController driverController =
@@ -29,6 +30,7 @@ public class RobotContainer {
 
   private final DriveSubsystem driveSubsystem = new DriveSubsystem();
   private final ManipulatorSubsystem manipulatorSubsystem = new ManipulatorSubsystem();
+  private final ObjectDetectionSubsystem objectDetectionSubsystem = new ObjectDetectionSubsystem();
 
   private boolean isTeleop;
 
@@ -86,6 +88,11 @@ public class RobotContainer {
         .onFalse(
             new InstantCommand(
                 () -> driverController.getHID().setRumble(RumbleType.kBothRumble, 0)));
+
+    new Trigger(
+            () ->
+                objectDetectionSubsystem.hasNoteInView() && !manipulatorSubsystem.isNoteInRoller())
+        .onTrue(manipulatorSubsystem.getSpecialIntakeCommand());
   }
 
   private RunCommand getDefaultDriveSubsystemCommand() {
