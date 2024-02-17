@@ -59,7 +59,7 @@ public class RobotContainer {
 
     driverController
         .leftBumper()
-        .whileTrue(manipulatorSubsystem.getShootCommand(2500))
+        .whileTrue(manipulatorSubsystem.getPodiumShootCommand())
         .onFalse(manipulatorSubsystem.getShootStopCommand());
 
     driverController
@@ -127,5 +127,9 @@ public class RobotContainer {
 
   public void setTeleop(boolean mode) {
     isTeleop = mode;
+  }
+
+  public void disabledInit() {
+    driverController.getHID().setRumble(RumbleType.kBothRumble, 0);
   }
 }

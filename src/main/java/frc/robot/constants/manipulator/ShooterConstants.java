@@ -21,7 +21,7 @@ public class ShooterConstants {
     public static final boolean INVERTED = true;
 
     public static class MotorPid {
-      public static final double Ff = 0.000149;
+      public static final double Ff = 0.00017;
     }
   }
 }

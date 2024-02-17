@@ -107,6 +107,8 @@ public class MotorConfig {
    * @return This MotorConfig instance for method chaining.
    */
   public MotorConfig configureEncoder(Rotation2d initialPosition) {
+    // TODO: Refactor
+
     String message =
         String.format(
             "[MotorConfig.configureEncoder] %s - %s:\n\t",

@@ -8,7 +8,8 @@ import com.revrobotics.SparkAbsoluteEncoder;
 import com.revrobotics.SparkAbsoluteEncoder.Type;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.networktables.GenericEntry;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.bearbotics.motor.MotorBuilder;
@@ -20,26 +21,17 @@ import frc.robot.constants.manipulator.ArmConstants;
 
 public class ArmSubsystem extends SubsystemBase {
   private CANSparkMax armMotor;
-  private CANSparkMax armMotorFollower;
 
   private SparkAbsoluteEncoder armMotorEncoder;
 
   private ArmFeedforward armFeedforward;
 
-  private GenericEntry debug_setPoint =
-      RobotConstants.ARM_SYSTEM_TAB.add("Arm Set Point", this.setPoint).getEntry();
+  private DigitalInput armLimitSwtich = new DigitalInput(ArmConstants.LIMIT_SWITCH_CHANNEL);
 
-  private GenericEntry debug_FfG =
-      RobotConstants.ARM_SYSTEM_TAB.add("Arm FF G", this.ffG).getEntry();
-
-  private GenericEntry debug_P = RobotConstants.ARM_SYSTEM_TAB.add("Arm P", this.p).getEntry();
-
-  private GenericEntry debug_D = RobotConstants.ARM_SYSTEM_TAB.add("Arm D", this.d).getEntry();
-
-  private double setPoint = 0;
-  private double ffG = 0;
-  private double p = 0;
-  private double d = 0;
+  private TrapezoidProfile trapezoidProfile =
+      new TrapezoidProfile(ArmConstants.Motor.TrapezoidProfile.constraints);
+  private TrapezoidProfile.State targetState = new TrapezoidProfile.State(0, 0);
+  private TrapezoidProfile.State currentState = new TrapezoidProfile.State(0, 0);
 
   public ArmSubsystem() {
     setupMotors();
@@ -47,51 +39,26 @@ public class ArmSubsystem extends SubsystemBase {
   }
 
   private void setupMotors() {
-    MotorPidBuilder armMotorLowerPid =
+    MotorPidBuilder armMotorPidBuilder =
         new MotorPidBuilder()
-            .withP(ArmConstants.Motor.MotorLowerPid.P)
-            .withMinOutput(ArmConstants.Motor.MotorLowerPid.MIN_OUTPUT)
-            .withMaxOutput(ArmConstants.Motor.MotorLowerPid.MAX_OUTPUT);
-
-    MotorPidBuilder armMotorRaisePid =
-        new MotorPidBuilder()
-            .withMinOutput(ArmConstants.Motor.MotorRaisePid.MIN_OUTPUT)
-            .withMaxOutput(ArmConstants.Motor.MotorRaisePid.MAX_OUTPUT);
+            .withP(ArmConstants.Motor.MotorPid.P)
+            .withMinOutput(ArmConstants.Motor.MotorPid.MIN_OUTPUT);
 
     MotorSoftLimit forwardSoftLimit =
-        new MotorSoftLimit().withDirection(SoftLimitDirection.kForward).withLimit(81);
-
-    MotorSoftLimit reverseSoftLimit =
-        new MotorSoftLimit().withDirection(SoftLimitDirection.kReverse).withLimit(0);
+        new MotorSoftLimit()
+            .withDirection(SoftLimitDirection.kForward)
+            .withLimit(ArmConstants.Motor.FORWARD_SOFT_LIMIT);
 
     MotorBuilder armMotorConfig =
         new MotorBuilder()
             .withName(ArmConstants.Motor.NAME)
             .withMotorPort(ArmConstants.Motor.MOTOR_PORT)
             .withMotorInverted(ArmConstants.Motor.INVERTED)
-            .withCurrentLimit(ArmConstants.Motor.CURRENT_LIMT)
-            .withReverseSoftLimit(forwardSoftLimit)
-            .withForwardSoftLimit(reverseSoftLimit)
+            .withCurrentLimit(ArmConstants.Motor.CURRENT_LIMIT)
             .withPositionConversionFactor(ArmConstants.Motor.POSITION_CONVERSION_FACTOR)
-            .withMotorPid(armMotorLowerPid, 0)
-            .withMotorPid(armMotorRaisePid, 1);
-
-    MotorBuilder armMotorFollowerConfig =
-        new MotorBuilder()
-            .withName(ArmConstants.MotorFollower.NAME)
-            .withMotorPort(ArmConstants.MotorFollower.MOTOR_PORT)
-            .withFollowInverted(ArmConstants.MotorFollower.FOLLOW_INVERTED)
-            .withCurrentLimit(ArmConstants.MotorFollower.CURRENT_LIMT)
-            .withReverseSoftLimit(forwardSoftLimit)
-            .withForwardSoftLimit(reverseSoftLimit);
-
-    armMotor =
-        new CANSparkMax(armMotorConfig.getMotorPort(), CANSparkLowLevel.MotorType.kBrushless);
-    armMotorFollower =
-        new CANSparkMax(
-            armMotorFollowerConfig.getMotorPort(), CANSparkLowLevel.MotorType.kBrushless);
-
-    armMotorEncoder = armMotor.getAbsoluteEncoder(Type.kDutyCycle);
+            .withIdleMode(ArmConstants.Motor.IDLE_MODE)
+            .withForwardSoftLimit(forwardSoftLimit)
+            .withMotorPid(armMotorPidBuilder);
 
     armFeedforward =
         new ArmFeedforward(
@@ -99,14 +66,14 @@ public class ArmSubsystem extends SubsystemBase {
             ArmConstants.Motor.FeedForward.GRAVITY,
             ArmConstants.Motor.FeedForward.VELOCITY);
 
+    armMotor =
+        new CANSparkMax(armMotorConfig.getMotorPort(), CANSparkLowLevel.MotorType.kBrushless);
+    armMotorEncoder = armMotor.getAbsoluteEncoder(Type.kDutyCycle);
+
     MotorConfig.fromMotorConstants(armMotor, armMotorEncoder, armMotorConfig)
         .configureMotor()
+        .configurePid()
         .configureEncoder(Rotation2d.fromDegrees(0))
-        .burnFlash();
-
-    MotorConfig.fromMotorConstants(armMotorFollower, armMotorFollowerConfig)
-        .configureMotor()
-        .follow(armMotor)
         .burnFlash();
   }
 
@@ -114,47 +81,34 @@ public class ArmSubsystem extends SubsystemBase {
     shuffleboardTab.addDouble("Arm Pos", armMotorEncoder::getPosition);
     shuffleboardTab.addDouble("Arm Cur", armMotor::getOutputCurrent);
     shuffleboardTab.addDouble("Arm Temp", armMotor::getMotorTemperature);
-    shuffleboardTab.addDouble("Follower Arm Cur", armMotorFollower::getOutputCurrent);
-  }
-
-  private Rotation2d getShootAngle() {
-    return new Rotation2d(); // TODO: impl
+    shuffleboardTab.addBoolean("Is Arm Home", this::isArmHome);
+    shuffleboardTab.addBoolean("Is Arm Setpoint", this::atTargetSetpoint);
   }
 
   @Override
   public void periodic() {
-    if (debug_D.getDouble(d) == d
-        && debug_P.getDouble(p) == p
-        && debug_FfG.getDouble(ffG) == ffG
-        && debug_setPoint.getDouble(setPoint) == setPoint) {
-      return;
-    } else {
-      d = debug_D.getDouble(d);
-      p = debug_P.getDouble(p);
-      ffG = debug_FfG.getDouble(ffG);
-      setPoint = debug_setPoint.getDouble(setPoint);
+    if (targetState.position == 0 && isArmHome()) {
+      armMotor.stopMotor(); // Prevent arm from pulling current when resting.
     }
 
-    MotorPidBuilder armMotorPid =
-        new MotorPidBuilder()
-            .withP(debug_P.getDouble(ArmConstants.Motor.MotorLowerPid.P))
-            .withD(debug_D.getDouble(ArmConstants.Motor.MotorLowerPid.D))
-            .withMinOutput(ArmConstants.Motor.MotorLowerPid.MIN_OUTPUT)
-            .withMaxOutput(ArmConstants.Motor.MotorLowerPid.MAX_OUTPUT);
-
-    armFeedforward =
-        new ArmFeedforward(
-            ArmConstants.Motor.FeedForward.STATIC,
-            debug_FfG.getDouble(ArmConstants.Motor.FeedForward.GRAVITY),
-            ArmConstants.Motor.FeedForward.VELOCITY);
-
-    MotorBuilder armMotorConfig = new MotorBuilder().withMotorPid(armMotorPid);
-
-    MotorConfig.fromMotorConstants(armMotor, armMotorEncoder, armMotorConfig).configurePid();
+    currentState = trapezoidProfile.calculate(RobotConstants.CYCLE_TIME, currentState, targetState);
 
     armMotor
         .getPIDController()
-        .setReference(debug_setPoint.getDouble(setPoint), ControlType.kPosition);
+        .setReference(
+            currentState.position,
+            ControlType.kPosition,
+            0,
+            armFeedforward.calculate(getPosition().getRadians(), currentState.velocity));
+  }
+
+  public boolean isArmHome() {
+    return armLimitSwtich.get();
+  }
+
+  public boolean atTargetSetpoint() {
+    return Math.abs(targetState.position - getPosition().getDegrees())
+        < ArmConstants.POSITION_TOLERANCE;
   }
 
   private Rotation2d getPosition() {
@@ -166,12 +120,18 @@ public class ArmSubsystem extends SubsystemBase {
    *
    * @param position The desired arm position.
    */
-  public void set(ArmPosition position) {
+  public void set(double position) {
+    targetState.position = position;
+    currentState =
+        trapezoidProfile.calculate(
+            RobotConstants.CYCLE_TIME,
+            new TrapezoidProfile.State(getPosition().getDegrees(), armMotorEncoder.getVelocity()),
+            targetState);
+
     double feedForward =
         armFeedforward.calculate(getPosition().getRotations(), armMotorEncoder.getVelocity());
-    double targetPosition = debug_setPoint.getDouble(feedForward);
 
-    armMotor.getPIDController().setReference(targetPosition, ControlType.kPosition);
+    armMotor.getPIDController().setReference(position, ControlType.kPosition, 0, feedForward);
   }
 
   public void stop() {
@@ -180,22 +140,19 @@ public class ArmSubsystem extends SubsystemBase {
 
   /** Enum representing different positions of the arm. */
   public enum ArmPosition {
-    HOME(Rotation2d.fromDegrees(0), 0),
-    AMP_SHOOT(Rotation2d.fromDegrees(40), 1),
-    SHOOT(Rotation2d.fromDegrees(90), 1);
+    HOME(Rotation2d.fromDegrees(0)),
+    AMP_SHOOT(Rotation2d.fromDegrees(40)),
+    SHOOT(Rotation2d.fromDegrees(90));
 
     private final Rotation2d angle;
-    private final int slot;
 
     /**
      * Constructor for ArmPosition.
      *
      * @param angle The rotation angle associated with the position.
-     * @param slot The PID slot associated with the position.
      */
-    private ArmPosition(Rotation2d angle, int slot) {
+    private ArmPosition(Rotation2d angle) {
       this.angle = angle;
-      this.slot = slot;
     }
 
     /**
@@ -205,15 +162,6 @@ public class ArmSubsystem extends SubsystemBase {
      */
     public Rotation2d getAngle() {
       return angle;
-    }
-
-    /**
-     * Get the PID slot associated with the position.
-     *
-     * @return The PID slot.
-     */
-    public int getSlot() {
-      return slot;
     }
   }
 }

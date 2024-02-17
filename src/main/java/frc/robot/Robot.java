@@ -47,6 +47,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void disabledInit() {
+    robotContainer.disabledInit();
     robotContainer.setTeleop(false);
   }
 }

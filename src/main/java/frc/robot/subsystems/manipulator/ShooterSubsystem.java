@@ -5,7 +5,6 @@ import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkFlex;
 import com.revrobotics.CANSparkLowLevel;
 import com.revrobotics.RelativeEncoder;
-import com.revrobotics.SparkPIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -18,9 +17,6 @@ import frc.robot.constants.manipulator.ShooterConstants;
 public class ShooterSubsystem extends SubsystemBase {
   private CANSparkFlex upperShooterMotor;
   private CANSparkFlex lowerShooterMotor;
-
-  private SparkPIDController upperShooterMotorPidController;
-  private SparkPIDController lowerShooterMotorPidController;
 
   private RelativeEncoder upperShooterMotorEncoder;
   private RelativeEncoder lowerShooterMotorEncoder;
@@ -67,9 +63,6 @@ public class ShooterSubsystem extends SubsystemBase {
     upperShooterMotorEncoder = upperShooterMotor.getEncoder();
     lowerShooterMotorEncoder = lowerShooterMotor.getEncoder();
 
-    upperShooterMotorPidController = upperShooterMotor.getPIDController();
-    lowerShooterMotorPidController = lowerShooterMotor.getPIDController();
-
     MotorConfig.fromMotorConstants(
             upperShooterMotor, upperShooterMotorEncoder, upperShooterMotorConfig)
         .configureMotor()
@@ -105,7 +98,10 @@ public class ShooterSubsystem extends SubsystemBase {
    * @return True if the shooter motor is at the target velocity, false otherwise.
    */
   public boolean atTargetVelocity() {
-    return Math.abs(targetVelocity - lowerShooterMotorEncoder.getVelocity())
+    return Math.abs(
+            targetVelocity
+                - (lowerShooterMotorEncoder.getVelocity() + upperShooterMotorEncoder.getVelocity())
+                    / 2)
         < ShooterConstants.VELOCITY_TOLERANCE;
   }
 
@@ -117,8 +113,8 @@ public class ShooterSubsystem extends SubsystemBase {
   public void set(int velocity) {
     targetVelocity = velocity;
 
-    upperShooterMotorPidController.setReference(velocity, ControlType.kVelocity);
-    lowerShooterMotorPidController.setReference(velocity, ControlType.kVelocity);
+    upperShooterMotor.getPIDController().setReference(velocity, ControlType.kVelocity);
+    lowerShooterMotor.getPIDController().setReference(velocity, ControlType.kVelocity);
   }
 
   /** Stop both shooter motors. */

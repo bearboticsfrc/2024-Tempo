@@ -8,7 +8,6 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
-import frc.robot.subsystems.manipulator.ArmSubsystem.ArmPosition;
 import frc.robot.subsystems.manipulator.IntakeSubsystem.IntakeSpeed;
 import java.util.function.DoubleSupplier;
 
@@ -34,8 +33,26 @@ public class ManipulatorSubsystem extends SubsystemBase {
     return intakeSubsystem.isNoteInRoller();
   }
 
-  public InstantCommand getShooterRunCommand(int velocity) {
-    return new InstantCommand(() -> shooterSubsystem.set(velocity));
+  /**
+   * Get a command to run the climber to a specified speed.
+   *
+   * @param speedSupplier The desired climber speed supplier.
+   * @return The RunCommand to set the climber speed.
+   */
+  public RunCommand getClimberRunCommand(DoubleSupplier speedSupplier) {
+    return new RunCommand(() -> climberSubsystem.set(speedSupplier.getAsDouble()), this);
+  }
+
+  /**
+   * Get a command to home the climber.
+   *
+   * @return The SequentialCommandGroup to home the climber.
+   */
+  public SequentialCommandGroup getClimberHomeCommand() {
+    return new SequentialCommandGroup(
+        new InstantCommand(() -> climberSubsystem.set(-0.5), this),
+        new WaitUntilCommand(climberSubsystem::isClimberHome),
+        new InstantCommand(() -> climberSubsystem.stop()));
   }
 
   /**
@@ -119,11 +136,12 @@ public class ManipulatorSubsystem extends SubsystemBase {
    * @param velocity The desired velocity for shooting.
    * @return The SequentialCommandGroup to shoot the note.
    */
-  public SequentialCommandGroup getShootCommand(int velocity) {
-    return new SequentialCommandGroup(
-        new InstantCommand(() -> shooterSubsystem.set(velocity)),
-        new WaitUntilCommand(shooterSubsystem::atTargetVelocity),
-        getIntakeFeedCommand());
+  public SequentialCommandGroup getSubwooferShootCommand(int velocity) {
+    return new SequentialCommandGroup(getShooterPrepareCommand(velocity), getIntakeFeedCommand());
+  }
+
+  public InstantCommand getShooterRunCommand(int velocity) {
+    return new InstantCommand(() -> shooterSubsystem.set(velocity));
   }
 
   /**
@@ -131,34 +149,37 @@ public class ManipulatorSubsystem extends SubsystemBase {
    *
    * @return The InstantCommand to stop the shooter.
    */
-  public InstantCommand getShootStopCommand() {
-    return new InstantCommand(() -> shooterSubsystem.stop());
+  public ParallelCommandGroup getShootStopCommand() {
+    return new ParallelCommandGroup(
+        new InstantCommand(() -> shooterSubsystem.stop()), getArmRunCommand(0));
   }
 
   /**
-   * Get a command to run the climber to a specified speed.
+   * 1. Run arm and wait until at setpoint and run shooter and wait until at velocity.
    *
-   * @param speedSupplier The desired climber speed supplier.
-   * @return The RunCommand to set the climber speed.
-   */
-  public RunCommand getClimberRunCommand(DoubleSupplier speedSupplier) {
-    return new RunCommand(() -> climberSubsystem.set(speedSupplier.getAsDouble()), this);
-  }
-
-  /**
-   * Get a command to home the climber.
+   * <p>2. Feed note.
    *
-   * @return The SequentialCommandGroup to home the climber.
+   * @return The command.
    */
-  public SequentialCommandGroup getClimberHomeCommand() {
+  public SequentialCommandGroup getPodiumShootCommand() {
     return new SequentialCommandGroup(
-        new InstantCommand(() -> climberSubsystem.set(-0.5), this),
-        new WaitUntilCommand(climberSubsystem::isClimberHome),
-        new InstantCommand(() -> climberSubsystem.stop()));
+        new ParallelCommandGroup(getArmPrepareCommand(25), getShooterPrepareCommand(2500)),
+        getIntakeFeedCommand(),
+        getShootStopCommand());
   }
 
-  public InstantCommand getArmRunCommand(ArmPosition position) {
+  private InstantCommand getArmRunCommand(double position) {
     return new InstantCommand(() -> armSubsystem.set(position));
+  }
+
+  private SequentialCommandGroup getShooterPrepareCommand(int velocity) {
+    return new SequentialCommandGroup(
+        getShooterRunCommand(velocity), new WaitUntilCommand(shooterSubsystem::atTargetVelocity));
+  }
+
+  private SequentialCommandGroup getArmPrepareCommand(double position) {
+    return new SequentialCommandGroup(
+        getArmRunCommand(position), new WaitUntilCommand(armSubsystem::atTargetSetpoint));
   }
 
   public InstantCommand getArmStopCommand() {

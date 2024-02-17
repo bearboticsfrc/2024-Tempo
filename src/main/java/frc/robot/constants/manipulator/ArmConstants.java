@@ -1,36 +1,34 @@
 package frc.robot.constants.manipulator;
 
+import com.revrobotics.CANSparkBase.IdleMode;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
+
 public class ArmConstants {
+  public static final int LIMIT_SWITCH_CHANNEL = 3;
+  public static final double POSITION_TOLERANCE = 1;
+
   public class Motor {
     public static final String NAME = "Arm Motor";
     public static final int MOTOR_PORT = 3;
-    public static final int CURRENT_LIMT = 40;
+    public static final int CURRENT_LIMIT = 40;
     public static final boolean INVERTED = false;
+    public static final IdleMode IDLE_MODE = IdleMode.kBrake;
     public static final double POSITION_CONVERSION_FACTOR = 360;
+    public static final float FORWARD_SOFT_LIMIT = 80;
 
-    public static class MotorLowerPid {
-      public static final double P = 0.02;
-      public static final double MIN_OUTPUT = -0.1;
-      public static final double MAX_OUTPUT = 0.5;
-      public static final double D = 0;
+    public static class MotorPid {
+      public static final double P = 0.032;
+      public static final double MIN_OUTPUT = -0.15;
     }
 
-    public static class MotorRaisePid {
-      public static final double MIN_OUTPUT = -0.1;
-      public static final double MAX_OUTPUT = 0.5;
-    }
-
-    public class FeedForward {
-      public static final double STATIC = 0;
-      public static final double GRAVITY = 0.25;
+    public static class FeedForward {
+      public static final double STATIC = 0.75;
+      public static final double GRAVITY = 0.6;
       public static final double VELOCITY = 0;
     }
-  }
 
-  public class MotorFollower {
-    public static final String NAME = "Arm Motor Follower";
-    public static final int MOTOR_PORT = 4;
-    public static final int CURRENT_LIMT = 40;
-    public static final boolean FOLLOW_INVERTED = true;
+    public static class TrapezoidProfile {
+      public static final Constraints constraints = new Constraints(720 * 8, 360 * 4);
+    }
   }
 }
