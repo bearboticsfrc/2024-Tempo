@@ -1,4 +1,4 @@
-package frc.robot.util;
+package frc.bearbotics.swerve;
 
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.CANSparkBase;
@@ -7,8 +7,10 @@ import com.revrobotics.MotorFeedbackSensor;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkPIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
-import frc.robot.subsystems.CANCoders;
-import frc.robot.subsystems.CANCoders.CANCoderBuilder;
+import edu.wpi.first.wpilibj.Timer;
+import frc.bearbotics.swerve.cancoder.CANCoders;
+import frc.bearbotics.swerve.cancoder.CANCoders.CANCoderBuilder;
+import frc.robot.util.RevUtil;
 
 public class MotorConfig {
   private CANSparkBase motor;
@@ -164,8 +166,9 @@ public class MotorConfig {
   }
 
   public void burnFlash() {
+    Timer.delay(0.25);
     RevUtil.checkRevError(motor.burnFlash());
-
+    Timer.delay(0.25);
     // Burn settings onto motor flash
     // might not work, needs a delay after setting values
   }
@@ -303,7 +306,7 @@ public class MotorConfig {
     private int motorPort;
     private boolean motorInverted;
     private boolean encoderInverted;
-    private CANCoderBuilder canCoder;
+    private CANCoderBuilder absoluteEncoder;
     private MotorPIDBuilder motorPID;
     private double nominalVoltage = 12;
     private int currentLimit;
@@ -311,12 +314,12 @@ public class MotorConfig {
     private double velocityConversionFactor = 1;
     private MotorPIDBuilder[] pidSlots = new MotorPIDBuilder[2];
 
-    public CANCoderBuilder getCanCoder() {
-      return canCoder;
+    public CANCoderBuilder getAbsoluteEncoder() {
+      return absoluteEncoder;
     }
 
-    public MotorBuilder setCanCoder(CANCoderBuilder canCoder) {
-      this.canCoder = canCoder;
+    public MotorBuilder setAbsoluteEncoder(CANCoderBuilder canCoder) {
+      this.absoluteEncoder = canCoder;
       return this;
     }
 

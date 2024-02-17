@@ -4,7 +4,7 @@
 
 package frc.robot.subsystems;
 
-import com.ctre.phoenix.sensors.WPI_PigeonIMU;
+import com.ctre.phoenix6.hardware.Pigeon2;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -18,6 +18,11 @@ import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.Subsystem;
+import frc.bearbotics.swerve.MotorConfig.MotorBuilder;
+import frc.bearbotics.swerve.MotorConfig.MotorPIDBuilder;
+import frc.bearbotics.swerve.SwerveModule;
+import frc.bearbotics.swerve.SwerveModule.SwerveModuleBuilder;
+import frc.bearbotics.swerve.cancoder.CANCoders.CANCoderBuilder;
 import frc.robot.constants.DriveConstants;
 import frc.robot.constants.DriveConstants.SpeedMode;
 import frc.robot.constants.RobotConstants;
@@ -26,20 +31,18 @@ import frc.robot.constants.SwerveModuleConstants.BackLeftConstants;
 import frc.robot.constants.SwerveModuleConstants.BackRightConstants;
 import frc.robot.constants.SwerveModuleConstants.FrontLeftConstants;
 import frc.robot.constants.SwerveModuleConstants.FrontRightConstants;
-import frc.robot.subsystems.SwerveModule.SwerveModuleBuilder;
-import frc.robot.util.CTREUtil;
-import frc.robot.util.MotorConfig.MotorBuilder;
-import frc.robot.util.MotorConfig.MotorPIDBuilder;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.stream.DoubleStream;
 
 /** Controls the four swerve modules for autonomous and teleoperated modes. */
 public class DriveSubsystem implements Subsystem {
   // Linked to maintain order.
   private final LinkedHashMap<SwerveCorner, SwerveModule> swerveModules = new LinkedHashMap<>();
-  private final WPI_PigeonIMU pigeonImu = new WPI_PigeonIMU(RobotConstants.PIGEON_CAN_ID);
+  private final Pigeon2 pigeonImu = new Pigeon2(RobotConstants.PIGEON_CAN_ID);
 
   private final SwerveDriveOdometry odometry;
   private GenericEntry competitionTabMaxSpeedEntry;
@@ -47,9 +50,15 @@ public class DriveSubsystem implements Subsystem {
   private double maxSpeed = DriveConstants.DRIVE_VELOCITY;
   private boolean fieldRelativeMode = true;
 
-  public DriveSubsystem() {
-    CTREUtil.checkCtreError(pigeonImu.configFactoryDefault());
+  private SwerveModuleState[] desiredSwerveModuleStates =
+      new SwerveModuleState[] {
+        new SwerveModuleState(),
+        new SwerveModuleState(),
+        new SwerveModuleState(),
+        new SwerveModuleState()
+      };
 
+  public DriveSubsystem() {
     for (SwerveCorner corner : SwerveCorner.values()) {
       swerveModules.put(
           corner,
@@ -83,9 +92,11 @@ public class DriveSubsystem implements Subsystem {
             .getEntry();
 
     DriveConstants.COMPETITION_TAB.addNumber("Pigeon Heading", () -> getHeading().getDegrees());
-    DriveConstants.DRIVE_SYSTEM_TAB.addDouble("Pitch", this::getPitch);
-    DriveConstants.DRIVE_SYSTEM_TAB.addDouble("Roll", this::getRoll);
     DriveConstants.DRIVE_SYSTEM_TAB.addBoolean("Field Relative?", () -> fieldRelativeMode);
+    DriveConstants.DRIVE_SYSTEM_TAB.addDoubleArray(
+        "MeasuredStates", this::getMeasuredSwerveModuleStates);
+    DriveConstants.DRIVE_SYSTEM_TAB.addDoubleArray(
+        "DesiredStates", this::getDesiredSwerveModuleStates);
   }
 
   @Override
@@ -130,6 +141,11 @@ public class DriveSubsystem implements Subsystem {
             .setPositionPidWrappingMax(
                 FrontLeftConstants.PivotMotor.MotorPid.POSITION_PID_WRAPPING_MAX);
 
+    CANCoderBuilder pivotAbsoluteEncoder =
+        new CANCoderBuilder()
+            .setId(FrontLeftConstants.PivotMotor.ABSOLUTE_ENCODER_PORT)
+            .setOffsetDegrees(FrontLeftConstants.PivotMotor.ABSOLUTE_ENCODER_OFFSET);
+
     MotorBuilder driveConfig =
         new MotorBuilder()
             .setName(FrontLeftConstants.DriveMotor.NAME)
@@ -145,6 +161,7 @@ public class DriveSubsystem implements Subsystem {
         new MotorBuilder()
             .setName(FrontLeftConstants.PivotMotor.NAME)
             .setMotorPort(FrontLeftConstants.PivotMotor.MOTOR_PORT)
+            .setAbsoluteEncoder(pivotAbsoluteEncoder)
             .setCurrentLimit(FrontLeftConstants.PivotMotor.CURRENT_LIMT)
             .setMotorInverted(FrontLeftConstants.PivotMotor.INVERTED)
             .setEncoderInverted(FrontLeftConstants.PivotMotor.ENCODER_INVERTED)
@@ -155,8 +172,6 @@ public class DriveSubsystem implements Subsystem {
     SwerveModuleBuilder moduleConfig =
         new SwerveModuleBuilder()
             .setModuleName(FrontLeftConstants.MODULE_NAME)
-            .setParkAngle(FrontLeftConstants.PARK_ANGLE)
-            .setChassisAngularOffset(FrontLeftConstants.CHASSIS_ANGULAR_OFFSET)
             .setDriveMotor(driveConfig)
             .setPivotMotor(pivotConfig);
 
@@ -179,6 +194,11 @@ public class DriveSubsystem implements Subsystem {
             .setPositionPidWrappingMax(
                 BackLeftConstants.PivotMotor.MotorPid.POSITION_PID_WRAPPING_MAX);
 
+    CANCoderBuilder pivotAbsoluteEncoder =
+        new CANCoderBuilder()
+            .setId(BackLeftConstants.PivotMotor.ABSOLUTE_ENCODER_PORT)
+            .setOffsetDegrees(BackLeftConstants.PivotMotor.ABSOLUTE_ENCODER_OFFSET);
+
     MotorBuilder driveConfig =
         new MotorBuilder()
             .setName(BackLeftConstants.DriveMotor.NAME)
@@ -194,6 +214,7 @@ public class DriveSubsystem implements Subsystem {
         new MotorBuilder()
             .setName(BackLeftConstants.PivotMotor.NAME)
             .setMotorPort(BackLeftConstants.PivotMotor.MOTOR_PORT)
+            .setAbsoluteEncoder(pivotAbsoluteEncoder)
             .setCurrentLimit(BackLeftConstants.PivotMotor.CURRENT_LIMT)
             .setMotorInverted(BackLeftConstants.PivotMotor.INVERTED)
             .setEncoderInverted(BackLeftConstants.PivotMotor.ENCODER_INVERTED)
@@ -204,8 +225,6 @@ public class DriveSubsystem implements Subsystem {
     SwerveModuleBuilder moduleConfig =
         new SwerveModuleBuilder()
             .setModuleName(BackLeftConstants.MODULE_NAME)
-            .setParkAngle(BackLeftConstants.PARK_ANGLE)
-            .setChassisAngularOffset(BackLeftConstants.CHASSIS_ANGULAR_OFFSET)
             .setDriveMotor(driveConfig)
             .setPivotMotor(pivotConfig);
 
@@ -228,6 +247,11 @@ public class DriveSubsystem implements Subsystem {
             .setPositionPidWrappingMax(
                 FrontRightConstants.PivotMotor.MotorPid.POSITION_PID_WRAPPING_MAX);
 
+    CANCoderBuilder pivotAbsoluteEncoder =
+        new CANCoderBuilder()
+            .setId(FrontRightConstants.PivotMotor.ABSOLUTE_ENCODER_PORT)
+            .setOffsetDegrees(FrontRightConstants.PivotMotor.ABSOLUTE_ENCODER_OFFSET);
+
     MotorBuilder driveConfig =
         new MotorBuilder()
             .setName(FrontRightConstants.DriveMotor.NAME)
@@ -243,6 +267,7 @@ public class DriveSubsystem implements Subsystem {
         new MotorBuilder()
             .setName(FrontRightConstants.PivotMotor.NAME)
             .setMotorPort(FrontRightConstants.PivotMotor.MOTOR_PORT)
+            .setAbsoluteEncoder(pivotAbsoluteEncoder)
             .setCurrentLimit(FrontRightConstants.PivotMotor.CURRENT_LIMT)
             .setMotorInverted(FrontRightConstants.PivotMotor.INVERTED)
             .setEncoderInverted(FrontRightConstants.PivotMotor.ENCODER_INVERTED)
@@ -253,8 +278,6 @@ public class DriveSubsystem implements Subsystem {
     SwerveModuleBuilder moduleConfig =
         new SwerveModuleBuilder()
             .setModuleName(FrontRightConstants.MODULE_NAME)
-            .setParkAngle(FrontRightConstants.PARK_ANGLE)
-            .setChassisAngularOffset(FrontRightConstants.CHASSIS_ANGULAR_OFFSET)
             .setDriveMotor(driveConfig)
             .setPivotMotor(pivotConfig);
 
@@ -277,6 +300,11 @@ public class DriveSubsystem implements Subsystem {
             .setPositionPidWrappingMax(
                 BackRightConstants.PivotMotor.MotorPid.POSITION_PID_WRAPPING_MAX);
 
+    CANCoderBuilder pivotAbsoluteEncoder =
+        new CANCoderBuilder()
+            .setId(BackRightConstants.PivotMotor.ABSOLUTE_ENCODER_PORT)
+            .setOffsetDegrees(BackRightConstants.PivotMotor.ABSOLUTE_ENCODER_OFFSET);
+
     MotorBuilder driveConfig =
         new MotorBuilder()
             .setName(BackRightConstants.DriveMotor.NAME)
@@ -292,6 +320,7 @@ public class DriveSubsystem implements Subsystem {
         new MotorBuilder()
             .setName(BackRightConstants.PivotMotor.NAME)
             .setMotorPort(BackRightConstants.PivotMotor.MOTOR_PORT)
+            .setAbsoluteEncoder(pivotAbsoluteEncoder)
             .setCurrentLimit(BackRightConstants.PivotMotor.CURRENT_LIMT)
             .setMotorInverted(BackRightConstants.PivotMotor.INVERTED)
             .setEncoderInverted(BackRightConstants.PivotMotor.ENCODER_INVERTED)
@@ -302,20 +331,10 @@ public class DriveSubsystem implements Subsystem {
     SwerveModuleBuilder moduleConfig =
         new SwerveModuleBuilder()
             .setModuleName(BackRightConstants.MODULE_NAME)
-            .setParkAngle(BackRightConstants.PARK_ANGLE)
-            .setChassisAngularOffset(BackRightConstants.CHASSIS_ANGULAR_OFFSET)
             .setDriveMotor(driveConfig)
             .setPivotMotor(pivotConfig);
 
     return moduleConfig;
-  }
-
-  public double getPitch() {
-    return pigeonImu.getPitch();
-  }
-
-  public double getRoll() {
-    return pigeonImu.getRoll();
   }
 
   /**
@@ -325,30 +344,8 @@ public class DriveSubsystem implements Subsystem {
    *
    * @return An array containing the swerve modules, ordered.
    */
-  public SwerveModule[] getSwerveModules() {
-    return (SwerveModule[]) swerveModules.values().toArray(new SwerveModule[4]);
-  }
-
-  /**
-   * Activates or deactivates the park mode for the robot.
-   *
-   * <p>When park mode is activated, each wheel is locked in an opposing configuration, preventing
-   * any movement.
-   *
-   * @param enabled true to activate park mode, false to deactivate.
-   */
-  public void setParkMode(boolean enabled) {
-    for (SwerveModule module : getSwerveModules()) {
-      if (!enabled) {
-        module.setParked(false);
-        continue;
-      }
-
-      SwerveModuleState state = new SwerveModuleState(0, module.getParkedAngle());
-
-      module.set(state);
-      module.setParked(true);
-    }
+  public Collection<SwerveModule> getSwerveModules() {
+    return swerveModules.values();
   }
 
   /**
@@ -433,8 +430,9 @@ public class DriveSubsystem implements Subsystem {
   public void setModuleStates(SwerveModuleState[] swerveModuleStates) {
     SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, maxSpeed);
     Iterator<SwerveModuleState> stateIterator = Arrays.asList(swerveModuleStates).iterator();
+    this.desiredSwerveModuleStates = swerveModuleStates;
 
-    for (SwerveModule module : swerveModules.values()) {
+    for (SwerveModule module : getSwerveModules()) {
       module.set(stateIterator.next());
     }
   }
@@ -445,12 +443,54 @@ public class DriveSubsystem implements Subsystem {
    * @return The states.
    */
   public SwerveModuleState[] getModuleStates() {
-    SwerveModuleState[] states = new SwerveModuleState[4];
-    int index = 0;
-    for (SwerveModule module : swerveModules.values()) {
-      states[index++] = module.getState();
-    }
-    return states;
+    return getSwerveModules().stream()
+        .map(module -> module.getState())
+        .toArray(SwerveModuleState[]::new);
+  }
+
+  /**
+   * Returns the position of every swerve module.
+   *
+   * @return The positions.
+   */
+  public SwerveModulePosition[] getModulePositions() {
+    return getSwerveModules().stream()
+        .map(module -> module.getPosition())
+        .toArray(SwerveModulePosition[]::new);
+  }
+
+  /**
+   * Gets an array which contains current swerve modules rotation and velocity. This is used for
+   * AdvantageScope.
+   *
+   * @return The array.
+   */
+  private double[] getMeasuredSwerveModuleStates() {
+    return getNormalizedSwerveModuleStates(getModuleStates());
+  }
+
+  /**
+   * Gets an array which contains the targeted swerve modules rotation and velocity. This is used
+   * for AdvantageScope.
+   *
+   * @return The array.
+   */
+  private double[] getDesiredSwerveModuleStates() {
+    return getNormalizedSwerveModuleStates(desiredSwerveModuleStates);
+  }
+
+  /**
+   * Normalizes an array of {@link SwerveModuleState} to an array containing the states's rotation
+   * and velocity. This method is used for AdvantageScope.
+   *
+   * @param swerveModuleStates The array of swerve module states to be normalized.
+   * @return The normalized array.
+   */
+  private double[] getNormalizedSwerveModuleStates(SwerveModuleState[] states) {
+    return Arrays.stream(states)
+        .flatMapToDouble(
+            state -> DoubleStream.of(state.angle.getRadians(), state.speedMetersPerSecond))
+        .toArray();
   }
 
   /**
@@ -461,18 +501,6 @@ public class DriveSubsystem implements Subsystem {
   public Rotation2d getHeading() {
     return Rotation2d.fromDegrees(
         MathUtil.inputModulus(pigeonImu.getRotation2d().getDegrees(), 0, 360));
-  }
-
-  /**
-   * Returns the position of every swerve module.
-   *
-   * @return The positions.
-   */
-  public SwerveModulePosition[] getModulePositions() {
-    return (SwerveModulePosition[])
-        Arrays.stream(getSwerveModules())
-            .map(module -> module.getPosition())
-            .toArray(SwerveModulePosition[]::new);
   }
 
   /**

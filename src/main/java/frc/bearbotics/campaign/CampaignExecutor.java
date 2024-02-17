@@ -1,11 +1,11 @@
-package frc.robot.auto.campaign;
+package frc.bearbotics.campaign;
 
 import edu.wpi.first.wpilibj2.command.Command;
 
 public class CampaignExecutor extends Command {
   private Campaign campaign;
   private MissionTree nextMission = null;
-  private Mission currentMission = null;
+  private AbstractMission currentMission = null;
 
   public CampaignExecutor(Campaign campaign) {
     this.campaign = campaign;

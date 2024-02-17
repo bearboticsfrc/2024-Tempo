@@ -8,7 +8,7 @@ public class RobotConstants {
   public static final double TRACK_WIDTH = Units.inchesToMeters(20.75);
   public static final double WHEEL_BASE = Units.inchesToMeters(18.75);
   public static final double WHEEL_DIAMETER = 0.0962; // TODO: Measure again
-  public static final int PIGEON_CAN_ID = 000;
+  public static final int PIGEON_CAN_ID = 20;
 
   public static final double CYCLE_TIME = Units.millisecondsToSeconds(20);
 
@@ -19,8 +19,6 @@ public class RobotConstants {
           new Translation2d(WHEEL_BASE / 2, -TRACK_WIDTH / 2), // FR
           new Translation2d(-WHEEL_BASE / 2, TRACK_WIDTH / 2), // BL
           new Translation2d(-WHEEL_BASE / 2, -TRACK_WIDTH / 2)); // BR
-
-  public static double ROBOT_RADIUS = new Translation2d(WHEEL_BASE / 2, TRACK_WIDTH / 2).getNorm();
 
   public enum SwerveCorner {
     FRONT_LEFT,
