@@ -4,48 +4,52 @@
 
 package frc.robot.subsystems.vision;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.constants.VisionConstants;
+import frc.robot.location.LocationHelper;
 import java.util.Optional;
 import org.photonvision.PhotonCamera;
-import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
 public class ObjectDetectionSubsystem extends SubsystemBase {
+  private PhotonCamera photonCamera;
+  private boolean driverCameraMode;
 
-  private PhotonCamera photonCamera = null;
-  private boolean driverCameraMode = false;
-
-  public ObjectDetectionSubsystem() {
-    photonCamera = new PhotonCamera(VisionConstants.OBJECT_DETECTION_CAMERA);
+  public ObjectDetectionSubsystem(String cameraName) {
+    photonCamera = new PhotonCamera(cameraName);
   }
 
   public void toggleDriverCamera() {
-    driverCameraMode = !driverCameraMode;
-    photonCamera.setDriverMode(driverCameraMode);
+    photonCamera.setDriverMode(driverCameraMode ^= true);
   }
 
   public boolean hasNoteInView() {
     return photonCamera.getLatestResult().hasTargets();
   }
 
-  public Optional<Double> getYawToNearestNote() {
-    PhotonPipelineResult photonResults = photonCamera.getLatestResult();
-
-    if (!photonResults.hasTargets()) return Optional.empty();
-
-    PhotonTrackedTarget target = photonResults.getBestTarget();
-
-    return Optional.of(target.getYaw());
+  private PhotonTrackedTarget getBestTarget() {
+    return photonCamera.getLatestResult().getBestTarget();
   }
 
-  public Optional<Double> getDistanceToNearestNote() {
-    PhotonPipelineResult photonResults = photonCamera.getLatestResult();
+  public Optional<PhotonTrackedTarget> getTargetToNearestNote() {
+    return Optional.ofNullable(getBestTarget());
+  }
 
-    if (!photonResults.hasTargets()) return Optional.empty();
+  public Optional<Transform3d> getTransformToNearestNote() {
+    return Optional.ofNullable(getBestTarget().getBestCameraToTarget());
+  }
 
-    PhotonTrackedTarget target = photonResults.getBestTarget();
+  public Optional<Pose2d> getPoseToNearestNote(Pose2d currentPose) {
+    if (!hasNoteInView()) {
+      return Optional.empty();
+    }
 
-    return Optional.of(target.getBestCameraToTarget().getX());
+    return Optional.of(
+        LocationHelper.getPoseByDistanceAndAngleToPose(
+            currentPose,
+            getTransformToNearestNote().get().getX(),
+            Rotation2d.fromDegrees(getTargetToNearestNote().get().getYaw())));
   }
 }

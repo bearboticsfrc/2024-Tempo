@@ -16,6 +16,7 @@ import frc.bearbotics.test.DriveSubsystemTest;
 import frc.robot.constants.DriveConstants;
 import frc.robot.constants.DriveConstants.SpeedMode;
 import frc.robot.constants.RobotConstants;
+import frc.robot.constants.VisionConstants;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.manipulator.IntakeSubsystem.IntakeSpeed;
 import frc.robot.subsystems.manipulator.ManipulatorSubsystem;
@@ -30,7 +31,8 @@ public class RobotContainer {
 
   private final DriveSubsystem driveSubsystem = new DriveSubsystem();
   private final ManipulatorSubsystem manipulatorSubsystem = new ManipulatorSubsystem();
-  private final ObjectDetectionSubsystem objectDetectionSubsystem = new ObjectDetectionSubsystem();
+  private final ObjectDetectionSubsystem objectDetectionSubsystem =
+      new ObjectDetectionSubsystem(VisionConstants.OBJECT_DETECTION_CAMERA);
 
   private boolean isTeleop;
 
@@ -61,13 +63,13 @@ public class RobotContainer {
 
     driverController
         .leftBumper()
-        .whileTrue(manipulatorSubsystem.getPodiumShootCommand())
+        .whileTrue(manipulatorSubsystem.getSubwooferShootCommand())
         .onFalse(manipulatorSubsystem.getShootStopCommand());
 
     driverController
         .rightBumper()
-        .onTrue(new InstantCommand(() -> driveSubsystem.setFieldRelative(false)))
-        .onFalse(new InstantCommand(() -> driveSubsystem.setFieldRelative(true)));
+        .whileTrue(manipulatorSubsystem.getPodiumShootCommand())
+        .onFalse(manipulatorSubsystem.getShootStopCommand());
 
     driverController
         .leftTrigger()
@@ -89,10 +91,13 @@ public class RobotContainer {
             new InstantCommand(
                 () -> driverController.getHID().setRumble(RumbleType.kBothRumble, 0)));
 
-    new Trigger(
-            () ->
-                objectDetectionSubsystem.hasNoteInView() && !manipulatorSubsystem.isNoteInRoller())
-        .onTrue(manipulatorSubsystem.getSpecialIntakeCommand());
+    // new Trigger(
+    //         () ->
+    //             objectDetectionSubsystem.hasNoteInView() &&
+    // !manipulatorSubsystem.isNoteInRoller())
+    //     .debounce(0.5, DebounceType.kFalling)
+    //     .whileTrue(manipulatorSubsystem.getSpecialIntakeCommand())
+    //     .onFalse(manipulatorSubsystem.getIntakeStopCommand());
   }
 
   private RunCommand getDefaultDriveSubsystemCommand() {
@@ -109,6 +114,11 @@ public class RobotContainer {
     manipulatorSubsystem.setDefaultCommand(
         manipulatorSubsystem.getClimberRunCommand(
             () -> -MathUtil.applyDeadband(operatorController.getRightY(), 0.01)));
+
+    operatorController
+        .a()
+        .whileTrue(manipulatorSubsystem.getAmpShootCommand())
+        .onFalse(manipulatorSubsystem.getShootStopCommand());
   }
 
   private void buildAutoList() {

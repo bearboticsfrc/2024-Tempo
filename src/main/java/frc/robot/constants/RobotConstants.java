@@ -18,10 +18,11 @@ public class RobotConstants {
   public static final ShuffleboardTab ARM_SYSTEM_TAB = Shuffleboard.getTab("Arm System");
   public static final ShuffleboardTab CLIMBER_SYSTEM_TAB = Shuffleboard.getTab("Climber System");
   public static final ShuffleboardTab INTAKE_SYSTEM_TAB = Shuffleboard.getTab("Intake System");
+  public static final ShuffleboardTab DRIVE_SYSTEM_TAB = Shuffleboard.getTab("Drive System");
+  public static final ShuffleboardTab VISION_SYSTEM_TAB = Shuffleboard.getTab("VIsion System");
 
   public static final ShuffleboardTab COMPETITION_TAB = Shuffleboard.getTab("Competition");
   public static final ShuffleboardTab TEST_TAB = Shuffleboard.getTab("Test");
-  public static final ShuffleboardTab DRIVE_SYSTEM_TAB = Shuffleboard.getTab("Drive System");
 
   // Pigeon IMU CAN ID
   public static final int PIGEON_CAN_ID = 20;

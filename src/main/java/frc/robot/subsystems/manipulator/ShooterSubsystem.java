@@ -21,7 +21,7 @@ public class ShooterSubsystem extends SubsystemBase {
   private RelativeEncoder upperShooterMotorEncoder;
   private RelativeEncoder lowerShooterMotorEncoder;
 
-  private int targetVelocity;
+  private double targetVelocity;
 
   public ShooterSubsystem() {
     configureMotors();
@@ -110,7 +110,16 @@ public class ShooterSubsystem extends SubsystemBase {
    *
    * @param velocity The desired velocity for the shooter motor.
    */
-  public void set(int velocity) {
+  public void set(ShooterVelocity velocity) {
+    set(velocity.getVelocity());
+  }
+
+  /**
+   * Set the target velocity for the shooter motor and adjust the PID controller accordingly.
+   *
+   * @param velocity The desired velocity for the shooter motor.
+   */
+  public void set(double velocity) {
     targetVelocity = velocity;
 
     upperShooterMotor.getPIDController().setReference(velocity, ControlType.kVelocity);
@@ -121,5 +130,21 @@ public class ShooterSubsystem extends SubsystemBase {
   public void stop() {
     upperShooterMotor.stopMotor();
     lowerShooterMotor.stopMotor();
+  }
+
+  public enum ShooterVelocity {
+    PODIUM_SHOOT(2500),
+    AMP_SHOOT(1200),
+    SUBWOOFER_SHOOT(2500);
+
+    public double velocity;
+
+    private ShooterVelocity(double velocity) {
+      this.velocity = velocity;
+    }
+
+    public double getVelocity() {
+      return velocity;
+    }
   }
 }

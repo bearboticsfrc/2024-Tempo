@@ -24,36 +24,30 @@ public class EstimationRunnable implements Runnable {
 
   private AprilTagFieldLayout layout;
 
-  public EstimationRunnable(String name, AprilTagCamera camera) {
+  public EstimationRunnable(String name, VisionCamera camera) {
+    this.layout = AprilTagFields.k2024Crescendo.loadAprilTagLayoutField();
+    this.layout.setOrigin(OriginPosition.kBlueAllianceWallRightSide);
+
     this.photonCamera = camera.getPhotonCamera();
-    PhotonPoseEstimator photonPoseEstimator = null;
 
-    layout = AprilTagFields.k2024Crescendo.loadAprilTagLayoutField();
-    layout.setOrigin(OriginPosition.kBlueAllianceWallRightSide);
-
-    if (photonCamera != null) {
-      photonPoseEstimator =
-          new PhotonPoseEstimator(
-              layout,
-              PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
-              photonCamera,
-              camera.getRobotToCameraTransform());
-      photonPoseEstimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
-    }
-
-    this.photonPoseEstimator = photonPoseEstimator;
+    this.photonPoseEstimator =
+        new PhotonPoseEstimator(
+            layout,
+            PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
+            photonCamera,
+            camera.getRobotToCameraTransform());
+    this.photonPoseEstimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
   }
 
   @Override
   public void run() {
-    if (photonPoseEstimator == null || photonCamera == null) return;
-
     PhotonPipelineResult photonResults = photonCamera.getLatestResult();
 
-    if (!photonResults.hasTargets()) return;
-
-    if (photonResults.targets.size() == 1
-        && photonResults.targets.get(0).getPoseAmbiguity() > APRILTAG_AMBIGUITY_THRESHOLD) return;
+    if (!photonResults.hasTargets()
+        || (photonResults.targets.size() == 1
+            && photonResults.targets.get(0).getPoseAmbiguity() > APRILTAG_AMBIGUITY_THRESHOLD)) {
+      return;
+    }
 
     photonPoseEstimator
         .update(photonResults)

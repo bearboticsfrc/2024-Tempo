@@ -40,7 +40,7 @@ public final class VisionConstants {
 
   public static final double APRILTAG_AMBIGUITY_THRESHOLD = 0.2;
 
-  public static final String OBJECT_DETECTION_CAMERA = "Arducam_OV9782_USB_Camera";
+  public static final String OBJECT_DETECTION_CAMERA = "OV9782NoteCamera";
   public static final String CAMERA2_NAME = "OV9281_2";
 
   public enum TAG {

@@ -8,7 +8,9 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
+import frc.robot.subsystems.manipulator.ArmSubsystem.ArmPosition;
 import frc.robot.subsystems.manipulator.IntakeSubsystem.IntakeSpeed;
+import frc.robot.subsystems.manipulator.ShooterSubsystem.ShooterVelocity;
 import java.util.function.DoubleSupplier;
 
 public class ManipulatorSubsystem extends SubsystemBase {
@@ -103,7 +105,6 @@ public class ManipulatorSubsystem extends SubsystemBase {
   public SequentialCommandGroup getSpecialIntakeCommand() {
     return new SequentialCommandGroup(
         getIntakeCommand(),
-        new WaitCommand(1),
         new ConditionalCommand(
             new InstantCommand(),
             getIntakeStopCommand(),
@@ -149,17 +150,7 @@ public class ManipulatorSubsystem extends SubsystemBase {
         getIntakeStopCommand());
   }
 
-  /**
-   * Get a command to shoot the note at a specified velocity.
-   *
-   * @param velocity The desired velocity for shooting.
-   * @return The SequentialCommandGroup to shoot the note.
-   */
-  public SequentialCommandGroup getSubwooferShootCommand(int velocity) {
-    return new SequentialCommandGroup(getShooterPrepareCommand(velocity), getIntakeFeedCommand());
-  }
-
-  public InstantCommand getShooterRunCommand(int velocity) {
+  public InstantCommand getShooterRunCommand(ShooterVelocity velocity) {
     return new InstantCommand(() -> shooterSubsystem.set(velocity));
   }
 
@@ -170,7 +161,11 @@ public class ManipulatorSubsystem extends SubsystemBase {
    */
   public ParallelCommandGroup getShootStopCommand() {
     return new ParallelCommandGroup(
-        new InstantCommand(() -> shooterSubsystem.stop()), getArmRunCommand(0));
+        new InstantCommand(() -> shooterSubsystem.stop()), getArmRunCommand(ArmPosition.HOME));
+  }
+
+  private SequentialCommandGroup getShootCommand() {
+    return new SequentialCommandGroup(getIntakeFeedCommand(), getShootStopCommand());
   }
 
   /**
@@ -182,26 +177,48 @@ public class ManipulatorSubsystem extends SubsystemBase {
    */
   public SequentialCommandGroup getPodiumShootCommand() {
     return new SequentialCommandGroup(
-        new ParallelCommandGroup(getArmPrepareCommand(25), getShooterPrepareCommand(2500)),
-        getIntakeFeedCommand(),
-        getShootStopCommand());
+        new ParallelCommandGroup(
+            getArmPrepareCommand(ArmPosition.PODIUM_SHOOT),
+            getShooterPrepareCommand(ShooterVelocity.PODIUM_SHOOT)),
+        getShootCommand());
   }
 
-  private InstantCommand getArmRunCommand(double position) {
+  public SequentialCommandGroup getAmpShootCommand() {
+    return new SequentialCommandGroup(
+        new ParallelCommandGroup(
+            getArmPrepareCommand(ArmPosition.AMP_SHOOT),
+            getShooterPrepareCommand(ShooterVelocity.AMP_SHOOT)),
+        getShootCommand());
+  }
+
+  private InstantCommand getArmRunCommand(ArmPosition position) {
     return new InstantCommand(() -> armSubsystem.set(position));
   }
 
-  private SequentialCommandGroup getShooterPrepareCommand(int velocity) {
+  private SequentialCommandGroup getShooterPrepareCommand(ShooterVelocity velocity) {
     return new SequentialCommandGroup(
         getShooterRunCommand(velocity), new WaitUntilCommand(shooterSubsystem::atTargetVelocity));
   }
 
-  private SequentialCommandGroup getArmPrepareCommand(double position) {
+  private SequentialCommandGroup getArmPrepareCommand(ArmPosition position) {
     return new SequentialCommandGroup(
         getArmRunCommand(position), new WaitUntilCommand(armSubsystem::atTargetSetpoint));
   }
 
   public InstantCommand getArmStopCommand() {
     return new InstantCommand(() -> armSubsystem.stop());
+  }
+
+  /**
+   * 1. Run arm and wait until at setpoint and run shooter and wait until at velocity.
+   *
+   * <p>2. Feed note.
+   *
+   * @return The command.
+   */
+  public SequentialCommandGroup getSubwooferShootCommand() {
+    return new SequentialCommandGroup(
+        new ParallelCommandGroup(getShooterPrepareCommand(ShooterVelocity.SUBWOOFER_SHOOT)),
+        getShootCommand());
   }
 }

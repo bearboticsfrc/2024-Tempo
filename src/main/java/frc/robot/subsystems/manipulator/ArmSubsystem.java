@@ -115,6 +115,19 @@ public class ArmSubsystem extends SubsystemBase {
     return Rotation2d.fromDegrees(armMotorEncoder.getPosition());
   }
 
+  public void stop() {
+    armMotor.stopMotor();
+  }
+
+  /**
+   * Set the arm motor to the specified position.
+   *
+   * @param position The desired arm position.
+   */
+  public void set(ArmPosition position) {
+    set(position.getAngle().getDegrees());
+  }
+
   /**
    * Set the arm motor to the specified position.
    *
@@ -134,14 +147,11 @@ public class ArmSubsystem extends SubsystemBase {
     armMotor.getPIDController().setReference(position, ControlType.kPosition, 0, feedForward);
   }
 
-  public void stop() {
-    armMotor.stopMotor();
-  }
-
   /** Enum representing different positions of the arm. */
   public enum ArmPosition {
     HOME(Rotation2d.fromDegrees(0)),
-    AMP_SHOOT(Rotation2d.fromDegrees(40)),
+    PODIUM_SHOOT(Rotation2d.fromDegrees(25)),
+    AMP_SHOOT(Rotation2d.fromDegrees(78)),
     SHOOT(Rotation2d.fromDegrees(90));
 
     private final Rotation2d angle;

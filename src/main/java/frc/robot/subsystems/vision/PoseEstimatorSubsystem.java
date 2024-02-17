@@ -28,7 +28,7 @@ public class PoseEstimatorSubsystem extends SubsystemBase {
   private final SwerveDrivePoseEstimator poseEstimator;
   private final DriveSubsystem driveSubsystem;
 
-  private List<AprilTagCamera> cameras = new ArrayList<AprilTagCamera>();
+  private List<VisionCamera> cameras = new ArrayList<VisionCamera>();
 
   private Pose2d initialPose = new Pose2d();
 
@@ -41,23 +41,23 @@ public class PoseEstimatorSubsystem extends SubsystemBase {
     this.driveSubsystem = driveSubsystem;
 
     cameras.add(
-        new AprilTagCamera(
+        new VisionCamera(
             "FrontRight", new PhotonCamera("OV9281_2"), VisionConstants.ROBOT_TO_RIGHT_CAMERA));
 
     cameras.add(
-        new AprilTagCamera(
+        new VisionCamera(
             "FrontLeft",
             new PhotonCamera("OV9281FrontLeft"),
             VisionConstants.ROBOT_TO_LEFT_CAMERA));
 
     cameras.add(
-        new AprilTagCamera(
+        new VisionCamera(
             "BackRight",
             new PhotonCamera("OV9281BackRight"),
             VisionConstants.ROBOT_TO_RIGHT_CAMERA));
 
     cameras.add(
-        new AprilTagCamera(
+        new VisionCamera(
             "BackLeft", new PhotonCamera("OV9281BackLeft"), VisionConstants.ROBOT_TO_LEFT_CAMERA));
 
     ShuffleboardTab tab = Shuffleboard.getTab("Vision");
@@ -71,16 +71,13 @@ public class PoseEstimatorSubsystem extends SubsystemBase {
             VisionConstants.STATE_STD_DEVS,
             VisionConstants.VISION_STD_DEVS);
 
-    for (AprilTagCamera robotCamera : cameras) {
+    for (VisionCamera robotCamera : cameras) {
       EstimationRunnable estimatorRunnable =
           new EstimationRunnable(robotCamera.getNiceName(), robotCamera);
-
       estimationRunnables.add(estimatorRunnable);
+
       Notifier notifier = new Notifier(estimatorRunnable);
       notifiers.add(notifier);
-
-      // this.m_cameraNotifier = (RobotBase.isReal()) ? new Notifier(() -> { for (var camera :
-      // m_cameras) camera.run(); })
 
       // Start PhotonVision thread
       notifier.setName(robotCamera.getNiceName());
@@ -189,13 +186,9 @@ public class PoseEstimatorSubsystem extends SubsystemBase {
   }
 
   public Optional<Double> getDistanceToSpeaker() {
-
     // check to see if the pose is initialized ????
-
-    Pose2d speaker = FieldPositions.getInstance().getSpeakerCenter();
-
-    double distance = LocationHelper.getDistanceToPose(getPose(), speaker);
-
-    return Optional.of(distance);
+    return Optional.of(
+        LocationHelper.getDistanceToPose(
+            getPose(), FieldPositions.getInstance().getSpeakerCenter()));
   }
 }
