@@ -133,9 +133,9 @@ public class ShooterSubsystem extends SubsystemBase {
   }
 
   public enum ShooterVelocity {
-    PODIUM_SHOOT(2500),
-    AMP_SHOOT(1200),
-    SUBWOOFER_SHOOT(2500);
+    SUBWOOFER_SHOOT(2000),
+    PODIUM_SHOOT(2750),
+    AMP_SHOOT(1200);
 
     public double velocity;
 
