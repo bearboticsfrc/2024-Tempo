@@ -26,7 +26,7 @@ public class VisionSubsystem extends SubsystemBase {
 
   public VisionSubsystem(DriveSubsystem driveSubsystem) {
     photonCamera = new PhotonCamera(VisionConstants.CAMERA_1_NAME);
-    photonCameraObject = new PhotonCamera(VisionConstants.CAMERA_2_NAME);
+    photonCameraObject = new PhotonCamera(VisionConstants.OBJECT_CAMERA_NAME);
     this.driveSubsystem = driveSubsystem;
   }
 

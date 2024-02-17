@@ -14,6 +14,7 @@ import frc.bearbotics.test.DriveSubsystemTest;
 import frc.robot.commands.AlignAmpCommand;
 import frc.robot.commands.AlignSpeakerCommand;
 import frc.robot.commands.notehuntcommand.PointAtNoteCommand;
+import frc.robot.commands.notehuntcommand.RunAtNoteCommand;
 import frc.robot.constants.DriveConstants;
 import frc.robot.constants.DriveConstants.SpeedMode;
 import frc.robot.subsystems.DriveSubsystem;
@@ -56,6 +57,10 @@ public class RobotContainer {
 
   private void configureDriverController() {
     driverController.a().onTrue(new InstantCommand(driveSubsystem::zeroHeading));
+    driverController
+        .x()
+        .whileTrue(new InstantCommand(() -> new RunAtNoteCommand(driveSubsystem, visionSubsystem)))
+        .onFalse(new Command() {});
 
     driverController
         .x()

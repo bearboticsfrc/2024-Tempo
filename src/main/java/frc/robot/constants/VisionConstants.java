@@ -14,7 +14,7 @@ import edu.wpi.first.math.util.Units;
 public final class VisionConstants {
 
   public static final String CAMERA_1_NAME = "Arducam_OV9281_USB_Camera"; // "OV9281_2";
-  public static final String CAMERA_2_NAME = "Arducam_OV9782_USB_Camera"; // "OV9281_2";
+  public static final String OBJECT_CAMERA_NAME = "Arducam_OV9782_USB_Camera"; // "OV9281_2";
 
   // old settings before using camera_to_robot then inverse.
   public static final Transform3d ROBOT_TO_RIGHT_CAMERA =
@@ -73,7 +73,6 @@ public final class VisionConstants {
   public static final double FIELD_WIDTH_METERS = 8.0137;
 
   public static final String CAMERA_NAME = "Arducam_OV9782_USB_Camera"; // "OV9281_2";
-  public static final String OBJECT_CAMERA_NAME = "objectcamname";
 
   public enum TAG {
     BLUE_SOURCE_RIGHT(1),
