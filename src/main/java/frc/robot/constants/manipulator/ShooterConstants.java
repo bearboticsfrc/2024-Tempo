@@ -10,6 +10,7 @@ public class ShooterConstants {
     public static final boolean INVERTED = false;
 
     public static class MotorPid {
+      public static final double P = 0.0001;
       public static final double Ff = 0.000148;
     }
   }
@@ -21,6 +22,7 @@ public class ShooterConstants {
     public static final boolean INVERTED = true;
 
     public static class MotorPid {
+      public static final double P = 0.0001;
       public static final double Ff = 0.00017;
     }
   }

@@ -90,14 +90,6 @@ public class RobotContainer {
         .onFalse(
             new InstantCommand(
                 () -> driverController.getHID().setRumble(RumbleType.kBothRumble, 0)));
-
-    // new Trigger(
-    //         () ->
-    //             objectDetectionSubsystem.hasNoteInView() &&
-    // !manipulatorSubsystem.isNoteInRoller())
-    //     .debounce(0.5, DebounceType.kFalling)
-    //     .whileTrue(manipulatorSubsystem.getSpecialIntakeCommand())
-    //     .onFalse(manipulatorSubsystem.getIntakeStopCommand());
   }
 
   private RunCommand getDefaultDriveSubsystemCommand() {

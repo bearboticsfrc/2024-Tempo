@@ -17,8 +17,8 @@ public class ArmConstants {
     public static final float FORWARD_SOFT_LIMIT = 80;
 
     public static class MotorPid {
-      public static final double P = 0.032;
-      public static final double MIN_OUTPUT = -0.15;
+      public static final double P = 0.031;
+      public static final double MIN_OUTPUT = -0.4;
     }
 
     public static class FeedForward {
@@ -28,7 +28,7 @@ public class ArmConstants {
     }
 
     public static class TrapezoidProfile {
-      public static final Constraints constraints = new Constraints(720 * 8, 360 * 4);
+      public static final Constraints constraints = new Constraints(180, 90);
     }
   }
 }

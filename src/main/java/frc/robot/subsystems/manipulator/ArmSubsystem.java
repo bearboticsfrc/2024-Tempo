@@ -33,11 +33,16 @@ public class ArmSubsystem extends SubsystemBase {
   private TrapezoidProfile.State targetState = new TrapezoidProfile.State(0, 0);
   private TrapezoidProfile.State currentState = new TrapezoidProfile.State(0, 0);
 
+  /**
+   * Constructor for the ArmSubsystem class. Initializes the motors, encoders, and sets up the
+   * ShuffleboardTab.
+   */
   public ArmSubsystem() {
     setupMotors();
     setupShuffleboardTab(RobotConstants.ARM_SYSTEM_TAB);
   }
 
+  /** Initializes the arm motors. */
   private void setupMotors() {
     MotorPidBuilder armMotorPidBuilder =
         new MotorPidBuilder()
@@ -77,6 +82,11 @@ public class ArmSubsystem extends SubsystemBase {
         .burnFlash();
   }
 
+  /**
+   * Sets up the ShuffleboardTab for displaying arm-related data on the Shuffleboard dashboard.
+   *
+   * @param shuffleboardTab The ShuffleboardTab instance to which arm data will be added.
+   */
   private void setupShuffleboardTab(ShuffleboardTab shuffleboardTab) {
     shuffleboardTab.addDouble("Arm Pos", armMotorEncoder::getPosition);
     shuffleboardTab.addDouble("Arm Cur", armMotor::getOutputCurrent);
@@ -85,12 +95,21 @@ public class ArmSubsystem extends SubsystemBase {
     shuffleboardTab.addBoolean("Is Arm Setpoint", this::atTargetSetpoint);
   }
 
+  private Rotation2d getPosition() {
+    return Rotation2d.fromDegrees(armMotorEncoder.getPosition());
+  }
+  /** Updates the arm's state periodically, ensuring smooth motion using a trapezoidal profile. */
   @Override
   public void periodic() {
     if (targetState.position == 0 && isArmHome()) {
       armMotor.stopMotor(); // Prevent arm from pulling current when resting.
     }
 
+    updateState();
+  }
+
+  /** Updates the arm's state based on the trapezoidal profile, adjusting the motor controller. */
+  private void updateState() {
     currentState = trapezoidProfile.calculate(RobotConstants.CYCLE_TIME, currentState, targetState);
 
     armMotor
@@ -102,25 +121,32 @@ public class ArmSubsystem extends SubsystemBase {
             armFeedforward.calculate(getPosition().getRadians(), currentState.velocity));
   }
 
+  /**
+   * Checks if the arm is at its home position based on the limit switch.
+   *
+   * @return True if the arm is at its home position, otherwise false.
+   */
   public boolean isArmHome() {
     return armLimitSwtich.get();
   }
 
+  /**
+   * Checks if the arm is at the target setpoint within a specified position tolerance.
+   *
+   * @return True if the arm is at the target setpoint, otherwise false.
+   */
   public boolean atTargetSetpoint() {
     return Math.abs(targetState.position - getPosition().getDegrees())
         < ArmConstants.POSITION_TOLERANCE;
   }
 
-  private Rotation2d getPosition() {
-    return Rotation2d.fromDegrees(armMotorEncoder.getPosition());
-  }
-
+  /** Stops the arm motor. */
   public void stop() {
     armMotor.stopMotor();
   }
 
   /**
-   * Set the arm motor to the specified position.
+   * Sets the arm motor to the specified position using the ArmPosition enum.
    *
    * @param position The desired arm position.
    */
@@ -129,22 +155,37 @@ public class ArmSubsystem extends SubsystemBase {
   }
 
   /**
-   * Set the arm motor to the specified position.
+   * Sets the arm motor to the specified position in degrees.
    *
-   * @param position The desired arm position.
+   * @param position The desired arm position in degrees.
    */
   public void set(double position) {
     targetState.position = position;
-    currentState =
-        trapezoidProfile.calculate(
-            RobotConstants.CYCLE_TIME,
-            new TrapezoidProfile.State(getPosition().getDegrees(), armMotorEncoder.getVelocity()),
-            targetState);
+    currentState = getState(targetState);
 
-    double feedForward =
-        armFeedforward.calculate(getPosition().getRotations(), armMotorEncoder.getVelocity());
+    armMotor.getPIDController().setReference(position, ControlType.kPosition, 0, getFeedForward());
+  }
 
-    armMotor.getPIDController().setReference(position, ControlType.kPosition, 0, feedForward);
+  /**
+   * Calculates the feedforward value for the arm motor based on the current position and velocity.
+   *
+   * @return The calculated feedforward value.
+   */
+  private double getFeedForward() {
+    return armFeedforward.calculate(getPosition().getRotations(), armMotorEncoder.getVelocity());
+  }
+
+  /**
+   * Calculates the trapezoidal profile state for a given target state.
+   *
+   * @param targetState The target state for which the profile state will be calculated.
+   * @return The calculated trapezoidal profile state.
+   */
+  private TrapezoidProfile.State getState(TrapezoidProfile.State targetState) {
+    return trapezoidProfile.calculate(
+        RobotConstants.CYCLE_TIME,
+        new TrapezoidProfile.State(getPosition().getDegrees(), armMotorEncoder.getVelocity()),
+        targetState);
   }
 
   /** Enum representing different positions of the arm. */
@@ -152,6 +193,7 @@ public class ArmSubsystem extends SubsystemBase {
     HOME(Rotation2d.fromDegrees(0)),
     PODIUM_SHOOT(Rotation2d.fromDegrees(25)),
     AMP_SHOOT(Rotation2d.fromDegrees(78)),
+    WING_SHOOT(Rotation2d.fromDegrees(35)),
     SHOOT(Rotation2d.fromDegrees(90));
 
     private final Rotation2d angle;

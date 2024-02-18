@@ -183,6 +183,14 @@ public class ManipulatorSubsystem extends SubsystemBase {
         getShootCommand());
   }
 
+  public SequentialCommandGroup getWingShootCommand() {
+    return new SequentialCommandGroup(
+        new ParallelCommandGroup(
+            getArmPrepareCommand(ArmPosition.WING_SHOOT),
+            getShooterPrepareCommand(ShooterVelocity.WING_SHOOT)),
+        getShootCommand());
+  }
+
   public SequentialCommandGroup getAmpShootCommand() {
     return new SequentialCommandGroup(
         new ParallelCommandGroup(
@@ -191,7 +199,7 @@ public class ManipulatorSubsystem extends SubsystemBase {
         getShootCommand());
   }
 
-  private InstantCommand getArmRunCommand(ArmPosition position) {
+  public InstantCommand getArmRunCommand(ArmPosition position) {
     return new InstantCommand(() -> armSubsystem.set(position));
   }
 

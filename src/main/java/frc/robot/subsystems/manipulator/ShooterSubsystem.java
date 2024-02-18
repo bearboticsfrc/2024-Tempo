@@ -30,7 +30,14 @@ public class ShooterSubsystem extends SubsystemBase {
 
   private void configureMotors() {
     MotorPidBuilder upperShooterMotorPidConfig =
-        new MotorPidBuilder().withFf(ShooterConstants.UpperMotor.MotorPid.Ff);
+        new MotorPidBuilder()
+            .withP(ShooterConstants.UpperMotor.MotorPid.P)
+            .withFf(ShooterConstants.UpperMotor.MotorPid.Ff);
+
+    MotorPidBuilder lowerShooterMotorPid =
+        new MotorPidBuilder()
+            .withP(ShooterConstants.LowerMotor.MotorPid.P)
+            .withFf(ShooterConstants.LowerMotor.MotorPid.Ff);
 
     MotorBuilder upperShooterMotorConfig =
         new MotorBuilder()
@@ -40,9 +47,6 @@ public class ShooterSubsystem extends SubsystemBase {
             .withCurrentLimit(ShooterConstants.UpperMotor.CURRENT_LIMT)
             .withMotorPid(upperShooterMotorPidConfig)
             .withIdleMode(IdleMode.kCoast);
-
-    MotorPidBuilder lowerShooterMotorPid =
-        new MotorPidBuilder().withFf(ShooterConstants.LowerMotor.MotorPid.Ff);
 
     MotorBuilder lowerShooterMotorConfig =
         new MotorBuilder()
@@ -135,7 +139,8 @@ public class ShooterSubsystem extends SubsystemBase {
   public enum ShooterVelocity {
     SUBWOOFER_SHOOT(2000),
     PODIUM_SHOOT(2750),
-    AMP_SHOOT(1200);
+    AMP_SHOOT(1200),
+    WING_SHOOT(3300);
 
     public double velocity;
 
