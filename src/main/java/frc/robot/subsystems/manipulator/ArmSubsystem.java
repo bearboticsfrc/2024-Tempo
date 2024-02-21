@@ -18,6 +18,8 @@ import frc.bearbotics.motor.MotorPidBuilder;
 import frc.bearbotics.motor.MotorSoftLimit;
 import frc.robot.constants.RobotConstants;
 import frc.robot.constants.manipulator.ArmConstants;
+import frc.robot.util.TunableNumber;
+import java.util.function.DoubleSupplier;
 
 public class ArmSubsystem extends SubsystemBase {
   private CANSparkMax armMotor;
@@ -32,6 +34,8 @@ public class ArmSubsystem extends SubsystemBase {
       new TrapezoidProfile(ArmConstants.Motor.TrapezoidProfile.constraints);
   private TrapezoidProfile.State targetState = new TrapezoidProfile.State(0, 0);
   private TrapezoidProfile.State currentState = new TrapezoidProfile.State(0, 0);
+
+  private TunableNumber tunableNumber = new TunableNumber("Arm Position", 0.5);
 
   /**
    * Constructor for the ArmSubsystem class. Initializes the motors, encoders, and sets up the
@@ -65,15 +69,15 @@ public class ArmSubsystem extends SubsystemBase {
             .withForwardSoftLimit(forwardSoftLimit)
             .withMotorPid(armMotorPidBuilder);
 
+    armMotor =
+        new CANSparkMax(armMotorConfig.getMotorPort(), CANSparkLowLevel.MotorType.kBrushless);
+    armMotorEncoder = armMotor.getAbsoluteEncoder(Type.kDutyCycle);
+
     armFeedforward =
         new ArmFeedforward(
             ArmConstants.Motor.FeedForward.STATIC,
             ArmConstants.Motor.FeedForward.GRAVITY,
             ArmConstants.Motor.FeedForward.VELOCITY);
-
-    armMotor =
-        new CANSparkMax(armMotorConfig.getMotorPort(), CANSparkLowLevel.MotorType.kBrushless);
-    armMotorEncoder = armMotor.getAbsoluteEncoder(Type.kDutyCycle);
 
     MotorConfig.fromMotorConstants(armMotor, armMotorEncoder, armMotorConfig)
         .configureMotor()
@@ -101,11 +105,15 @@ public class ArmSubsystem extends SubsystemBase {
   /** Updates the arm's state periodically, ensuring smooth motion using a trapezoidal profile. */
   @Override
   public void periodic() {
+    updateState();
+
     if (targetState.position == 0 && isArmHome()) {
       armMotor.stopMotor(); // Prevent arm from pulling current when resting.
     }
 
-    updateState();
+    if (tunableNumber.hasChanged()) {
+      set(tunableNumber.get());
+    }
   }
 
   /** Updates the arm's state based on the trapezoidal profile, adjusting the motor controller. */
@@ -166,13 +174,17 @@ public class ArmSubsystem extends SubsystemBase {
     armMotor.getPIDController().setReference(position, ControlType.kPosition, 0, getFeedForward());
   }
 
+  public void set(DoubleSupplier distanceSupplier) {
+    set(getPositionFromDistance(distanceSupplier.getAsDouble()));
+  }
+
   /**
    * Calculates the feedforward value for the arm motor based on the current position and velocity.
    *
    * @return The calculated feedforward value.
    */
   private double getFeedForward() {
-    return armFeedforward.calculate(getPosition().getRotations(), armMotorEncoder.getVelocity());
+    return armFeedforward.calculate(getPosition().getRotations(), currentState.velocity);
   }
 
   /**
@@ -184,8 +196,12 @@ public class ArmSubsystem extends SubsystemBase {
   private TrapezoidProfile.State getState(TrapezoidProfile.State targetState) {
     return trapezoidProfile.calculate(
         RobotConstants.CYCLE_TIME,
-        new TrapezoidProfile.State(getPosition().getDegrees(), armMotorEncoder.getVelocity()),
+        new TrapezoidProfile.State(getPosition().getDegrees(), currentState.velocity),
         targetState);
+  }
+
+  private double getPositionFromDistance(double distance) {
+    return -8.65989 + 26.3662 * Math.log(distance);
   }
 
   /** Enum representing different positions of the arm. */

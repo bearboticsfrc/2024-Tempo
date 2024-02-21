@@ -58,7 +58,9 @@ public class LocationHelper {
   }
 
   public static double getDistanceToPose(Pose2d fromPose, Pose2d toPose) {
-    return Math.abs((fromPose.getX() - toPose.getX()) + (fromPose.getY() - toPose.getY()));
+    return Math.sqrt(
+        Math.pow(fromPose.getX() - toPose.getX(), 2)
+            + Math.pow(fromPose.getY() - toPose.getY(), 2));
   }
 
   public static Transform3d normalizeCameraAngle(Transform3d cameraToTarget) {
@@ -73,14 +75,5 @@ public class LocationHelper {
 
     return new Transform3d(
         new Translation3d(xPrime, cameraToTarget.getY(), zPrime), cameraToTarget.getRotation());
-  }
-
-  public static void main(String[] args) {
-    Pose2d pose = new Pose2d(10.0, 5.0, Rotation2d.fromDegrees(45.0));
-    Pose2d newPose =
-        LocationHelper.getPoseByDistanceAndAngleToPose(pose, 3.0, Rotation2d.fromDegrees(0.0));
-
-    System.out.println("pose = " + pose);
-    System.out.println("new pose = " + newPose);
   }
 }

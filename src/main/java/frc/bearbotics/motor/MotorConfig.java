@@ -57,8 +57,16 @@ public class MotorConfig {
     motor.setInverted(motorBuilder.isMotorInverted());
 
     String motorDescription = motorBuilder.getName();
-    RevUtil.checkRevError(motor.setIdleMode(motorBuilder.getIdleMode()));
-    RevUtil.checkRevError(motor.enableVoltageCompensation(motorBuilder.getNominalVoltage()));
+    RevUtil.checkRevError(
+        motor.setIdleMode(motorBuilder.getIdleMode()),
+        String.format(
+            "[MotorConfig.configureMotor]: Failed to set idle mode to %s",
+            motorBuilder.getIdleMode()));
+    RevUtil.checkRevError(
+        motor.enableVoltageCompensation(motorBuilder.getNominalVoltage()),
+        String.format(
+            "[MotorConfig.configureMotor]: Failed to set voltage compensation to %s.",
+            motorBuilder.getNominalVoltage()));
     RevUtil.checkRevError(motor.setSmartCurrentLimit(motorBuilder.getCurrentLimit()));
     RevUtil.setPeriodicFramePeriodHigh(motor, motorDescription);
 

@@ -13,6 +13,8 @@ import frc.bearbotics.motor.MotorConfig;
 import frc.bearbotics.motor.MotorPidBuilder;
 import frc.robot.constants.RobotConstants;
 import frc.robot.constants.manipulator.ShooterConstants;
+import frc.robot.util.TunableNumber;
+import java.util.function.DoubleSupplier;
 
 public class ShooterSubsystem extends SubsystemBase {
   private CANSparkFlex upperShooterMotor;
@@ -22,6 +24,8 @@ public class ShooterSubsystem extends SubsystemBase {
   private RelativeEncoder lowerShooterMotorEncoder;
 
   private double targetVelocity;
+
+  private TunableNumber tunableNumber = new TunableNumber("Shooter Velocity", 0);
 
   public ShooterSubsystem() {
     configureMotors();
@@ -96,6 +100,13 @@ public class ShooterSubsystem extends SubsystemBase {
     shuffleboardTab.addBoolean("At Target Velocity?", this::atTargetVelocity);
   }
 
+  @Override
+  public void periodic() {
+    if (tunableNumber.hasChanged()) {
+      set(tunableNumber.get());
+    }
+  }
+
   /**
    * Check if the shooter motor is at the target velocity within a specified tolerance.
    *
@@ -107,6 +118,14 @@ public class ShooterSubsystem extends SubsystemBase {
                 - (lowerShooterMotorEncoder.getVelocity() + upperShooterMotorEncoder.getVelocity())
                     / 2)
         < ShooterConstants.VELOCITY_TOLERANCE;
+  }
+
+  private double getVelocityFromDistance(double distance) {
+    return 1580.9 + 1121.24 * Math.log(distance);
+  }
+
+  public void set(DoubleSupplier distanceSupplier) {
+    set(getVelocityFromDistance(distanceSupplier.getAsDouble()));
   }
 
   /**

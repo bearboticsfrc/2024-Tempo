@@ -6,7 +6,6 @@ import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.subsystems.manipulator.ArmSubsystem.ArmPosition;
 import frc.robot.subsystems.manipulator.IntakeSubsystem.IntakeSpeed;
@@ -146,12 +145,15 @@ public class ManipulatorSubsystem extends SubsystemBase {
     return new SequentialCommandGroup(
         getFeederRunCommand(IntakeSpeed.FULL),
         new WaitUntilCommand(() -> !intakeSubsystem.isNoteInFeeder()),
-        new WaitCommand(0.02), // Waits until feeder motors are not holding a note anymore.
         getIntakeStopCommand());
   }
 
   public InstantCommand getShooterRunCommand(ShooterVelocity velocity) {
     return new InstantCommand(() -> shooterSubsystem.set(velocity));
+  }
+
+  public InstantCommand getShooterRunCommand(DoubleSupplier doubleSupplier) {
+    return new InstantCommand(() -> shooterSubsystem.set(doubleSupplier));
   }
 
   /**
@@ -199,8 +201,19 @@ public class ManipulatorSubsystem extends SubsystemBase {
         getShootCommand());
   }
 
+  public SequentialCommandGroup getAutoShootCommand(DoubleSupplier distanceSupplier) {
+    return new SequentialCommandGroup(
+        new ParallelCommandGroup(
+            getArmPrepareCommand(distanceSupplier), getShooterPrepareCommand(distanceSupplier)),
+        getShootCommand());
+  }
+
   public InstantCommand getArmRunCommand(ArmPosition position) {
     return new InstantCommand(() -> armSubsystem.set(position));
+  }
+
+  public InstantCommand getArmRunCommand(DoubleSupplier distanceSupplier) {
+    return new InstantCommand(() -> armSubsystem.set(distanceSupplier));
   }
 
   private SequentialCommandGroup getShooterPrepareCommand(ShooterVelocity velocity) {
@@ -208,9 +221,20 @@ public class ManipulatorSubsystem extends SubsystemBase {
         getShooterRunCommand(velocity), new WaitUntilCommand(shooterSubsystem::atTargetVelocity));
   }
 
+  private SequentialCommandGroup getShooterPrepareCommand(DoubleSupplier distanceSupplier) {
+    return new SequentialCommandGroup(
+        getShooterRunCommand(distanceSupplier),
+        new WaitUntilCommand(shooterSubsystem::atTargetVelocity));
+  }
+
   private SequentialCommandGroup getArmPrepareCommand(ArmPosition position) {
     return new SequentialCommandGroup(
         getArmRunCommand(position), new WaitUntilCommand(armSubsystem::atTargetSetpoint));
+  }
+
+  private SequentialCommandGroup getArmPrepareCommand(DoubleSupplier distanceSupplier) {
+    return new SequentialCommandGroup(
+        getArmRunCommand(distanceSupplier), new WaitUntilCommand(armSubsystem::atTargetSetpoint));
   }
 
   public InstantCommand getArmStopCommand() {

@@ -15,6 +15,7 @@ public class CommandMission extends AbstractMission {
    */
   public CommandMission(final Command command) {
     this.command = command;
+    m_requirements.addAll(command.getRequirements());
   }
 
   /**

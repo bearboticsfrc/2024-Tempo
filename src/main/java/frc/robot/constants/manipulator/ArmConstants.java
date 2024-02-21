@@ -23,7 +23,7 @@ public class ArmConstants {
 
     public static class FeedForward {
       public static final double STATIC = 0.75;
-      public static final double GRAVITY = 0.6;
+      public static final double GRAVITY = 0.86;
       public static final double VELOCITY = 0;
     }
 

@@ -14,6 +14,8 @@ import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.networktables.GenericEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -50,6 +52,8 @@ public class DriveSubsystem extends SubsystemBase {
   private double maxSpeed = DriveConstants.DRIVE_VELOCITY;
   private boolean fieldRelativeMode = true;
 
+  private StructPublisher<Pose2d> posePublisher;
+
   private SwerveModuleState[] desiredSwerveModuleStates =
       new SwerveModuleState[] {
         new SwerveModuleState(),
@@ -68,6 +72,9 @@ public class DriveSubsystem extends SubsystemBase {
     odometry =
         new SwerveDriveOdometry(
             RobotConstants.DRIVE_KINEMATICS, getHeading(), getModulePositions());
+
+    posePublisher =
+        NetworkTableInstance.getDefault().getStructTopic("/vision/pose", Pose2d.struct).publish();
 
     zeroHeading();
     setupShuffleboardTab();
@@ -100,6 +107,7 @@ public class DriveSubsystem extends SubsystemBase {
     odometry.update(getHeading(), getModulePositions());
 
     maxSpeed = competitionTabMaxSpeedEntry.getDouble(DriveConstants.MAX_VELOCITY);
+    posePublisher.set(getPose());
 
     for (SwerveModule module : swerveModules.values()) {
       module.updateDataLogs();

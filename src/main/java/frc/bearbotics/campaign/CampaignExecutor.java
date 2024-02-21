@@ -24,9 +24,9 @@ public class CampaignExecutor extends Command {
 
     if (!currentMission.isFinished() || nextMission == null) {
       return;
-    } else {
-      currentMission.end(false);
     }
+
+    currentMission.end(false);
 
     nextMission =
         currentMission.isSuccess() ? nextMission.getSuccessNode() : nextMission.getFailureNode();

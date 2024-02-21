@@ -47,7 +47,7 @@ public final class VisionConstants {
     BLUE_SOURCE_RIGHT(1),
     BLUE_SOURCE_LEFT(2),
     RED_SPEAKER_RIGHT(3),
-    RED_SPEAKER_CENTER(10),
+    RED_SPEAKER_CENTER(4),
     RED_AMP(5),
     BLUE_AMP(6),
     BLUE_SPEAKER_CENTER(7),

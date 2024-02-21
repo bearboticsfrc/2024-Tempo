@@ -5,6 +5,8 @@
 package frc.robot;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -17,6 +19,8 @@ import frc.robot.constants.DriveConstants;
 import frc.robot.constants.DriveConstants.SpeedMode;
 import frc.robot.constants.RobotConstants;
 import frc.robot.constants.VisionConstants;
+import frc.robot.location.FieldPositions;
+import frc.robot.location.LocationHelper;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.manipulator.IntakeSubsystem.IntakeSpeed;
 import frc.robot.subsystems.manipulator.ManipulatorSubsystem;
@@ -43,6 +47,12 @@ public class RobotContainer {
     buildTestList();
     configureDriverBindings();
     configureOperatorBindings();
+
+    RobotConstants.TUNING_TAB.addDouble(
+        "Distance to Pose",
+        () ->
+            LocationHelper.getDistanceToPose(
+                driveSubsystem.getPose(), FieldPositions.getInstance().getSpeakerCenter()));
 
     RobotConstants.COMPETITION_TAB.add(
         "Home Climber", manipulatorSubsystem.getClimberHomeCommand());
@@ -90,6 +100,23 @@ public class RobotContainer {
         .onFalse(
             new InstantCommand(
                 () -> driverController.getHID().setRumble(RumbleType.kBothRumble, 0)));
+
+    driverController
+        .x()
+        .onTrue(
+            new InstantCommand(
+                () ->
+                    driveSubsystem.resetOdometry(
+                        new Pose2d(15.071, 5.51, Rotation2d.fromDegrees(180)))));
+
+    driverController
+        .a()
+        .whileTrue(
+            manipulatorSubsystem.getAutoShootCommand(
+                () ->
+                    LocationHelper.getDistanceToPose(
+                        driveSubsystem.getPose(), FieldPositions.getInstance().getSpeakerCenter())))
+        .onFalse(manipulatorSubsystem.getIntakeStopCommand());
   }
 
   private RunCommand getDefaultDriveSubsystemCommand() {
@@ -135,6 +162,10 @@ public class RobotContainer {
   }
 
   public void setTeleop(boolean mode) {
+    if (mode) {
+      driveSubsystem.resetOdometry(new Pose2d(15.071, 5.51, Rotation2d.fromDegrees(180)));
+    }
+
     isTeleop = mode;
   }
 

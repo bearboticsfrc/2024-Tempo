@@ -24,6 +24,8 @@ public class RobotConstants {
   public static final ShuffleboardTab COMPETITION_TAB = Shuffleboard.getTab("Competition");
   public static final ShuffleboardTab TEST_TAB = Shuffleboard.getTab("Test");
 
+  public static final ShuffleboardTab TUNING_TAB = Shuffleboard.getTab("Tuning");
+
   // Pigeon IMU CAN ID
   public static final int PIGEON_CAN_ID = 20;
 
