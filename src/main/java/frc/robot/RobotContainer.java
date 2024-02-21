@@ -7,10 +7,13 @@ package frc.robot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.constants.DriveConstants;
+import frc.robot.subsystems.LightsSubsystem;
 
 public class RobotContainer {
   private boolean isTeleop;
+  private LightsSubsystem lights = new LightsSubsystem();
 
   private SendableChooser<Command> autoCommandChooser = new SendableChooser<>();
 
@@ -19,7 +22,14 @@ public class RobotContainer {
     buildAutoList();
   }
 
-  private void configureBindings() {}
+  private final CommandXboxController operatorController =
+      new CommandXboxController(DriveConstants.OPERATOR_CONTROLLER_PORT);
+
+  private void configureBindings() {
+    operatorController.a().onTrue(new InstantCommand(() -> lights.setColor("green")));
+    operatorController.b().onTrue(new InstantCommand(() -> lights.setStrip("all")));
+    operatorController.x().onTrue(new InstantCommand(() -> lights.setColor("red")));
+  }
 
   public void setTeleop(boolean mode) {
     isTeleop = mode;
