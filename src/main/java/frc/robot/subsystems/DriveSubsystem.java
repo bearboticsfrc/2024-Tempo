@@ -6,8 +6,10 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix6.hardware.Pigeon2;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
@@ -33,12 +35,15 @@ import frc.robot.constants.SwerveModuleConstants.BackLeftConstants;
 import frc.robot.constants.SwerveModuleConstants.BackRightConstants;
 import frc.robot.constants.SwerveModuleConstants.FrontLeftConstants;
 import frc.robot.constants.SwerveModuleConstants.FrontRightConstants;
+import frc.robot.location.FieldPositions;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.function.DoubleSupplier;
 import java.util.stream.DoubleStream;
+import org.apache.commons.math3.geometry.euclidean.twod.Vector2D;
 
 /** Controls the four swerve modules for autonomous and teleoperated modes. */
 public class DriveSubsystem extends SubsystemBase {
@@ -53,6 +58,10 @@ public class DriveSubsystem extends SubsystemBase {
   private boolean fieldRelativeMode = true;
 
   private StructPublisher<Pose2d> posePublisher;
+
+  private final PIDController rotationPidController = new PIDController(0.01, 0, 0);
+
+  private final double AIM_VELOCITY_COMPENSATION_FUDGE_FACTOR = 0;
 
   private SwerveModuleState[] desiredSwerveModuleStates =
       new SwerveModuleState[] {
@@ -427,6 +436,72 @@ public class DriveSubsystem extends SubsystemBase {
             ChassisSpeeds.discretize(chassisSpeeds, RobotConstants.CYCLE_TIME));
 
     setModuleStates(swerveModuleStates);
+  }
+
+  public void drive(DoubleSupplier xSpeed, DoubleSupplier ySpeed) {
+    aimAtPoint(
+        xSpeed, xSpeed, FieldPositions.getInstance().getSpeakerCenter().getTranslation(), true);
+  }
+
+  /**
+   * Aim robot at a desired point on the field
+   *
+   * @param xRequest Desired X axis (forward) speed [-1.0, +1.0]
+   * @param yRequest Desired Y axis (sideways) speed [-1.0, +1.0]
+   * @param point Target point.
+   * @param velocityCorrection True to compensate for robot's own velocity
+   */
+  private void aimAtPoint(
+      DoubleSupplier xRequest,
+      DoubleSupplier yRequest,
+      Translation2d point,
+      boolean velocityCorrection) {
+    // Calculate desired robot velocity
+    double moveRequest = Math.hypot(xRequest.getAsDouble(), yRequest.getAsDouble());
+    double moveDirection = Math.atan2(yRequest.getAsDouble(), xRequest.getAsDouble());
+    double velocityOutput = Math.min(DriveConstants.MAX_VELOCITY, moveRequest);
+
+    // Get current pose
+    Pose2d currentPose = getPose();
+    // Angle to target point
+    Rotation2d targetAngle =
+        new Rotation2d(point.getX() - currentPose.getX(), point.getY() - currentPose.getY());
+    // Movement vector of robot
+    Vector2D robotVector =
+        new Vector2D(
+            velocityOutput * getHeading().getCos(), velocityOutput * getHeading().getSin());
+    // Vector from robot to target
+    Vector2D targetVector =
+        new Vector2D(
+            currentPose.getTranslation().getDistance(point) * targetAngle.getCos(),
+            currentPose.getTranslation().getDistance(point) * targetAngle.getSin());
+    // Parallel component of robot's motion to target vector
+    Vector2D parallelRobotVector =
+        targetVector.scalarMultiply(
+            robotVector.dotProduct(targetVector) / targetVector.getNormSq());
+    // Perpendicular component of robot's motion to target vector
+    Vector2D perpendicularRobotVector =
+        robotVector
+            .subtract(parallelRobotVector)
+            .scalarMultiply(velocityCorrection ? AIM_VELOCITY_COMPENSATION_FUDGE_FACTOR : 0.0);
+    // Adjust aim point using calculated vector
+    Translation2d adjustedPoint =
+        point.minus(
+            new Translation2d(perpendicularRobotVector.getX(), perpendicularRobotVector.getY()));
+    // Calculate new angle using adjusted point
+    Rotation2d adjustedAngle =
+        new Rotation2d(
+            adjustedPoint.getX() - currentPose.getX(), adjustedPoint.getY() - currentPose.getY());
+    // Calculate necessary rotate rate
+    double rotateOutput =
+        rotationPidController.calculate(
+            currentPose.getRotation().getDegrees(), adjustedAngle.getDegrees());
+
+    // Drive robot accordingly
+    drive(
+        -velocityOutput * Math.cos(moveDirection),
+        -velocityOutput * Math.sin(moveDirection),
+        rotateOutput);
   }
 
   /** Stops all drive motors. */

@@ -100,7 +100,7 @@ public class RobotContainer {
         .onFalse(
             new InstantCommand(
                 () -> driverController.getHID().setRumble(RumbleType.kBothRumble, 0)));
-
+    /*
     driverController
         .x()
         .onTrue(
@@ -117,6 +117,11 @@ public class RobotContainer {
                     LocationHelper.getDistanceToPose(
                         driveSubsystem.getPose(), FieldPositions.getInstance().getSpeakerCenter())))
         .onFalse(manipulatorSubsystem.getIntakeStopCommand());
+
+    driverController
+        .y()
+        .whileTrue(
+            new RunCommand(() -> driveSubsystem.drive(() -> 0.0, () -> 0.0), driveSubsystem));*/
   }
 
   private RunCommand getDefaultDriveSubsystemCommand() {

@@ -7,6 +7,7 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.SparkAbsoluteEncoder;
 import com.revrobotics.SparkAbsoluteEncoder.Type;
 import edu.wpi.first.math.controller.ArmFeedforward;
+import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.DigitalInput;
@@ -31,9 +32,11 @@ public class ArmSubsystem extends SubsystemBase {
   private DigitalInput armLimitSwtich = new DigitalInput(ArmConstants.LIMIT_SWITCH_CHANNEL);
 
   private TrapezoidProfile trapezoidProfile =
-      new TrapezoidProfile(ArmConstants.Motor.TrapezoidProfile.constraints);
+      new TrapezoidProfile(ArmConstants.Motor.TrapezoidProfile.CONSTRAINTS);
   private TrapezoidProfile.State targetState = new TrapezoidProfile.State(0, 0);
   private TrapezoidProfile.State currentState = new TrapezoidProfile.State(0, 0);
+
+  private Debouncer setpointDebouncer = new Debouncer(0.5);
 
   private TunableNumber tunableNumber = new TunableNumber("Arm Position", 0.5);
 
@@ -51,7 +54,11 @@ public class ArmSubsystem extends SubsystemBase {
     MotorPidBuilder armMotorPidBuilder =
         new MotorPidBuilder()
             .withP(ArmConstants.Motor.MotorPid.P)
-            .withMinOutput(ArmConstants.Motor.MotorPid.MIN_OUTPUT);
+            .withD(ArmConstants.Motor.MotorPid.D)
+            .withMinOutput(ArmConstants.Motor.MotorPid.MIN_OUTPUT)
+            .withPositionPidWrappingEnabled(ArmConstants.Motor.MotorPid.POSITION_WRAPPING_ENABLED)
+            .withPositionPidWrappingMin(ArmConstants.Motor.MotorPid.POSITION_WRAPPING_MIN)
+            .withPositionPidWrappingMax(ArmConstants.Motor.MotorPid.POSITION_WRAPPING_MAX);
 
     MotorSoftLimit forwardSoftLimit =
         new MotorSoftLimit()
@@ -94,6 +101,8 @@ public class ArmSubsystem extends SubsystemBase {
   private void setupShuffleboardTab(ShuffleboardTab shuffleboardTab) {
     shuffleboardTab.addDouble("Arm Pos", armMotorEncoder::getPosition);
     shuffleboardTab.addDouble("Arm Cur", armMotor::getOutputCurrent);
+    shuffleboardTab.addDouble("Goal Pos", () -> targetState.position);
+    shuffleboardTab.addDouble("Cur State Pos", () -> currentState.position);
     shuffleboardTab.addDouble("Arm Temp", armMotor::getMotorTemperature);
     shuffleboardTab.addBoolean("Is Arm Home", this::isArmHome);
     shuffleboardTab.addBoolean("Is Arm Setpoint", this::atTargetSetpoint);
@@ -126,7 +135,7 @@ public class ArmSubsystem extends SubsystemBase {
             currentState.position,
             ControlType.kPosition,
             0,
-            armFeedforward.calculate(getPosition().getRadians(), currentState.velocity));
+            armFeedforward.calculate(Math.toRadians(currentState.position), currentState.velocity));
   }
 
   /**
@@ -144,8 +153,9 @@ public class ArmSubsystem extends SubsystemBase {
    * @return True if the arm is at the target setpoint, otherwise false.
    */
   public boolean atTargetSetpoint() {
-    return Math.abs(targetState.position - getPosition().getDegrees())
-        < ArmConstants.POSITION_TOLERANCE;
+    return setpointDebouncer.calculate(
+        Math.abs(targetState.position - getPosition().getDegrees())
+            < ArmConstants.POSITION_TOLERANCE);
   }
 
   /** Stops the arm motor. */
@@ -171,7 +181,9 @@ public class ArmSubsystem extends SubsystemBase {
     targetState.position = position;
     currentState = getState(targetState);
 
-    armMotor.getPIDController().setReference(position, ControlType.kPosition, 0, getFeedForward());
+    armMotor
+        .getPIDController()
+        .setReference(currentState.position, ControlType.kPosition, 0, getFeedForward());
   }
 
   public void set(DoubleSupplier distanceSupplier) {
@@ -184,7 +196,7 @@ public class ArmSubsystem extends SubsystemBase {
    * @return The calculated feedforward value.
    */
   private double getFeedForward() {
-    return armFeedforward.calculate(getPosition().getRotations(), currentState.velocity);
+    return armFeedforward.calculate(getPosition().getRadians(), currentState.velocity);
   }
 
   /**
@@ -201,7 +213,19 @@ public class ArmSubsystem extends SubsystemBase {
   }
 
   private double getPositionFromDistance(double distance) {
-    return -8.65989 + 26.3662 * Math.log(distance);
+    if (distance <= 1.543) {
+      return 0;
+    } else if (distance <= 3) {
+      return (44.5168 * Math.pow(distance, 0.519352)) - 55.7307;
+    } else if (distance <= 4) {
+      return (-6 * Math.pow(distance, 2)) + (49 * distance) - 70;
+    } else if (distance <= 5) {
+      return (-4.5 * Math.pow(distance, 2)) + (44.25 * distance) - 75;
+    } else if (distance <= 6) {
+      return (-2.3 * Math.pow(distance, 2)) + (25.45 * distance) - 36;
+    }
+
+    return 0;
   }
 
   /** Enum representing different positions of the arm. */

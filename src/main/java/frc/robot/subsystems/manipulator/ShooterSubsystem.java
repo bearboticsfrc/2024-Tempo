@@ -121,7 +121,13 @@ public class ShooterSubsystem extends SubsystemBase {
   }
 
   private double getVelocityFromDistance(double distance) {
-    return 1580.9 + 1121.24 * Math.log(distance);
+    if (distance <= 2) {
+      return 2200;
+    } else if (distance >= 5) {
+      return 3500;
+    }
+
+    return (17868.1 * Math.pow(distance, 0.070036)) - 16523.3;
   }
 
   public void set(DoubleSupplier distanceSupplier) {
