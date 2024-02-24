@@ -100,38 +100,29 @@ public class RobotContainer {
         .onFalse(
             new InstantCommand(
                 () -> driverController.getHID().setRumble(RumbleType.kBothRumble, 0)));
-    /*
-    driverController
-        .x()
-        .onTrue(
-            new InstantCommand(
-                () ->
-                    driveSubsystem.resetOdometry(
-                        new Pose2d(15.071, 5.51, Rotation2d.fromDegrees(180)))));
-
-    driverController
-        .a()
-        .whileTrue(
-            manipulatorSubsystem.getAutoShootCommand(
-                () ->
-                    LocationHelper.getDistanceToPose(
-                        driveSubsystem.getPose(), FieldPositions.getInstance().getSpeakerCenter())))
-        .onFalse(manipulatorSubsystem.getIntakeStopCommand());
-
-    driverController
-        .y()
-        .whileTrue(
-            new RunCommand(() -> driveSubsystem.drive(() -> 0.0, () -> 0.0), driveSubsystem));*/
   }
 
   private RunCommand getDefaultDriveSubsystemCommand() {
     return new RunCommand(
         () ->
             driveSubsystem.drive(
-                -MathUtil.applyDeadband(Math.pow(driverController.getLeftY(), 3), 0.01),
-                -MathUtil.applyDeadband(Math.pow(driverController.getLeftX(), 3), 0.01),
-                -MathUtil.applyDeadband(Math.pow(driverController.getRightX(), 3), 0.01)),
+                -MathUtil.applyDeadband(powWithSign(driverController.getLeftY(), 2), 0.01),
+                -MathUtil.applyDeadband(powWithSign(driverController.getLeftX(), 3), 0.01),
+                -MathUtil.applyDeadband(powWithSign(driverController.getRightX(), 2), 0.01)),
         driveSubsystem);
+  }
+
+  /**
+   * Raise the first argument to the power of the second argument, keeping the sign of the first.
+   *
+   * <p>
+   *
+   * @param x A double.
+   * @param b A double.
+   * @return The result of x^b with the sign of x.
+   */
+  private double powWithSign(double x, double b) {
+    return Math.copySign(Math.pow(x, b), x);
   }
 
   private void configureOperatorBindings() {

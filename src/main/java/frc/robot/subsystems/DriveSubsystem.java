@@ -556,7 +556,7 @@ public class DriveSubsystem extends SubsystemBase {
    */
   public Rotation2d getHeading() {
     return Rotation2d.fromDegrees(
-        MathUtil.inputModulus(pigeonImu.getRotation2d().getDegrees(), 0, 360));
+        MathUtil.inputModulus(pigeonImu.getRotation2d().getDegrees(), -180, 180));
   }
 
   /**
