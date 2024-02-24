@@ -42,6 +42,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
 import java.util.stream.DoubleStream;
 
 /** Controls the four swerve modules for autonomous and teleoperated modes. */
@@ -89,6 +90,8 @@ public class DriveSubsystem extends SubsystemBase {
 
     posePublisher =
         NetworkTableInstance.getDefault().getStructTopic("/drive/pose", Pose2d.struct).publish();
+
+    aimPidController.setTolerance(0.5);
 
     zeroHeading();
     setupShuffleboardTab();
@@ -461,22 +464,32 @@ public class DriveSubsystem extends SubsystemBase {
    * @param yRequest Desired Y axis (sideways) speed [-1.0, +1.0]
    * @param point Target point.
    */
-  public void aimAtPoint(DoubleSupplier xRequest, DoubleSupplier yRequest, Translation2d point) {
+  public void aimAtPoint(
+      DoubleSupplier xRequest,
+      DoubleSupplier yRequest,
+      Supplier<Pose2d> currentPose,
+      Translation2d point) {
     // Get current pose
-    Pose2d currentPose = getPose();
+    Pose2d pose = currentPose.get();
 
     // Angle to target point
-    Rotation2d targetAngle =
-        new Rotation2d(point.getX() - currentPose.getX(), point.getY() - currentPose.getY());
+    Rotation2d targetAngle = new Rotation2d(point.getX() - pose.getX(), point.getY() - pose.getY());
 
     // Calculate necessary rotate rate
     double rotateOutput =
         aimPidController.calculate(
-            currentPose.getRotation().plus(Rotation2d.fromRadians(Math.PI)).getDegrees(),
+            pose.getRotation().plus(Rotation2d.fromRadians(Math.PI)).getDegrees(),
             targetAngle.getDegrees());
 
     // Drive robot accordingly
-    drive(xRequest.getAsDouble(), yRequest.getAsDouble(), rotateOutput);
+    drive(
+        yRequest.getAsDouble(),
+        xRequest.getAsDouble(),
+        rotateOutput); // TODO: Refactor into own command
+  }
+
+  public boolean atAimSetpoint() {
+    return aimPidController.atSetpoint();
   }
 
   /** Stops all drive motors. */

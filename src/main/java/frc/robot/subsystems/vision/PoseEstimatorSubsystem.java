@@ -42,19 +42,18 @@ public class PoseEstimatorSubsystem extends SubsystemBase {
     this.driveSubsystem = driveSubsystem;
 
     // Front Left
-    cameras.add(
-        new VisionCamera(
-            "FrontLeft",
-            new PhotonCamera(VisionConstants.FRONT_LEFT_CAMERA_NAME),
-            VisionConstants.ROBOT_TO_FRONT_LEFT_CAMERA));
-
-    // Front Right
-    cameras.add(
-        new VisionCamera(
-            "FrontRight",
-            new PhotonCamera(VisionConstants.FRONT_RIGHT_CAMERA_NAME),
-            VisionConstants.ROBOT_TO_FRONT_RIGHT_CAMERA));
-
+    /*cameras.add(
+            new VisionCamera(
+                "FrontLeft",
+                new PhotonCamera(VisionConstants.FRONT_LEFT_CAMERA_NAME),
+                VisionConstants.ROBOT_TO_FRONT_LEFT_CAMERA));
+        // Front Right
+        cameras.add(
+            new VisionCamera(
+                "FrontRight",
+                new PhotonCamera(VisionConstants.FRONT_RIGHT_CAMERA_NAME),
+                VisionConstants.ROBOT_TO_FRONT_RIGHT_CAMERA));
+    */
     // Back Right
     cameras.add(
         new VisionCamera(

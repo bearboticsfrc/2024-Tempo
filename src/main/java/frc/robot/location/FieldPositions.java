@@ -5,6 +5,7 @@ import edu.wpi.first.apriltag.AprilTagFieldLayout.OriginPosition;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.bearbotics.fms.AllianceColor;
@@ -135,6 +136,16 @@ public class FieldPositions implements AllianceReadyListener {
       tagId = VisionConstants.TAG.RED_SPEAKER_RIGHT.getValue();
     }
     return getTagPose(tagId);
+  }
+
+  public Translation2d getSpeakerTranslation() {
+    int tagId = VisionConstants.TAG.BLUE_SPEAKER_CENTER.getValue();
+
+    if (AllianceColor.alliance == Alliance.Red) {
+      tagId = VisionConstants.TAG.RED_SPEAKER_CENTER.getValue();
+    }
+
+    return getTagPose(tagId).getTranslation().plus(new Translation2d(0.2, 0));
   }
 
   public Pose2d getAmp() {

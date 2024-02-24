@@ -10,8 +10,6 @@ import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PIDConstants;
 import com.pathplanner.lib.util.ReplanningConfig;
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
@@ -25,7 +23,10 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.bearbotics.fms.AllianceColor;
 import frc.bearbotics.test.DriveSubsystemTest;
+import frc.robot.commands.AutoShootCommand;
 import frc.robot.commands.auto.MiddleC1C2;
+import frc.robot.commands.auto.MiddleTwoNote;
+import frc.robot.commands.auto.Sub3TwoNote;
 import frc.robot.constants.DriveConstants;
 import frc.robot.constants.DriveConstants.SpeedMode;
 import frc.robot.constants.RobotConstants;
@@ -73,7 +74,9 @@ public class RobotContainer {
                   manipulatorSubsystem.getPodiumShootCommand()),
           "intake", manipulatorSubsystem.getIntakeCommand(),
           "shootWingNote", manipulatorSubsystem.getPodiumShootCommand(),
-          "shootStage", manipulatorSubsystem.getStageShootCommand());
+          "shootStage", manipulatorSubsystem.getStageShootCommand(),
+          "autoShoot",
+              new AutoShootCommand(driveSubsystem, manipulatorSubsystem, poseEstimatorSubsystem));
 
   public RobotContainer() {
     setupShuffleboardTab(RobotConstants.COMPETITION_TAB);
@@ -121,6 +124,9 @@ public class RobotContainer {
   private void buildAutoList() {
     autoCommandChooser.addOption("0 - NoOp", new InstantCommand());
     autoCommandChooser.addOption("1 - MiddleC1C2", MiddleC1C2.get(manipulatorSubsystem));
+    autoCommandChooser.addOption("2 - MidleTwoNote", MiddleTwoNote.get(manipulatorSubsystem));
+    autoCommandChooser.addOption("3 - Sub1TwoNote", Sub3TwoNote.get(manipulatorSubsystem));
+    autoCommandChooser.addOption("4 - Sub3TwoNote", Sub3TwoNote.get(manipulatorSubsystem));
 
     RobotConstants.COMPETITION_TAB
         .add("Auto Command", autoCommandChooser)
@@ -160,7 +166,7 @@ public class RobotContainer {
         .onFalse(manipulatorSubsystem.getShootStopCommand());
 
     driverController
-        .rightBumper()
+        .povUp()
         .whileTrue(manipulatorSubsystem.getPodiumShootCommand())
         .onFalse(manipulatorSubsystem.getShootStopCommand());
 
@@ -181,13 +187,14 @@ public class RobotContainer {
                         () ->
                             -MathUtil.applyDeadband(
                                 powWithSign(driverController.getLeftY(), 2), 0.01),
-                        FieldPositions.getInstance().getSpeakerCenter().getTranslation()),
+                        () -> poseEstimatorSubsystem.getPose(),
+                        FieldPositions.getInstance().getSpeakerTranslation()),
                 driveSubsystem));
 
     driverController.a().onTrue(new InstantCommand(() -> driveSubsystem.resetImu()));
 
     driverController
-        .povUp()
+        .povLeft()
         .whileTrue(manipulatorSubsystem.getStageShootCommand())
         .onFalse(manipulatorSubsystem.getShootStopCommand());
 
@@ -197,7 +204,7 @@ public class RobotContainer {
         .onFalse(manipulatorSubsystem.getIntakeStopCommand());
 
     driverController
-        .povLeft()
+        .rightBumper()
         .whileTrue(
             manipulatorSubsystem.getAutoShootCommand(
                 () ->
@@ -231,8 +238,6 @@ public class RobotContainer {
 
   /**
    * Raise the first argument to the power of the second argument, keeping the sign of the first.
-   *
-   * <p>
    *
    * @param x A double.
    * @param b A double.
@@ -273,10 +278,6 @@ public class RobotContainer {
    * @param mode If true, sets the robot to teleop mode and resets odometry.
    */
   public void setTeleop(boolean mode) {
-    if (mode) {
-      driveSubsystem.resetOdometry(new Pose2d(15.071, 5.51, Rotation2d.fromDegrees(180)));
-    }
-
     isTeleop = mode;
   }
 
