@@ -138,7 +138,7 @@ public class FieldPositions implements AllianceReadyListener {
     return getTagPose(tagId);
   }
 
-  public Translation2d getSpeakerTarget() {
+  public Translation2d getSpeakerTranslation() {
     int tagId = VisionConstants.TAG.BLUE_SPEAKER_CENTER.getValue();
 
     if (AllianceColor.alliance == Alliance.Red) {

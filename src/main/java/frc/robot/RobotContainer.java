@@ -23,7 +23,10 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.bearbotics.fms.AllianceColor;
 import frc.bearbotics.test.DriveSubsystemTest;
+import frc.robot.commands.AutoShootCommand;
 import frc.robot.commands.auto.MiddleC1C2;
+import frc.robot.commands.auto.MiddleTwoNote;
+import frc.robot.commands.auto.Sub3TwoNote;
 import frc.robot.constants.DriveConstants;
 import frc.robot.constants.DriveConstants.SpeedMode;
 import frc.robot.constants.RobotConstants;
@@ -71,7 +74,9 @@ public class RobotContainer {
                   manipulatorSubsystem.getPodiumShootCommand()),
           "intake", manipulatorSubsystem.getIntakeCommand(),
           "shootWingNote", manipulatorSubsystem.getPodiumShootCommand(),
-          "shootStage", manipulatorSubsystem.getStageShootCommand());
+          "shootStage", manipulatorSubsystem.getStageShootCommand(),
+          "autoShoot",
+              new AutoShootCommand(driveSubsystem, manipulatorSubsystem, poseEstimatorSubsystem));
 
   public RobotContainer() {
     setupShuffleboardTab(RobotConstants.COMPETITION_TAB);
@@ -119,6 +124,9 @@ public class RobotContainer {
   private void buildAutoList() {
     autoCommandChooser.addOption("0 - NoOp", new InstantCommand());
     autoCommandChooser.addOption("1 - MiddleC1C2", MiddleC1C2.get(manipulatorSubsystem));
+    autoCommandChooser.addOption("2 - MidleTwoNote", MiddleTwoNote.get(manipulatorSubsystem));
+    autoCommandChooser.addOption("3 - Sub1TwoNote", Sub3TwoNote.get(manipulatorSubsystem));
+    autoCommandChooser.addOption("4 - Sub3TwoNote", Sub3TwoNote.get(manipulatorSubsystem));
 
     RobotConstants.COMPETITION_TAB
         .add("Auto Command", autoCommandChooser)
@@ -180,7 +188,7 @@ public class RobotContainer {
                             -MathUtil.applyDeadband(
                                 powWithSign(driverController.getLeftY(), 2), 0.01),
                         () -> poseEstimatorSubsystem.getPose(),
-                        FieldPositions.getInstance().getSpeakerTarget()),
+                        FieldPositions.getInstance().getSpeakerTranslation()),
                 driveSubsystem));
 
     driverController.a().onTrue(new InstantCommand(() -> driveSubsystem.resetImu()));

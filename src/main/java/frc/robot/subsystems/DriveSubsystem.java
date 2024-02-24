@@ -91,6 +91,8 @@ public class DriveSubsystem extends SubsystemBase {
     posePublisher =
         NetworkTableInstance.getDefault().getStructTopic("/drive/pose", Pose2d.struct).publish();
 
+    aimPidController.setTolerance(0.5);
+
     zeroHeading();
     setupShuffleboardTab();
     setupDataLogging();
@@ -480,7 +482,14 @@ public class DriveSubsystem extends SubsystemBase {
             targetAngle.getDegrees());
 
     // Drive robot accordingly
-    drive(xRequest.getAsDouble(), yRequest.getAsDouble(), rotateOutput);
+    drive(
+        xRequest.getAsDouble(),
+        yRequest.getAsDouble(),
+        rotateOutput); // TODO: Refactor into own command
+  }
+
+  public boolean atAimSetpoint() {
+    return aimPidController.atSetpoint();
   }
 
   /** Stops all drive motors. */
