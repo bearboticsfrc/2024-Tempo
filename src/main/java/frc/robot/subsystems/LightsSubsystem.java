@@ -49,13 +49,13 @@ public class LightsSubsystem {
   public void setPattern(Spark blinkin, LightsConstants.BlinkinPattern blinkinPattern) {
     blinkin.set(blinkinPattern.value);
   }
+  // public ParallelCommandGroup signalSource(Spark blinkin) {
+  // return new ParallelCommandGroup(
+  //   new InstantCommand(() -> setColor(blinkins, LightsConstants.Color.YELLOW)),
+  // new InstantCommand(() -> setPattern(blinkins, LightsConstants.BlinkinPattern.CP2_STROBE)));
+  // }
 
   public InstantCommand signalSource() {
     return new InstantCommand(() -> setColor(blinkins, LightsConstants.Color.YELLOW));
   }
 }
-// public ParallelCommandGroup signalSource(Spark blinkin) {
-// return new ParallelCommandGroup(
-//   new InstantCommand(() -> setColor(blinkins, LightsConstants.Color.YELLOW)),
-// new InstantCommand(() -> setPattern(blinkins, LightsConstants.BlinkinPattern.CP2_STROBE)));
-// }

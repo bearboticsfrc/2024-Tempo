@@ -54,6 +54,7 @@ public class RobotContainer {
         .rightBumper()
         .whileTrue(new InstantCommand(() -> driveSubsystem.setSpeedMode(SpeedMode.TURTLE)))
         .onFalse(new InstantCommand(() -> driveSubsystem.setSpeedMode(SpeedMode.NORMAL)));
+    driverController.a().whileTrue(lightsSubsystem.signalSource());
   }
 
   public void setTeleop(boolean mode) {
