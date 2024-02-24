@@ -10,6 +10,8 @@ import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PIDConstants;
 import com.pathplanner.lib.util.ReplanningConfig;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
@@ -28,7 +30,10 @@ import frc.robot.constants.DriveConstants;
 import frc.robot.constants.DriveConstants.SpeedMode;
 import frc.robot.constants.RobotConstants;
 import frc.robot.constants.VisionConstants;
+import frc.robot.location.FieldPositions;
+import frc.robot.location.LocationHelper;
 import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.subsystems.PowerDistributionSubsystem;
 import frc.robot.subsystems.manipulator.IntakeSubsystem.IntakeSpeed;
 import frc.robot.subsystems.manipulator.ManipulatorSubsystem;
 import frc.robot.subsystems.vision.ObjectDetectionSubsystem;
@@ -46,6 +51,8 @@ public class RobotContainer {
   private final CommandXboxController operatorController =
       new CommandXboxController(DriveConstants.OPERATOR_CONTROLLER_PORT);
 
+  private final PowerDistributionSubsystem powerDistributionSubsystem =
+      new PowerDistributionSubsystem();
   private final DriveSubsystem driveSubsystem = new DriveSubsystem();
   private final ManipulatorSubsystem manipulatorSubsystem = new ManipulatorSubsystem();
   private final ObjectDetectionSubsystem objectDetectionSubsystem =
@@ -161,10 +168,39 @@ public class RobotContainer {
 
     driverController
         .rightTrigger()
+        .whileTrue(
+            new RunCommand(
+                () ->
+                    driveSubsystem.aimAtPoint(
+                        () ->
+                            -MathUtil.applyDeadband(
+                                powWithSign(driverController.getLeftX(), 2), 0.01),
+                        () ->
+                            -MathUtil.applyDeadband(
+                                powWithSign(driverController.getLeftY(), 2), 0.01),
+                        FieldPositions.getInstance().getSpeakerCenter().getTranslation()),
+                driveSubsystem));
+
+    driverController.a().onTrue(new InstantCommand(() -> driveSubsystem.resetImu()));
+
+    driverController
+        .povUp()
+        .whileTrue(manipulatorSubsystem.getStageShootCommand())
+        .onFalse(manipulatorSubsystem.getShootStopCommand());
+
+    driverController
+        .povDown()
         .whileTrue(manipulatorSubsystem.getRollerRunCommand(IntakeSpeed.REVERSE))
         .onFalse(manipulatorSubsystem.getIntakeStopCommand());
 
-    driverController.a().onTrue(new InstantCommand(() -> driveSubsystem.resetImu()));
+    driverController
+        .povLeft()
+        .whileTrue(
+            manipulatorSubsystem.getAutoShootCommand(
+                () ->
+                    LocationHelper.getDistanceToPose(
+                        driveSubsystem.getPose(),
+                        FieldPositions.getInstance().getSpeakerCenter())));
 
     new Trigger(() -> manipulatorSubsystem.isNoteInRoller() && isTeleop)
         .onTrue(
@@ -185,7 +221,7 @@ public class RobotContainer {
         () ->
             driveSubsystem.drive(
                 -MathUtil.applyDeadband(powWithSign(driverController.getLeftY(), 2), 0.01),
-                -MathUtil.applyDeadband(powWithSign(driverController.getLeftX(), 3), 0.01),
+                -MathUtil.applyDeadband(powWithSign(driverController.getLeftX(), 2), 0.01),
                 -MathUtil.applyDeadband(powWithSign(driverController.getRightX(), 2), 0.01)),
         driveSubsystem);
   }
@@ -224,6 +260,10 @@ public class RobotContainer {
    * @param mode If true, sets the robot to teleop mode and resets odometry.
    */
   public void setTeleop(boolean mode) {
+    if (mode) {
+      driveSubsystem.resetOdometry(new Pose2d(15.071, 5.51, Rotation2d.fromDegrees(180)));
+    }
+
     isTeleop = mode;
   }
 
