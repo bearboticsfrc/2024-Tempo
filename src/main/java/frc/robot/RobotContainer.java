@@ -271,8 +271,7 @@ public class RobotContainer {
 
     operatorController
         .a()
-        .whileTrue(manipulatorSubsystem.getAmpShootCommand())
-        .onFalse(manipulatorSubsystem.getShootStopCommand());
+        .onTrue(lightsSubsystem.signalSource());
   }
 
   /**
