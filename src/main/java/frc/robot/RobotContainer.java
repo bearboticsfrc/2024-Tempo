@@ -37,6 +37,7 @@ import frc.robot.subsystems.PowerDistributionSubsystem;
 import frc.robot.subsystems.manipulator.IntakeSubsystem.IntakeSpeed;
 import frc.robot.subsystems.manipulator.ManipulatorSubsystem;
 import frc.robot.subsystems.vision.ObjectDetectionSubsystem;
+import frc.robot.subsystems.vision.PoseEstimatorSubsystem;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -57,6 +58,8 @@ public class RobotContainer {
   private final ManipulatorSubsystem manipulatorSubsystem = new ManipulatorSubsystem();
   private final ObjectDetectionSubsystem objectDetectionSubsystem =
       new ObjectDetectionSubsystem(VisionConstants.OBJECT_DETECTION_CAMERA);
+  private final PoseEstimatorSubsystem poseEstimatorSubsystem =
+      new PoseEstimatorSubsystem(driveSubsystem, FieldPositions.getInstance());
 
   private boolean isTeleop;
 
@@ -199,7 +202,7 @@ public class RobotContainer {
             manipulatorSubsystem.getAutoShootCommand(
                 () ->
                     LocationHelper.getDistanceToPose(
-                        driveSubsystem.getPose(),
+                        poseEstimatorSubsystem.getPose(),
                         FieldPositions.getInstance().getSpeakerCenter())));
 
     new Trigger(() -> manipulatorSubsystem.isNoteInRoller() && isTeleop)

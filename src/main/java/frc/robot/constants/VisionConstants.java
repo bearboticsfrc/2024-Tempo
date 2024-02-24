@@ -25,17 +25,46 @@ public final class VisionConstants {
           new Translation3d(.2, 0.06, 0.49),
           new Rotation3d(Math.toRadians(0.0), Math.toRadians(-27.0), Math.toRadians(30.0)));
 
+  public static final Transform3d ROBOT_TO_FRONT_LEFT_CAMERA =
+      new Transform3d(
+          // camera is .2 meters forward, 0.06 left, 0.49 up
+          new Translation3d(.412625, 0.2242, 0.53026),
+          new Rotation3d(Math.toRadians(0.0), Math.toRadians(-27.0), Math.toRadians(30.0)));
+
+  public static final Transform3d ROBOT_TO_FRONT_RIGHT_CAMERA =
+      new Transform3d(
+          // camera is .2 meters forward, 0.06 left, 0.49 up
+          new Translation3d(.412625, -0.2242, 0.53026),
+          new Rotation3d(Math.toRadians(0.0), Math.toRadians(-27.0), Math.toRadians(-30.0)));
+
+  public static final Transform3d ROBOT_TO_BACK_LEFT_CAMERA =
+      new Transform3d(
+          // camera is .2 meters forward, 0.06 left, 0.49 up
+          new Translation3d(.0178, 0.3072, 0.40311),
+          new Rotation3d(Math.toRadians(0.0), Math.toRadians(-30.0), Math.toRadians(165.0)));
+
+  public static final Transform3d ROBOT_TO_BACK_RIGHT_CAMERA =
+      new Transform3d(
+          // camera is .2 meters forward, 0.06 left, 0.49 up
+          new Translation3d(.0178, -0.3072, 0.40311),
+          new Rotation3d(Math.toRadians(0.0), Math.toRadians(-30.0), Math.toRadians(-165.0)));
+
+  public static final String FRONT_LEFT_CAMERA_NAME = "OV9281FrontLeft";
+  public static final String FRONT_RIGHT_CAMERA_NAME = "OV9281FrontRight";
+  public static final String BACK_LEFT_CAMERA_NAME = "OV9281BackLreft";
+  public static final String BACK_RIGHT_CAMERA_NAME = "OV9281BackRight";
+
   public static final Vector<N3> STATE_STD_DEVS =
-      VecBuilder.fill(0.1, 0.1, Units.degreesToRadians(1));
+      VecBuilder.fill(1.0, 1.0, Units.degreesToRadians(30));
   public static final Vector<N3> VISION_STD_DEVS =
-      VecBuilder.fill(1.5, 1.5, Units.degreesToRadians(60));
+      VecBuilder.fill(0.1, 0.1, Units.degreesToRadians(10));
   public static final Matrix<N3, N1> VISION_MEASUREMENT_STD_DEVS =
       MatBuilder.fill(Nat.N3(), Nat.N1(), 1, 1, 1 * Math.PI);
 
   public static final double POSE_AMBIGUITY_SHIFTER = 0.2;
   public static final double POSE_AMBIGUITY_MULTIPLIER = 4;
   public static final double TAG_PRESENCE_WEIGHT = 10;
-  public static final double NOISY_DISTANCE_METERS = 2.5;
+  public static final double NOISY_DISTANCE_METERS = 3.5;
   public static final double DISTANCE_WEIGHT = 7;
 
   public static final double APRILTAG_AMBIGUITY_THRESHOLD = 0.2;

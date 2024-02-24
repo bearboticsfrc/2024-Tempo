@@ -32,7 +32,8 @@ public class PoseEstimatorSubsystem extends SubsystemBase {
 
   private Pose2d initialPose = new Pose2d();
 
-  private StructPublisher<Pose2d> posePublisher;
+  private StructPublisher<Pose2d> fusedPosePublisher;
+  private StructPublisher<Pose2d> drivePosePublisher;
 
   private List<Notifier> notifiers = new ArrayList<Notifier>();
   private List<EstimationRunnable> estimationRunnables = new ArrayList<EstimationRunnable>();
@@ -40,25 +41,26 @@ public class PoseEstimatorSubsystem extends SubsystemBase {
   public PoseEstimatorSubsystem(DriveSubsystem driveSubsystem, FieldPositions fieldPositions) {
     this.driveSubsystem = driveSubsystem;
 
-    cameras.add(
-        new VisionCamera(
-            "FrontRight", new PhotonCamera("OV9281_2"), VisionConstants.ROBOT_TO_RIGHT_CAMERA));
-
+    // Front Left
     cameras.add(
         new VisionCamera(
             "FrontLeft",
-            new PhotonCamera("OV9281FrontLeft"),
-            VisionConstants.ROBOT_TO_LEFT_CAMERA));
+            new PhotonCamera(VisionConstants.FRONT_LEFT_CAMERA_NAME),
+            VisionConstants.ROBOT_TO_FRONT_LEFT_CAMERA));
 
+    // Front Right
+    cameras.add(
+        new VisionCamera(
+            "FrontRight",
+            new PhotonCamera(VisionConstants.FRONT_RIGHT_CAMERA_NAME),
+            VisionConstants.ROBOT_TO_FRONT_RIGHT_CAMERA));
+
+    // Back Right
     cameras.add(
         new VisionCamera(
             "BackRight",
-            new PhotonCamera("OV9281BackRight"),
-            VisionConstants.ROBOT_TO_RIGHT_CAMERA));
-
-    cameras.add(
-        new VisionCamera(
-            "BackLeft", new PhotonCamera("OV9281BackLeft"), VisionConstants.ROBOT_TO_LEFT_CAMERA));
+            new PhotonCamera(VisionConstants.BACK_RIGHT_CAMERA_NAME),
+            VisionConstants.ROBOT_TO_BACK_RIGHT_CAMERA));
 
     ShuffleboardTab tab = Shuffleboard.getTab("Vision");
 
@@ -75,17 +77,28 @@ public class PoseEstimatorSubsystem extends SubsystemBase {
       EstimationRunnable estimatorRunnable =
           new EstimationRunnable(robotCamera.getNiceName(), robotCamera);
       estimationRunnables.add(estimatorRunnable);
-
-      Notifier notifier = new Notifier(estimatorRunnable);
-      notifiers.add(notifier);
-
-      // Start PhotonVision thread
-      notifier.setName(robotCamera.getNiceName());
-      notifier.startPeriodic(RobotConstants.CYCLE_TIME);
     }
 
-    posePublisher =
+    Notifier notifier =
+        new Notifier(
+            () -> {
+              for (EstimationRunnable estimationRunnable : estimationRunnables) {
+                estimationRunnable.run();
+              }
+            });
+    notifiers.add(notifier);
+
+    // Start PhotonVision thread
+    notifier.setName("AprilTagCameras");
+    notifier.startPeriodic(RobotConstants.CYCLE_TIME);
+
+    fusedPosePublisher =
         NetworkTableInstance.getDefault().getStructTopic("/vision/pose", Pose2d.struct).publish();
+
+    drivePosePublisher =
+        NetworkTableInstance.getDefault()
+            .getStructTopic("/vision/drivePose", Pose2d.struct)
+            .publish();
 
     tab.addString("Pose", () -> StringFormatting.poseToString(getPose()))
         .withPosition(0, 0)
@@ -107,7 +120,8 @@ public class PoseEstimatorSubsystem extends SubsystemBase {
   public void periodic() {
     updateOdometry();
     updateVisionMeasurement();
-    posePublisher.set(getPose());
+    fusedPosePublisher.set(getPose());
+    drivePosePublisher.set(driveSubsystem.getPose());
   }
 
   public void updateOdometry() {
@@ -182,7 +196,8 @@ public class PoseEstimatorSubsystem extends SubsystemBase {
     Pose2d visionPose = robotPose.estimatedPose.toPose2d();
 
     poseEstimator.addVisionMeasurement(
-        visionPose, robotPose.timestampSeconds, confidenceCalculator(robotPose));
+        //        visionPose, robotPose.timestampSeconds, confidenceCalculator(robotPose));
+        visionPose, robotPose.timestampSeconds, VisionConstants.VISION_STD_DEVS);
   }
 
   public Optional<Double> getDistanceToSpeaker() {

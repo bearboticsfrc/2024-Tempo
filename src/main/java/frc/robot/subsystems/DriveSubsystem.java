@@ -88,7 +88,7 @@ public class DriveSubsystem extends SubsystemBase {
             RobotConstants.DRIVE_KINEMATICS, getHeading(), getModulePositions());
 
     posePublisher =
-        NetworkTableInstance.getDefault().getStructTopic("/vision/pose", Pose2d.struct).publish();
+        NetworkTableInstance.getDefault().getStructTopic("/drive/pose", Pose2d.struct).publish();
 
     zeroHeading();
     setupShuffleboardTab();

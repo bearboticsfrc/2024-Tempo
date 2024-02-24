@@ -24,6 +24,8 @@ import frc.robot.util.RevUtil;
 import java.util.function.DoubleSupplier;
 
 public class ArmSubsystem extends SubsystemBase {
+  private final double ARM_POSITION_COMPENSATION = 2.5;
+
   private CANSparkMax armMotor;
 
   private SparkAbsoluteEncoder armAbsoluteMotorEncoder;
@@ -154,10 +156,6 @@ public class ArmSubsystem extends SubsystemBase {
     if (isArmHome() && targetState.position == 0) {
       armMotor.stopMotor(); // Prevent arm from pulling current when resting.
     }
-
-    /* if (isArmHome() && armRelativeEncoder.getPosition() != 0) {
-      armRelativeEncoder.setPosition(0);
-    }*/
   }
 
   /** Updates the arm's state based on the trapezoidal profile, adjusting the motor controller. */
@@ -218,7 +216,7 @@ public class ArmSubsystem extends SubsystemBase {
   }
 
   public void set(DoubleSupplier distanceSupplier) {
-    set((getPositionFromDistance(distanceSupplier.getAsDouble()) + 1));
+    set((getPositionFromDistance(distanceSupplier.getAsDouble()) + ARM_POSITION_COMPENSATION));
   }
 
   /**
