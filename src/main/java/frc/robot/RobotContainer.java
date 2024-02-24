@@ -10,8 +10,6 @@ import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PIDConstants;
 import com.pathplanner.lib.util.ReplanningConfig;
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
@@ -181,7 +179,8 @@ public class RobotContainer {
                         () ->
                             -MathUtil.applyDeadband(
                                 powWithSign(driverController.getLeftY(), 2), 0.01),
-                        FieldPositions.getInstance().getSpeakerCenter().getTranslation()),
+                        () -> poseEstimatorSubsystem.getPose(),
+                        FieldPositions.getInstance().getSpeakerTarget()),
                 driveSubsystem));
 
     driverController.a().onTrue(new InstantCommand(() -> driveSubsystem.resetImu()));
@@ -232,8 +231,6 @@ public class RobotContainer {
   /**
    * Raise the first argument to the power of the second argument, keeping the sign of the first.
    *
-   * <p>
-   *
    * @param x A double.
    * @param b A double.
    * @return The result of x^b with the sign of x.
@@ -273,10 +270,6 @@ public class RobotContainer {
    * @param mode If true, sets the robot to teleop mode and resets odometry.
    */
   public void setTeleop(boolean mode) {
-    if (mode) {
-      driveSubsystem.resetOdometry(new Pose2d(15.071, 5.51, Rotation2d.fromDegrees(180)));
-    }
-
     isTeleop = mode;
   }
 
