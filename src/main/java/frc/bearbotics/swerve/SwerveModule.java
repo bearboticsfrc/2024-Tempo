@@ -16,37 +16,49 @@ import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.util.datalog.DoubleLogEntry;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
-import frc.bearbotics.swerve.MotorConfig.MotorBuilder;
-import frc.bearbotics.swerve.cancoder.CANCoders;
+import frc.bearbotics.motor.MotorBuilder;
+import frc.bearbotics.motor.MotorConfig;
+import frc.bearbotics.motor.cancoder.CANCoders;
 import java.util.HashMap;
 import java.util.Map.Entry;
 import java.util.function.DoubleSupplier;
 
-/** A SwerveModules consists of a drive motor and a pivot motor */
+/**
+ * Represents a Swerve Module in a robotics application. A Swerve Module consists of a drive motor
+ * and a pivot motor.
+ */
 public class SwerveModule {
-  private final boolean SHUFFLEBOARD_ENABLED = true;
 
+  // Flag to enable/disable Shuffleboard integration
+  private final boolean SHUFFLEBOARD_ENABLED = false;
+
+  // Name of the swerve module
   private String moduleName;
 
+  // Drive motor and pivot motor
   private CANSparkFlex driveMotor;
   private CANSparkMax pivotMotor;
 
+  // Encoders for drive and pivot motors
   private RelativeEncoder driveMotorEncoder;
   private RelativeEncoder pivotMotorRelativeEncoder;
   private CANcoder pivotMotorAbsoluteEncoder;
 
+  // PID controllers for drive and pivot motors
   private SparkPIDController driveMotorPIDController;
   private SparkPIDController pivotMotorPIDController;
 
+  // Reference angle for the swerve module
   private Rotation2d referenceAngle = new Rotation2d();
 
+  // Data logs for various motor properties
   private HashMap<String, DoubleLogEntry> dataLogs = new HashMap<String, DoubleLogEntry>();
 
   /**
-   * Initalize the swerve module.
+   * Initializes the swerve module.
    *
-   * @param swerveModule the builder that contains all constants.
-   * @param shuffleboardTab the shuffleboard tab to use.
+   * @param swerveModule The builder that contains all constants.
+   * @param shuffleboardTab The shuffleboard tab to use.
    */
   public SwerveModule(SwerveModuleBuilder swerveModule, ShuffleboardTab shuffleboardTab) {
     this.moduleName = swerveModule.getModuleName();
@@ -64,26 +76,23 @@ public class SwerveModule {
 
     MotorConfig.fromMotorConstants(driveMotor, driveMotorEncoder, swerveModule.getDriveMotor())
         .configureMotor()
-        .configureEncoder(Rotation2d.fromRadians(0))
-        .configurePID(swerveModule.getDriveMotor().getMotorPID())
+        .configureEncoder()
+        .configurePid()
         .burnFlash();
-
-    MotorConfig.fromMotorConstants(
-            pivotMotor,
-            pivotMotorRelativeEncoder,
-            swerveModule.getPivotMotor().getAbsoluteEncoder(),
-            swerveModule.getPivotMotor())
-        .configureMotor()
-        .configureAbsoluteEncoder()
-        .configurePID(swerveModule.getPivotMotor().getMotorPID())
-        .burnFlash();
-
-    this.pivotMotorAbsoluteEncoder =
-        CANCoders.getInstance().get(swerveModule.getPivotMotor().getAbsoluteEncoder().getId());
 
     MotorConfig.fromMotorConstants(
             pivotMotor, pivotMotorRelativeEncoder, swerveModule.getPivotMotor())
-        .configureEncoder(getAbsoluteAngle())
+        .configureMotor()
+        .configureCanCoder()
+        .configurePid()
+        .burnFlash();
+
+    this.pivotMotorAbsoluteEncoder =
+        CANCoders.getInstance().get(swerveModule.getPivotMotor().getCanCoderBuilder().getId());
+
+    MotorConfig.fromMotorConstants(
+            pivotMotor, pivotMotorRelativeEncoder, swerveModule.getPivotMotor())
+        .configureEncoder(getAbsoluteAngle().getRadians())
         .burnFlash();
 
     this.driveMotorPIDController = driveMotor.getPIDController();
@@ -264,34 +273,75 @@ public class SwerveModule {
 
     referenceAngle = state.angle;
   }
-
+  /**
+   * Builder class for constructing instances of the {@link SwerveModule} class. Allows configuring
+   * the parameters of a swerve module before creating an instance.
+   */
   public static class SwerveModuleBuilder {
+    // Name of the swerve module
     private String moduleName;
+
+    // Builder for the drive motor
     private MotorBuilder driveMotor;
+
+    // Builder for the pivot motor
     private MotorBuilder pivotMotor;
 
+    /**
+     * Gets the name of the swerve module.
+     *
+     * @return The name of the swerve module.
+     */
     public String getModuleName() {
       return moduleName;
     }
 
+    /**
+     * Sets the name of the swerve module.
+     *
+     * @param moduleName The name to set.
+     * @return The current instance of the builder for method chaining.
+     */
     public SwerveModuleBuilder setModuleName(String moduleName) {
       this.moduleName = moduleName;
       return this;
     }
 
+    /**
+     * Gets the builder for the drive motor.
+     *
+     * @return The builder for the drive motor.
+     */
     public MotorBuilder getDriveMotor() {
       return driveMotor;
     }
 
+    /**
+     * Sets the builder for the drive motor.
+     *
+     * @param driveMotor The builder for the drive motor.
+     * @return The current instance of the builder for method chaining.
+     */
     public SwerveModuleBuilder setDriveMotor(MotorBuilder driveMotor) {
       this.driveMotor = driveMotor;
       return this;
     }
 
+    /**
+     * Gets the builder for the pivot motor.
+     *
+     * @return The builder for the pivot motor.
+     */
     public MotorBuilder getPivotMotor() {
       return pivotMotor;
     }
 
+    /**
+     * Sets the builder for the pivot motor.
+     *
+     * @param pivotMotor The builder for the pivot motor.
+     * @return The current instance of the builder for method chaining.
+     */
     public SwerveModuleBuilder setPivotMotor(MotorBuilder pivotMotor) {
       this.pivotMotor = pivotMotor;
       return this;

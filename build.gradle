@@ -1,11 +1,11 @@
 plugins {
     id "java"
-    id "edu.wpi.first.GradleRIO" version "2024.2.1"
+    id "edu.wpi.first.GradleRIO" version "2024.3.1"
     id "com.diffplug.spotless" version "6.11.0"
 }
 
 repositories {
-  maven { url 'https://jitpack.io' }
+  maven { url "https://jitpack.io" }
 }
 
 java {
@@ -86,6 +86,8 @@ dependencies {
     nativeRelease wpi.java.deps.wpilibJniRelease(wpi.platforms.desktop)
     nativeRelease wpi.java.vendor.jniRelease(wpi.platforms.desktop)
     simulationRelease wpi.sim.enableRelease()
+
+    implementation 'org.apache.commons:commons-math3:3.+'
 
     testImplementation 'junit:junit:4.12'
     implementation "com.jcraft:jsch:0.1.55"
