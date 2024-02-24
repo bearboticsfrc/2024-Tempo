@@ -5,7 +5,6 @@ import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkFlex;
 import com.revrobotics.CANSparkLowLevel;
 import com.revrobotics.RelativeEncoder;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.bearbotics.motor.MotorBuilder;
@@ -75,14 +74,14 @@ public class ShooterSubsystem extends SubsystemBase {
             upperShooterMotor, upperShooterMotorEncoder, upperShooterMotorConfig)
         .configureMotor()
         .configurePid()
-        .configureEncoder(Rotation2d.fromRotations(0))
+        .configureEncoder()
         .burnFlash();
 
     MotorConfig.fromMotorConstants(
             lowerShooterMotor, lowerShooterMotorEncoder, lowerShooterMotorConfig)
         .configureMotor()
         .configurePid()
-        .configureEncoder(Rotation2d.fromRotations(0))
+        .configureEncoder()
         .burnFlash();
   }
 
@@ -165,7 +164,7 @@ public class ShooterSubsystem extends SubsystemBase {
     SUBWOOFER_SHOOT(2000),
     PODIUM_SHOOT(2750),
     AMP_SHOOT(1200),
-    WING_SHOOT(3300);
+    STAGE_SHOOT(3300);
 
     public double velocity;
 

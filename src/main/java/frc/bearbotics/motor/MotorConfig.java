@@ -6,7 +6,6 @@ import com.revrobotics.MotorFeedbackSensor;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkAbsoluteEncoder;
 import com.revrobotics.SparkPIDController;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.util.datalog.StringLogEntry;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.Timer;
@@ -121,10 +120,20 @@ public class MotorConfig {
    * Configures the motor encoder parameters, including initial position, feedback device, and
    * conversion factors.
    *
+   * @return This MotorConfig instance for method chaining.
+   */
+  public MotorConfig configureEncoder() {
+    return configureEncoder(0);
+  }
+
+  /**
+   * Configures the motor encoder parameters, including initial position, feedback device, and
+   * conversion factors.
+   *
    * @param initialPosition The initial position for the motor encoder.
    * @return This MotorConfig instance for method chaining.
    */
-  public MotorConfig configureEncoder(Rotation2d initialPosition) {
+  public MotorConfig configureEncoder(double initialPosition) {
     // TODO: Refactor
 
     String message =
@@ -134,10 +143,10 @@ public class MotorConfig {
 
     if (motorEncoder instanceof RelativeEncoder) {
       RevUtil.checkRevError(
-          ((RelativeEncoder) motorEncoder).setPosition(initialPosition.getRadians()),
+          ((RelativeEncoder) motorEncoder).setPosition(initialPosition),
           String.format(
-              "[MotorCongig.configureEncoder]: Failed to set motor encoder position to %s degrees.",
-              initialPosition.getDegrees()));
+              "[MotorCongig.configureEncoder]: Failed to set motor encoder position to %s.",
+              initialPosition));
       RevUtil.checkRevError(
           ((RelativeEncoder) motorEncoder)
               .setPositionConversionFactor(motorBuilder.getPositionConversionFactor()),
@@ -184,7 +193,7 @@ public class MotorConfig {
     message +=
         String.format(
             "Inital position -> %s\n\tPosition conversion factor -> %s\n\tVelocity conversion factor -> %s\n\t",
-            initialPosition.getDegrees(),
+            initialPosition,
             motorBuilder.getPositionConversionFactor(),
             motorBuilder.getVelocityConversionFactor());
 

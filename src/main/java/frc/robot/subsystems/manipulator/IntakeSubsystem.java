@@ -4,7 +4,6 @@ import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkLowLevel;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -62,12 +61,12 @@ public class IntakeSubsystem extends SubsystemBase {
 
     MotorConfig.fromMotorConstants(rollerMotor, rollerMotorEncoder, rollerMotorBuilder)
         .configureMotor()
-        .configureEncoder(Rotation2d.fromRotations(0))
+        .configureEncoder()
         .burnFlash();
 
     MotorConfig.fromMotorConstants(feederMotor, feederMotorEncoder, feederMotorBuilder)
         .configureMotor()
-        .configureEncoder(Rotation2d.fromRotations(0))
+        .configureEncoder()
         .burnFlash();
   }
 

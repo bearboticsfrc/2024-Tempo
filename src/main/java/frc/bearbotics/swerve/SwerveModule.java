@@ -76,7 +76,7 @@ public class SwerveModule {
 
     MotorConfig.fromMotorConstants(driveMotor, driveMotorEncoder, swerveModule.getDriveMotor())
         .configureMotor()
-        .configureEncoder(Rotation2d.fromRadians(0))
+        .configureEncoder()
         .configurePid()
         .burnFlash();
 
@@ -92,7 +92,7 @@ public class SwerveModule {
 
     MotorConfig.fromMotorConstants(
             pivotMotor, pivotMotorRelativeEncoder, swerveModule.getPivotMotor())
-        .configureEncoder(getAbsoluteAngle())
+        .configureEncoder(getAbsoluteAngle().getRadians())
         .burnFlash();
 
     this.driveMotorPIDController = driveMotor.getPIDController();

@@ -4,7 +4,6 @@ import com.revrobotics.CANSparkBase.SoftLimitDirection;
 import com.revrobotics.CANSparkLowLevel;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -58,7 +57,7 @@ public class ClimberSubsystem extends SubsystemBase {
 
     MotorConfig.fromMotorConstants(climberMotor, climberMotorEncoder, climberMotorConfig)
         .configureMotor()
-        .configureEncoder(Rotation2d.fromDegrees(0))
+        .configureEncoder()
         .burnFlash();
 
     MotorConfig.fromMotorConstants(climberMotorFollower, climberMotorFollowerConfig)
