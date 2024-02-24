@@ -166,7 +166,7 @@ public class RobotContainer {
         .onFalse(manipulatorSubsystem.getShootStopCommand());
 
     driverController
-        .rightBumper()
+        .povUp()
         .whileTrue(manipulatorSubsystem.getPodiumShootCommand())
         .onFalse(manipulatorSubsystem.getShootStopCommand());
 
@@ -194,7 +194,7 @@ public class RobotContainer {
     driverController.a().onTrue(new InstantCommand(() -> driveSubsystem.resetImu()));
 
     driverController
-        .povUp()
+        .povLeft()
         .whileTrue(manipulatorSubsystem.getStageShootCommand())
         .onFalse(manipulatorSubsystem.getShootStopCommand());
 
@@ -204,7 +204,7 @@ public class RobotContainer {
         .onFalse(manipulatorSubsystem.getIntakeStopCommand());
 
     driverController
-        .povLeft()
+        .rightBumper()
         .whileTrue(
             manipulatorSubsystem.getAutoShootCommand(
                 () ->

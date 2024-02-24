@@ -483,8 +483,8 @@ public class DriveSubsystem extends SubsystemBase {
 
     // Drive robot accordingly
     drive(
-        xRequest.getAsDouble(),
         yRequest.getAsDouble(),
+        xRequest.getAsDouble(),
         rotateOutput); // TODO: Refactor into own command
   }
 
