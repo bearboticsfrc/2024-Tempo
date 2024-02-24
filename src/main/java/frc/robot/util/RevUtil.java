@@ -25,6 +25,19 @@ public class RevUtil {
   }
 
   /**
+   * Accepts a command that returns a REVLibError and if it is not "ok" then print an error to the
+   * driver station
+   *
+   * @param error A REVLibError from any REV API command
+   * @param message A message to log with the error.
+   */
+  public static void checkRevError(REVLibError error, String message) {
+    if (error != REVLibError.kOk) {
+      DriverStation.reportError(String.format("%s: %s", message, error.toString()), false);
+    }
+  }
+
+  /**
    * Sets the Status 0,1,2,3 frame rates for a CANSparkMax motor controller
    *
    * @param motor A CANSparkMax motor controller

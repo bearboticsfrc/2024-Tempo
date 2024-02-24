@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.bearbotics.fms.AllianceColor;
 
 public class Robot extends TimedRobot {
   private Command autonomousCommand;
@@ -17,6 +18,8 @@ public class Robot extends TimedRobot {
   @Override
   public void robotInit() {
     DriverStation.silenceJoystickConnectionWarning(true);
+    updateAllianceColor();
+
     robotContainer = new RobotContainer();
   }
 
@@ -34,6 +37,8 @@ public class Robot extends TimedRobot {
     if (autonomousCommand != null) {
       autonomousCommand.schedule();
     }
+
+    updateAllianceColor();
   }
 
   @Override
@@ -43,10 +48,20 @@ public class Robot extends TimedRobot {
     if (autonomousCommand != null) {
       autonomousCommand.cancel();
     }
+
+    updateAllianceColor();
   }
 
   @Override
   public void disabledInit() {
+    robotContainer.disabledInit();
     robotContainer.setTeleop(false);
+    updateAllianceColor();
+  }
+
+  private void updateAllianceColor() {
+    if (DriverStation.isDSAttached() && DriverStation.getAlliance().isPresent()) {
+      AllianceColor.setAllianceColor(DriverStation.getAlliance().get());
+    }
   }
 }
