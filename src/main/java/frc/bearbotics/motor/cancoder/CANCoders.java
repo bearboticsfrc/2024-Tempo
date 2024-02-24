@@ -17,8 +17,7 @@ import java.util.Map;
 /** Singleton class for managing and configuring CANCoders in a robotics application. */
 public class CANCoders {
   // Timeout for configuring CANCoders (milliseconds)
-  private final double CONFIGURATION_TIMEOUT =
-      Units.millisecondsToSeconds(10000); // TODO: Move to constants
+  private final double CONFIGURATION_TIMEOUT = Units.millisecondsToSeconds(10000);
 
   // Timeout for updating CANCoders (milliseconds)
   private final double UPDATE_TIMEOUT = Units.millisecondsToSeconds(1000);
@@ -89,7 +88,7 @@ public class CANCoders {
               "[CANCoder %s]: Timed out while waiting for update... sleeping and retrying",
               cancoderConfiguration.getId()),
           false);
-      Timer.delay(0.25); // TODO: Might need a maximum attempts
+      Timer.delay(0.25);
     }
 
     cancoders.put(cancoderConfiguration.getId(), cancoder);

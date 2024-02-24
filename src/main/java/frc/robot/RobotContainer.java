@@ -249,6 +249,16 @@ public class RobotContainer {
             () -> -MathUtil.applyDeadband(operatorController.getRightY(), 0.01)));
 
     operatorController
+        .x()
+        .whileTrue(manipulatorSubsystem.getPodiumShootCommand())
+        .onFalse(manipulatorSubsystem.getShootStopCommand());
+
+    operatorController
+        .b()
+        .whileTrue(manipulatorSubsystem.getSubwooferShootCommand())
+        .onFalse(manipulatorSubsystem.getShootStopCommand());
+
+    operatorController
         .a()
         .whileTrue(manipulatorSubsystem.getAmpShootCommand())
         .onFalse(manipulatorSubsystem.getShootStopCommand());

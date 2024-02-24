@@ -13,7 +13,7 @@ public class MotorBuilder {
   private int currentLimit;
   private double positionConversionFactor = 1;
   private double velocityConversionFactor = 1;
-  private IdleMode idleMode = IdleMode.kBrake; // TODO: remove
+  private IdleMode idleMode = IdleMode.kBrake;
   private boolean followInverted;
   private MotorPidBuilder[] pidSlots = new MotorPidBuilder[2];
   private MotorSoftLimit reverseSoftLimit;
