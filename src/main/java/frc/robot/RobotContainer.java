@@ -4,28 +4,41 @@
 
 package frc.robot;
 
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
+import com.pathplanner.lib.util.PIDConstants;
+import com.pathplanner.lib.util.ReplanningConfig;
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.ScheduleCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.bearbotics.fms.AllianceColor;
 import frc.bearbotics.test.DriveSubsystemTest;
+import frc.robot.commands.auto.MiddleC1C2;
 import frc.robot.constants.DriveConstants;
 import frc.robot.constants.DriveConstants.SpeedMode;
 import frc.robot.constants.RobotConstants;
 import frc.robot.constants.VisionConstants;
-import frc.robot.location.FieldPositions;
-import frc.robot.location.LocationHelper;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.manipulator.IntakeSubsystem.IntakeSpeed;
 import frc.robot.subsystems.manipulator.ManipulatorSubsystem;
 import frc.robot.subsystems.vision.ObjectDetectionSubsystem;
+import java.util.Map;
+import java.util.Map.Entry;
 
+/**
+ * Constructs a new RobotContainer object. This constructor is responsible for initializing
+ * controllers, subsystems, shuffleboard tabs, and configuring bindings.
+ */
 public class RobotContainer {
   private final CommandXboxController driverController =
       new CommandXboxController(DriveConstants.DRIVER_CONTROLLER_PORT);
@@ -42,22 +55,82 @@ public class RobotContainer {
 
   private SendableChooser<Command> autoCommandChooser = new SendableChooser<>();
 
+  private Map<String, Command> namedCommands =
+      Map.of(
+          "intakeAndShootPodium",
+              new SequentialCommandGroup(
+                  manipulatorSubsystem.getIntakeCommand(),
+                  manipulatorSubsystem.getPodiumShootCommand()),
+          "intake", manipulatorSubsystem.getIntakeCommand(),
+          "shootWingNote", manipulatorSubsystem.getPodiumShootCommand(),
+          "shootStage", manipulatorSubsystem.getStageShootCommand());
+
   public RobotContainer() {
+    setupShuffleboardTab(RobotConstants.COMPETITION_TAB);
+    configurePathPlanner();
     buildAutoList();
     buildTestList();
     configureDriverBindings();
     configureOperatorBindings();
-
-    RobotConstants.TUNING_TAB.addDouble(
-        "Distance to Pose",
-        () ->
-            LocationHelper.getDistanceToPose(
-                driveSubsystem.getPose(), FieldPositions.getInstance().getSpeakerCenter()));
-
-    RobotConstants.COMPETITION_TAB.add(
-        "Home Climber", manipulatorSubsystem.getClimberHomeCommand());
   }
 
+  /**
+   * Sets up the Shuffleboard tab with the specified commands.
+   *
+   * @param tab The ShuffleboardTab to add commands to.
+   */
+  private void setupShuffleboardTab(ShuffleboardTab tab) {
+    tab.add("Home Climber", manipulatorSubsystem.getClimberHomeCommand());
+  }
+
+  /**
+   * Configures the path planner for autonomous routines. This method sets up holonomic path
+   * following with specified PID constants, replanning configurations, etc.
+   */
+  private void configurePathPlanner() {
+    AutoBuilder.configureHolonomic(
+        driveSubsystem::getPose,
+        driveSubsystem::resetOdometry,
+        driveSubsystem::getRobotRelativeSpeeds,
+        driveSubsystem::driveRobotRelative,
+        new HolonomicPathFollowerConfig(
+            new PIDConstants(1.0, 0.0, 0.0),
+            new PIDConstants(1.0, 0.0, 0.0),
+            2.5,
+            0.4,
+            new ReplanningConfig()),
+        () -> AllianceColor.alliance == Alliance.Red,
+        driveSubsystem);
+
+    for (Entry<String, Command> entry : namedCommands.entrySet()) {
+      NamedCommands.registerCommand(entry.getKey(), new ScheduleCommand(entry.getValue()));
+    }
+  }
+
+  /** Builds the list of autonomous command options for the SendableChooser. */
+  private void buildAutoList() {
+    autoCommandChooser.addOption("0 - NoOp", new InstantCommand());
+    autoCommandChooser.addOption("1 - MiddleC1C2", MiddleC1C2.get(manipulatorSubsystem));
+
+    RobotConstants.COMPETITION_TAB
+        .add("Auto Command", autoCommandChooser)
+        .withSize(4, 1)
+        .withPosition(0, 1);
+  }
+
+  /** Builds the list of test commands for the Test tab. */
+  private void buildTestList() {
+    RobotConstants.TEST_TAB
+        .add(
+            "Drive Subsystem Test", new DriveSubsystemTest(driveSubsystem, RobotConstants.TEST_TAB))
+        .withPosition(2, 1)
+        .withSize(2, 1);
+  }
+
+  /**
+   * Configures button bindings for the driver controller, setting up commands for different button
+   * combinations.
+   */
   private void configureDriverBindings() {
     driveSubsystem.setDefaultCommand(getDefaultDriveSubsystemCommand());
 
@@ -102,6 +175,11 @@ public class RobotContainer {
                 () -> driverController.getHID().setRumble(RumbleType.kBothRumble, 0)));
   }
 
+  /**
+   * Returns the default RunCommand for driving the robot based on controller input.
+   *
+   * @return The default RunCommand for driving the robot.
+   */
   private RunCommand getDefaultDriveSubsystemCommand() {
     return new RunCommand(
         () ->
@@ -125,6 +203,10 @@ public class RobotContainer {
     return Math.copySign(Math.pow(x, b), x);
   }
 
+  /**
+   * Configures button bindings for the operator controller, setting up commands for different
+   * button combinations.
+   */
   private void configureOperatorBindings() {
     manipulatorSubsystem.setDefaultCommand(
         manipulatorSubsystem.getClimberRunCommand(
@@ -136,35 +218,25 @@ public class RobotContainer {
         .onFalse(manipulatorSubsystem.getShootStopCommand());
   }
 
-  private void buildAutoList() {
-    autoCommandChooser.addOption("0 - NoOp", new InstantCommand());
-
-    RobotConstants.COMPETITION_TAB
-        .add("Auto Command", autoCommandChooser)
-        .withSize(4, 1)
-        .withPosition(0, 1);
+  /**
+   * Sets the robot to teleop mode and optionally resets the odometry if `mode` is true.
+   *
+   * @param mode If true, sets the robot to teleop mode and resets odometry.
+   */
+  public void setTeleop(boolean mode) {
+    isTeleop = mode;
   }
 
-  private void buildTestList() {
-    RobotConstants.TEST_TAB
-        .add(
-            "Drive Subsystem Test", new DriveSubsystemTest(driveSubsystem, RobotConstants.TEST_TAB))
-        .withPosition(2, 1)
-        .withSize(2, 1);
-  }
-
+  /**
+   * Gets the selected autonomous command from the SendableChooser.
+   *
+   * @return The selected autonomous command.
+   */
   public Command getAutonomousCommand() {
     return autoCommandChooser.getSelected();
   }
 
-  public void setTeleop(boolean mode) {
-    if (mode) {
-      driveSubsystem.resetOdometry(new Pose2d(15.071, 5.51, Rotation2d.fromDegrees(180)));
-    }
-
-    isTeleop = mode;
-  }
-
+  /** Initializes the robot when transitioning to the disabled state. Resets controller rumble. */
   public void disabledInit() {
     driverController.getHID().setRumble(RumbleType.kBothRumble, 0);
   }

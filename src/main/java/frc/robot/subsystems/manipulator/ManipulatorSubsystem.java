@@ -185,7 +185,7 @@ public class ManipulatorSubsystem extends SubsystemBase {
         getShootCommand());
   }
 
-  public SequentialCommandGroup getWingShootCommand() {
+  public SequentialCommandGroup getStageShootCommand() {
     return new SequentialCommandGroup(
         new ParallelCommandGroup(
             getArmPrepareCommand(ArmPosition.STAGE_SHOOT),
