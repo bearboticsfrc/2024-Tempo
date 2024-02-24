@@ -13,7 +13,6 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.bearbotics.test.DriveSubsystemTest;
 import frc.robot.constants.DriveConstants;
 import frc.robot.constants.DriveConstants.SpeedMode;
-import frc.robot.constants.LightsConstants;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.LightsSubsystem;
 
@@ -55,11 +54,6 @@ public class RobotContainer {
         .rightBumper()
         .whileTrue(new InstantCommand(() -> driveSubsystem.setSpeedMode(SpeedMode.TURTLE)))
         .onFalse(new InstantCommand(() -> driveSubsystem.setSpeedMode(SpeedMode.NORMAL)));
-
-    driverController
-        .a()
-        .whileTrue(new InstantCommand(() -> lightsSubsystem.set(LightsConstants.Color.GREEN)))
-        .whileFalse(new InstantCommand(() -> lightsSubsystem.set(LightsConstants.Color.RED)));
   }
 
   public void setTeleop(boolean mode) {

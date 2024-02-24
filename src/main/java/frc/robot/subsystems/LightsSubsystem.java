@@ -1,31 +1,61 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj.motorcontrol.Spark;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.constants.LightsConstants;
-import java.util.Stack;
 
 public class LightsSubsystem {
-  private final Spark blinkin;
-  private Stack<LightsConstants.Color> colorStack = new Stack<LightsConstants.Color>();
+  private final Spark blinkinFront;
+  private final Spark blinkinBack;
+  private final Spark[] blinkins;
 
   public LightsSubsystem() {
-    blinkin = new Spark(LightsConstants.pwmPort);
-    set(LightsConstants.Color.BLACK);
+    blinkinFront = new Spark(LightsConstants.lightPortFront);
+    blinkinBack = new Spark(LightsConstants.lightPortBack);
+    blinkins = new Spark[] {blinkinFront, blinkinBack};
+    setColor(blinkins, LightsConstants.Color.BLACK);
   }
 
-  public void set(double val) {
+  public void setColor(double val) {
     if ((val >= -1.0) && (val <= 1.0)) {
-      blinkin.set(val);
+      blinkinFront.set(val);
     }
   }
 
-  public void set(LightsConstants.Color color) {
-    blinkin.set(color.value);
-    colorStack.add(color);
+  public void setColor(Spark[] blinkins, LightsConstants.Color color) {
+    for (Spark blinkin : blinkins) {
+      blinkin.set(color.value);
+    }
   }
 
-  public LightsConstants.Color getPreviousColor() {
-    colorStack.pop();
-    return colorStack.pop();
+  public void setColor(Spark blinkin, LightsConstants.Color color) {
+    blinkin.set(color.value);
+  }
+
+  public void setPattern(Spark[] blinkins, double val) {
+    if ((val >= -1.0) && (val <= 1.0)) {
+      for (Spark blinkin : blinkins) {
+        blinkin.set(val);
+      }
+    }
+  }
+
+  public void setPattern(Spark[] blinkins, LightsConstants.BlinkinPattern blinkinPattern) {
+    for (Spark blinkin : blinkins) {
+      blinkin.set(blinkinPattern.value);
+    }
+  }
+
+  public void setPattern(Spark blinkin, LightsConstants.BlinkinPattern blinkinPattern) {
+    blinkin.set(blinkinPattern.value);
+  }
+
+  public InstantCommand signalSource() {
+    return new InstantCommand(() -> setColor(blinkins, LightsConstants.Color.YELLOW));
   }
 }
+// public ParallelCommandGroup signalSource(Spark blinkin) {
+// return new ParallelCommandGroup(
+//   new InstantCommand(() -> setColor(blinkins, LightsConstants.Color.YELLOW)),
+// new InstantCommand(() -> setPattern(blinkins, LightsConstants.BlinkinPattern.CP2_STROBE)));
+// }
