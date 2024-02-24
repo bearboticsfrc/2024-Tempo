@@ -46,9 +46,9 @@ public class DriveConstants {
   public static final RateLimiter TURNING_ACCELERATION_LIMITER =
       new RateLimiter(MAX_ANGULAR_ACCELERATION_PER_SECOND, MAX_ANGULAR_DECELERATION_PER_SECOND);
 
-  public static final PIDConstants AIM_PID_CONSTANTS = new PIDConstants(0.006, 0, 0.0005);
+  public static final PIDConstants AIM_PID_CONSTANTS = new PIDConstants(0.008, 0, 0.0005);
   public static final TrapezoidProfile.Constraints AIM_PID_CONSTRAINTS =
-      new TrapezoidProfile.Constraints(720.0, 225.0);
+      new TrapezoidProfile.Constraints(720, 225);
 
   // Enum for different speed modes
   public enum SpeedMode {

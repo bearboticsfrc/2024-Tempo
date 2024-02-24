@@ -30,7 +30,7 @@ import java.util.function.DoubleSupplier;
 public class SwerveModule {
 
   // Flag to enable/disable Shuffleboard integration
-  private final boolean SHUFFLEBOARD_ENABLED = true;
+  private final boolean SHUFFLEBOARD_ENABLED = false;
 
   // Name of the swerve module
   private String moduleName;

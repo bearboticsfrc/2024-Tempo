@@ -11,7 +11,7 @@ public class RobotConstants {
   // Robot dimensions in meters
   public static final double TRACK_WIDTH = Units.inchesToMeters(20.75);
   public static final double WHEEL_BASE = Units.inchesToMeters(18.75);
-  public static final double WHEEL_DIAMETER = 0.0962;
+  public static final double WHEEL_DIAMETER = 0.0985;
 
   // Shuffleboard tabs
   public static final ShuffleboardTab SHOOTER_SYSTEM_TAB = Shuffleboard.getTab("Shooter System");

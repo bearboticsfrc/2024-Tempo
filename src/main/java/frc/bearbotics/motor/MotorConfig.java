@@ -64,7 +64,7 @@ public class MotorConfig {
     RevUtil.checkRevError(
         motor.enableVoltageCompensation(motorBuilder.getNominalVoltage()),
         String.format(
-            "[MotorConfig.configureMotor]: Failed to set voltage compensation to %s.",
+            "[MotorConfig.configureMotor]: Failed to set voltage compensation to %s",
             motorBuilder.getNominalVoltage()));
     RevUtil.checkRevError(motor.setSmartCurrentLimit(motorBuilder.getCurrentLimit()));
     RevUtil.setPeriodicFramePeriodHigh(motor, motorDescription);
@@ -81,11 +81,11 @@ public class MotorConfig {
       MotorSoftLimit reverseSoftLimit = motorBuilder.getReverseSoftLimit();
       RevUtil.checkRevError(
           motor.enableSoftLimit(reverseSoftLimit.getDirection(), true),
-          "[MotorConfig.configureMotor]: Failed to set reverse soft limit.");
+          "[MotorConfig.configureMotor]: Failed to set reverse soft limit");
       RevUtil.checkRevError(
           motor.setSoftLimit(reverseSoftLimit.getDirection(), reverseSoftLimit.getLimit()),
           String.format(
-              "[MotorConfig.configureMotor]: Failed to set reverse soft limit to %s.",
+              "[MotorConfig.configureMotor]: Failed to set reverse soft limit to %s",
               reverseSoftLimit.getDirection()));
 
       message +=
@@ -98,11 +98,11 @@ public class MotorConfig {
       MotorSoftLimit forwardSoftLimit = motorBuilder.getForwardSoftLimit();
       RevUtil.checkRevError(
           motor.enableSoftLimit(forwardSoftLimit.getDirection(), true),
-          "[MotorConfig.configureMotor]: Failed to set forward soft limit.");
+          "[MotorConfig.configureMotor]: Failed to set forward soft limit");
       RevUtil.checkRevError(
           motor.setSoftLimit(forwardSoftLimit.getDirection(), forwardSoftLimit.getLimit()),
           String.format(
-              "[MotorConfig.configureMotor]: Failed to set forward soft limit to %s.",
+              "[MotorConfig.configureMotor]: Failed to set forward soft limit to %s",
               forwardSoftLimit.getDirection()));
 
       message +=
@@ -145,48 +145,48 @@ public class MotorConfig {
       RevUtil.checkRevError(
           ((RelativeEncoder) motorEncoder).setPosition(initialPosition),
           String.format(
-              "[MotorCongig.configureEncoder]: Failed to set motor encoder position to %s.",
+              "[MotorCongig.configureEncoder]: Failed to set motor encoder position to %s",
               initialPosition));
       RevUtil.checkRevError(
           ((RelativeEncoder) motorEncoder)
               .setPositionConversionFactor(motorBuilder.getPositionConversionFactor()),
           String.format(
-              "[MotorCongig.configureEncoder]: Failed to set position conversion factor to %s.",
+              "[MotorCongig.configureEncoder]: Failed to set position conversion factor to %s",
               motorBuilder.getPositionConversionFactor()));
       RevUtil.checkRevError(
           ((RelativeEncoder) motorEncoder)
               .setVelocityConversionFactor(motorBuilder.getVelocityConversionFactor()),
           String.format(
-              "[MotorCongig.configureEncoder]: Failed to set velocity conversion factor to %s.",
+              "[MotorCongig.configureEncoder]: Failed to set velocity conversion factor to %s",
               motorBuilder.getVelocityConversionFactor()));
     } else if (motorEncoder instanceof AbsoluteEncoder) {
       RevUtil.checkRevError(
           ((AbsoluteEncoder) motorEncoder).setInverted(motorBuilder.isEncoderInverted()));
       RevUtil.checkRevError(
-          ((RelativeEncoder) motorEncoder)
+          ((AbsoluteEncoder) motorEncoder)
               .setPositionConversionFactor(motorBuilder.getPositionConversionFactor()),
           String.format(
-              "[MotorCongig.configureEncoder]: Failed to set position conversion factor to %s.",
+              "[MotorCongig.configureEncoder]: Failed to set position conversion factor to %s",
               motorBuilder.getPositionConversionFactor()));
       RevUtil.checkRevError(
-          ((RelativeEncoder) motorEncoder)
+          ((AbsoluteEncoder) motorEncoder)
               .setVelocityConversionFactor(motorBuilder.getVelocityConversionFactor()),
           String.format(
-              "[MotorCongig.configureEncoder]: Failed to set velocity conversion factor to %s.",
+              "[MotorCongig.configureEncoder]: Failed to set velocity conversion factor to %s",
               motorBuilder.getVelocityConversionFactor()));
     } else if (motorEncoder instanceof SparkAbsoluteEncoder) {
       ((SparkAbsoluteEncoder) motorEncoder).setInverted(motorBuilder.isEncoderInverted());
       RevUtil.checkRevError(
-          ((RelativeEncoder) motorEncoder)
+          ((SparkAbsoluteEncoder) motorEncoder)
               .setPositionConversionFactor(motorBuilder.getPositionConversionFactor()),
           String.format(
-              "[MotorCongig.configureEncoder]: Failed to set position conversion factor to %s.",
+              "[MotorCongig.configureEncoder]: Failed to set position conversion factor to %s",
               motorBuilder.getPositionConversionFactor()));
       RevUtil.checkRevError(
-          ((RelativeEncoder) motorEncoder)
+          ((SparkAbsoluteEncoder) motorEncoder)
               .setVelocityConversionFactor(motorBuilder.getVelocityConversionFactor()),
           String.format(
-              "[MotorCongig.configureEncoder]: Failed to set velocity conversion factor to %s.",
+              "[MotorCongig.configureEncoder]: Failed to set velocity conversion factor to %s",
               motorBuilder.getVelocityConversionFactor()));
     }
 
@@ -201,7 +201,7 @@ public class MotorConfig {
       message += String.format("Set feedback device -> %s\n", motorEncoder.getClass());
       RevUtil.checkRevError(
           motor.getPIDController().setFeedbackDevice(motorEncoder),
-          "[MotorCongig.configureEncoder]: Failed to set PID feedback device.");
+          "[MotorCongig.configureEncoder]: Failed to set PID feedback device");
     }
 
     logEntry.append(message);
@@ -305,16 +305,16 @@ public class MotorConfig {
 
     RevUtil.checkRevError(
         motorPIDController.setPositionPIDWrappingEnabled(positionPidWrappingEnabled),
-        "[MotorConfig.configurePositionalPidWrapping]: Failed to enable position PID wrapping.");
+        "[MotorConfig.configurePositionalPidWrapping]: Failed to enable position PID wrapping");
     RevUtil.checkRevError(
         motorPIDController.setPositionPIDWrappingMinInput(motorPid.getPositionPidWrappingMin()),
         String.format(
-            "[MotorConfig.configurePositionalPidWrapping]: Failed to enable position PID min input to %s.",
+            "[MotorConfig.configurePositionalPidWrapping]: Failed to enable position PID min input to %s",
             motorPid.getPositionPidWrappingMin()));
     RevUtil.checkRevError(
         motorPIDController.setPositionPIDWrappingMaxInput(motorPid.getPositionPidWrappingMax()),
         String.format(
-            "[MotorConfig.configurePositionalPidWrapping]: Failed to enable position PID max input to %s.",
+            "[MotorConfig.configurePositionalPidWrapping]: Failed to enable position PID max input to %s",
             motorPid.getPositionPidWrappingMax()));
 
     String message =
@@ -338,7 +338,7 @@ public class MotorConfig {
     RevUtil.checkRevError(
         motor.follow(leaderMotor, motorBuilder.isFollowInverted()),
         String.format(
-            "[MotorConfig.follow]: Failed to follow motor %s.", leaderMotor.getDeviceId()));
+            "[MotorConfig.follow]: Failed to follow motor %s", leaderMotor.getDeviceId()));
 
     String message =
         String.format(
@@ -358,7 +358,7 @@ public class MotorConfig {
     logEntry.append(message);
 
     Timer.delay(0.25);
-    RevUtil.checkRevError(motor.burnFlash(), "[MotorConfig.burnFlash]: Failed to burn flash.");
+    RevUtil.checkRevError(motor.burnFlash(), "[MotorConfig.burnFlash]: Failed to burn flash");
     Timer.delay(0.25);
     // Burn parameters onto motor flash
     // might not work, needs a delay after setting values

@@ -18,6 +18,7 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructPublisher;
+import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -57,7 +58,9 @@ public class DriveSubsystem extends SubsystemBase {
 
   private StructPublisher<Pose2d> posePublisher;
 
-  public final ProfiledPIDController aimPidController =
+  private Notifier loggingNotifier; // To prevent mem leak.
+
+  private final ProfiledPIDController aimPidController =
       new ProfiledPIDController(
           DriveConstants.AIM_PID_CONSTANTS.kP,
           DriveConstants.AIM_PID_CONSTANTS.kI,
@@ -89,6 +92,7 @@ public class DriveSubsystem extends SubsystemBase {
 
     zeroHeading();
     setupShuffleboardTab();
+    setupDataLogging();
   }
 
   public void zeroHeading() {
@@ -113,13 +117,20 @@ public class DriveSubsystem extends SubsystemBase {
         "DesiredStates", this::getDesiredSwerveModuleStates);
   }
 
+  private void setupDataLogging() {
+    loggingNotifier = new Notifier(this::updateDataLogs);
+    loggingNotifier.startPeriodic(RobotConstants.CYCLE_TIME);
+  }
+
   @Override
   public void periodic() {
     odometry.update(getHeading(), getModulePositions());
 
     maxSpeed = competitionTabMaxSpeedEntry.getDouble(DriveConstants.MAX_VELOCITY);
     posePublisher.set(getPose());
+  }
 
+  private void updateDataLogs() {
     for (SwerveModule module : swerveModules.values()) {
       module.updateDataLogs();
     }
@@ -449,13 +460,8 @@ public class DriveSubsystem extends SubsystemBase {
    * @param xRequest Desired X axis (forward) speed [-1.0, +1.0]
    * @param yRequest Desired Y axis (sideways) speed [-1.0, +1.0]
    * @param point Target point.
-   * @param velocityCorrection True to compensate for robot's own velocity
    */
-  private void aimAtPoint(
-      DoubleSupplier xRequest,
-      DoubleSupplier yRequest,
-      Translation2d point,
-      boolean velocityCorrection) {
+  public void aimAtPoint(DoubleSupplier xRequest, DoubleSupplier yRequest, Translation2d point) {
     // Get current pose
     Pose2d currentPose = getPose();
 

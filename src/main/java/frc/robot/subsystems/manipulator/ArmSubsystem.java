@@ -120,8 +120,8 @@ public class ArmSubsystem extends SubsystemBase {
    * @param shuffleboardTab The ShuffleboardTab instance to which arm data will be added.
    */
   private void setupShuffleboardTab(ShuffleboardTab shuffleboardTab) {
-    shuffleboardTab.addDouble("Arm Pos", armAbsoluteMotorEncoder::getPosition);
-    shuffleboardTab.addDouble("Arm Rel Enc Pos", armRelativeEncoder::getPosition);
+    shuffleboardTab.addDouble("Arm Abs Pos", armAbsoluteMotorEncoder::getPosition);
+    shuffleboardTab.addDouble("Arm Rel Pos", armRelativeEncoder::getPosition);
     shuffleboardTab.addDouble("Arm Goal", this::getGoal);
     shuffleboardTab.addDouble("Arm current pos", this::getCurrentPosition);
     shuffleboardTab.addDouble("Arm current vel", this::getCurrentVelocity);
@@ -151,9 +151,13 @@ public class ArmSubsystem extends SubsystemBase {
   public void periodic() {
     updateState();
 
-    if (targetState.position == 0 && isArmHome()) {
+    if (isArmHome() && targetState.position == 0) {
       armMotor.stopMotor(); // Prevent arm from pulling current when resting.
     }
+
+    /* if (isArmHome() && armRelativeEncoder.getPosition() != 0) {
+      armRelativeEncoder.setPosition(0);
+    }*/
   }
 
   /** Updates the arm's state based on the trapezoidal profile, adjusting the motor controller. */
@@ -214,7 +218,7 @@ public class ArmSubsystem extends SubsystemBase {
   }
 
   public void set(DoubleSupplier distanceSupplier) {
-    set(getPositionFromDistance(distanceSupplier.getAsDouble()));
+    set((getPositionFromDistance(distanceSupplier.getAsDouble()) + 1));
   }
 
   /**
@@ -239,8 +243,19 @@ public class ArmSubsystem extends SubsystemBase {
         targetState);
   }
 
-  private double getPositionFromDistance(double distance) {
-    return -8.65989 + 26.3662 * Math.log(distance);
+  private static double getPositionFromDistance(double distance) {
+    if (distance <= 1.543) {
+      return 0;
+    } else if (distance <= 3) {
+      return (44.5168 * Math.pow(distance, 0.519352)) - 55.7307;
+    } else if (distance <= 4) {
+      return (-6 * Math.pow(distance, 2)) + (49 * distance) - 70;
+    } else if (distance <= 5) {
+      return (-4.5 * Math.pow(distance, 2)) + (44.25 * distance) - 75;
+    } else if (distance <= 6) {
+      return (-2.3 * Math.pow(distance, 2)) + (25.45 * distance) - 36;
+    }
+    return 0;
   }
 
   /** Enum representing different positions of the arm. */
