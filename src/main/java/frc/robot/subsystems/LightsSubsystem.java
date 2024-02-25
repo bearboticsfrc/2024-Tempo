@@ -1,19 +1,29 @@
 package frc.robot.subsystems;
 
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.motorcontrol.Spark;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.bearbotics.fms.AllianceColor;
 import frc.robot.constants.LightsConstants;
+import java.util.function.BooleanSupplier;
 
-public class LightsSubsystem {
+public class LightsSubsystem extends SubsystemBase {
+
+  private final BooleanSupplier isBlue =
+      () -> (AllianceColor.alliance == Alliance.Blue) ? true : false;
+
+  private BooleanSupplier isTeleOp;
+
   private final Spark blinkinFront;
   private final Spark blinkinBack;
   private final Spark[] blinkins;
 
-  public LightsSubsystem() {
+  public LightsSubsystem(BooleanSupplier TeleOp) {
+    isTeleOp = TeleOp;
     blinkinFront = new Spark(LightsConstants.lightPortFront);
     blinkinBack = new Spark(LightsConstants.lightPortBack);
     blinkins = new Spark[] {blinkinFront, blinkinBack};
-    setColor(blinkins, LightsConstants.Color.BLACK);
+    reset();
   }
 
   public void setColor(double val) {
@@ -49,13 +59,52 @@ public class LightsSubsystem {
   public void setPattern(Spark blinkin, LightsConstants.BlinkinPattern blinkinPattern) {
     blinkin.set(blinkinPattern.value);
   }
-  // public ParallelCommandGroup signalSource(Spark blinkin) {
-  // return new ParallelCommandGroup(
-  //   new InstantCommand(() -> setColor(blinkins, LightsConstants.Color.YELLOW)),
-  // new InstantCommand(() -> setPattern(blinkins, LightsConstants.BlinkinPattern.CP2_STROBE)));
-  // }
 
-  public InstantCommand signalSource() {
-    return new InstantCommand(() -> setColor(blinkins, LightsConstants.Color.YELLOW));
+  public void signalSource() {
+    setPattern(blinkins, LightsConstants.BlinkinPattern.STROBE_GOLD);
+  }
+
+  public void setBlue() {
+    setColor(blinkins, LightsConstants.Color.BLUE);
+  }
+
+  public void setRed() {
+    setColor(blinkins, LightsConstants.Color.RED);
+  }
+
+  public void setRedAutoAnimation() {
+    setPattern(blinkins, LightsConstants.BlinkinPattern.HEARTBEAT_RED);
+  }
+
+  public void setBlueAutoAnimation() {
+    setPattern(blinkins, LightsConstants.BlinkinPattern.HEARTBEAT_BLUE);
+  }
+
+  public void signalNoteInHolder() {
+    setColor(blinkins, LightsConstants.Color.GREEN);
+  }
+
+  public void displayAllianceColorInAuto() {
+    if (isBlue.getAsBoolean() == true) {
+      setBlueAutoAnimation();
+      return;
+    }
+    setRedAutoAnimation();
+  }
+
+  public void displayAllianceColor() {
+    if (isBlue.getAsBoolean() == true) {
+      setBlue();
+      return;
+    }
+    setRed();
+  }
+
+  public void reset() {
+    if (isTeleOp.getAsBoolean()) {
+      displayAllianceColor();
+      return;
+    }
+    displayAllianceColorInAuto();
   }
 }

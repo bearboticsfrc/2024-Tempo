@@ -58,7 +58,6 @@ public class RobotContainer {
       new PowerDistributionSubsystem();
   private final DriveSubsystem driveSubsystem = new DriveSubsystem();
 
-  private final LightsSubsystem lightsSubsystem = new LightsSubsystem();
   private final ManipulatorSubsystem manipulatorSubsystem = new ManipulatorSubsystem();
   private final ObjectDetectionSubsystem objectDetectionSubsystem =
       new ObjectDetectionSubsystem(VisionConstants.OBJECT_DETECTION_CAMERA);
@@ -66,6 +65,7 @@ public class RobotContainer {
       new PoseEstimatorSubsystem(driveSubsystem, FieldPositions.getInstance());
 
   private boolean isTeleop;
+  private final LightsSubsystem lightsSubsystem = new LightsSubsystem(() -> this.isTeleop);
 
   private SendableChooser<Command> autoCommandChooser = new SendableChooser<>();
 
@@ -215,6 +215,10 @@ public class RobotContainer {
                         poseEstimatorSubsystem.getPose(),
                         FieldPositions.getInstance().getSpeakerCenter())));
 
+    new Trigger(() -> manipulatorSubsystem.isNoteInFeeder())
+        .onTrue(new InstantCommand(() -> lightsSubsystem.signalNoteInHolder()))
+        .onFalse(new InstantCommand(() -> lightsSubsystem.reset()));
+
     new Trigger(() -> manipulatorSubsystem.isNoteInRoller() && isTeleop)
         .onTrue(
             new InstantCommand(
@@ -271,7 +275,8 @@ public class RobotContainer {
 
     operatorController
         .a()
-        .onTrue(lightsSubsystem.signalSource());
+        .onTrue(new InstantCommand(() -> lightsSubsystem.signalSource()))
+        .onFalse(new InstantCommand((() -> lightsSubsystem.reset())));
   }
 
   /**
@@ -281,6 +286,8 @@ public class RobotContainer {
    */
   public void setTeleop(boolean mode) {
     isTeleop = mode;
+
+    lightsSubsystem.reset();
   }
 
   /**
