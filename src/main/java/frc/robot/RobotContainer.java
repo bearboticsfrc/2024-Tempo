@@ -34,6 +34,7 @@ import frc.robot.constants.DriveConstants.SpeedMode;
 import frc.robot.constants.RobotConstants;
 import frc.robot.constants.VisionConstants;
 import frc.robot.location.FieldPositions;
+import frc.robot.subsystems.BlinkinSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.PowerDistributionSubsystem;
 import frc.robot.subsystems.manipulator.IntakeSubsystem.IntakeSpeed;
@@ -57,11 +58,13 @@ public class RobotContainer {
   private final PowerDistributionSubsystem powerDistributionSubsystem =
       new PowerDistributionSubsystem();
   private final DriveSubsystem driveSubsystem = new DriveSubsystem();
+
   private final ManipulatorSubsystem manipulatorSubsystem = new ManipulatorSubsystem();
   private final ObjectDetectionSubsystem objectDetectionSubsystem =
       new ObjectDetectionSubsystem(VisionConstants.OBJECT_DETECTION_CAMERA);
   private final PoseEstimatorSubsystem poseEstimatorSubsystem =
       new PoseEstimatorSubsystem(driveSubsystem, FieldPositions.getInstance());
+  private final BlinkinSubsystem lightsSubsystem = new BlinkinSubsystem();
 
   private boolean isTeleop;
 
@@ -207,6 +210,10 @@ public class RobotContainer {
                 () -> -MathUtil.applyDeadband(powWithSign(driverController.getLeftX(), 2), 0.01),
                 () -> -MathUtil.applyDeadband(powWithSign(driverController.getLeftY(), 2), 0.01)));
 
+    new Trigger(() -> manipulatorSubsystem.isNoteInFeeder())
+        .onTrue(new InstantCommand(() -> lightsSubsystem.signalNoteInHolder()))
+        .onFalse(new InstantCommand(() -> lightsSubsystem.reset()));
+
     new Trigger(() -> manipulatorSubsystem.isNoteInRoller() && isTeleop)
         .onTrue(
             new InstantCommand(
@@ -263,8 +270,8 @@ public class RobotContainer {
 
     operatorController
         .a()
-        .whileTrue(manipulatorSubsystem.getAmpShootCommand())
-        .onFalse(manipulatorSubsystem.getShootStopCommand());
+        .onTrue(new InstantCommand(() -> lightsSubsystem.signalSource()))
+        .onFalse(new InstantCommand((() -> lightsSubsystem.reset())));
   }
 
   /**
@@ -274,6 +281,8 @@ public class RobotContainer {
    */
   public void setTeleop(boolean mode) {
     isTeleop = mode;
+
+    lightsSubsystem.reset();
   }
 
   /**
