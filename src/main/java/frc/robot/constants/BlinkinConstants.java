@@ -1,10 +1,10 @@
 package frc.robot.constants;
 
-public final class LightsConstants {
+public final class BlinkinConstants {
   public static final int FRONT_BLINKIN = 1;
   public static final int BACK_BLINKIN = 0;
 
-  public static enum BlinkinPattern {
+  public static enum Pattern {
     /*
      * Fixed Palette Pattern
      */
@@ -98,7 +98,7 @@ public final class LightsConstants {
 
     public final double value;
 
-    private BlinkinPattern(double value) {
+    private Pattern(double value) {
       this.value = value;
     }
   };
