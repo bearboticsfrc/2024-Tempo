@@ -6,13 +6,16 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix6.hardware.Pigeon2;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructPublisher;
@@ -34,6 +37,7 @@ import frc.robot.constants.SwerveModuleConstants.BackLeftConstants;
 import frc.robot.constants.SwerveModuleConstants.BackRightConstants;
 import frc.robot.constants.SwerveModuleConstants.FrontLeftConstants;
 import frc.robot.constants.SwerveModuleConstants.FrontRightConstants;
+import frc.robot.constants.VisionConstants;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
@@ -47,7 +51,7 @@ public class DriveSubsystem extends SubsystemBase {
   private final LinkedHashMap<SwerveCorner, SwerveModule> swerveModules = new LinkedHashMap<>();
   private final Pigeon2 pigeonImu = new Pigeon2(RobotConstants.PIGEON_CAN_ID);
 
-  private final SwerveDriveOdometry odometry;
+  private final SwerveDrivePoseEstimator odometry;
   private GenericEntry competitionTabMaxSpeedEntry;
 
   private double maxSpeed = DriveConstants.DRIVE_VELOCITY;
@@ -73,8 +77,13 @@ public class DriveSubsystem extends SubsystemBase {
     }
 
     odometry =
-        new SwerveDriveOdometry(
-            RobotConstants.DRIVE_KINEMATICS, getHeading(), getModulePositions());
+        new SwerveDrivePoseEstimator(
+            RobotConstants.DRIVE_KINEMATICS,
+            getHeading(),
+            getModulePositions(),
+            new Pose2d(),
+            VisionConstants.STATE_STD_DEVS,
+            VisionConstants.VISION_STD_DEVS);
 
     posePublisher =
         NetworkTableInstance.getDefault().getStructTopic("/drive/pose", Pose2d.struct).publish();
@@ -430,7 +439,7 @@ public class DriveSubsystem extends SubsystemBase {
 
     ChassisSpeeds chassisSpeeds =
         fieldRelative
-            ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rot, getHeading())
+            ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rot, getPose().getRotation())
             : new ChassisSpeeds(xSpeed, ySpeed, rot);
 
     SwerveModuleState[] swerveModuleStates =
@@ -532,7 +541,7 @@ public class DriveSubsystem extends SubsystemBase {
    * @return The pose.
    */
   public Pose2d getPose() {
-    return odometry.getPoseMeters();
+    return odometry.getEstimatedPosition();
   }
 
   /**
@@ -542,6 +551,10 @@ public class DriveSubsystem extends SubsystemBase {
    */
   public void resetOdometry(Pose2d pose) {
     odometry.resetPosition(getHeading(), getModulePositions(), pose);
+  }
+
+  public void addVisionMeasurement(Pose2d visionPose, double timestamp, Matrix<N3, N1> stdDevs) {
+    odometry.addVisionMeasurement(visionPose, timestamp, stdDevs);
   }
 
   /** Resets the IMU to a heading of zero. */

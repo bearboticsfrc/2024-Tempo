@@ -58,9 +58,13 @@ public class LocationHelper {
   }
 
   public static double getDistanceToPose(Pose2d fromPose, Pose2d toPose) {
-    return Math.sqrt(
-        Math.pow(fromPose.getX() - toPose.getX(), 2)
-            + Math.pow(fromPose.getY() - toPose.getY(), 2));
+    return Math.hypot(fromPose.getX() - toPose.getX(), fromPose.getY() - toPose.getY());
+  }
+
+  public static Rotation2d getRotationToTranslation(Pose2d fromPose, Translation2d translation) {
+    return new Rotation2d(
+            translation.getX() - fromPose.getX(), translation.getY() - fromPose.getY())
+        .minus(Rotation2d.fromDegrees(180));
   }
 
   public static Transform3d normalizeCameraAngle(Transform3d cameraToTarget) {

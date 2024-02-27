@@ -6,11 +6,12 @@ package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PIDConstants;
 import com.pathplanner.lib.util.ReplanningConfig;
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -34,6 +35,7 @@ import frc.robot.constants.DriveConstants.SpeedMode;
 import frc.robot.constants.RobotConstants;
 import frc.robot.constants.VisionConstants;
 import frc.robot.location.FieldPositions;
+import frc.robot.location.LocationHelper;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.PowerDistributionSubsystem;
 import frc.robot.subsystems.manipulator.IntakeSubsystem.IntakeSpeed;
@@ -41,7 +43,7 @@ import frc.robot.subsystems.manipulator.ManipulatorSubsystem;
 import frc.robot.subsystems.vision.ObjectDetectionSubsystem;
 import frc.robot.subsystems.vision.PoseEstimatorSubsystem;
 import java.util.Map;
-import java.util.Map.Entry;
+import java.util.Optional;
 
 /**
  * Constructs a new RobotContainer object. This constructor is responsible for initializing
@@ -64,20 +66,25 @@ public class RobotContainer {
       new PoseEstimatorSubsystem(driveSubsystem, FieldPositions.getInstance());
 
   private boolean isTeleop;
+  private boolean isAutoPathTargeting = false;
 
   private SendableChooser<Command> autoCommandChooser = new SendableChooser<>();
 
   private Map<String, Command> namedCommands =
       Map.of(
           "intakeAndShootPodium",
-              new SequentialCommandGroup(
-                  manipulatorSubsystem.getIntakeCommand(),
-                  manipulatorSubsystem.getPodiumShootCommand()),
+              new ScheduleCommand(
+                  new SequentialCommandGroup(
+                      manipulatorSubsystem.getIntakeCommand(),
+                      manipulatorSubsystem.getPodiumShootCommand())),
           "intake", manipulatorSubsystem.getIntakeCommand(),
-          "shootWingNote", manipulatorSubsystem.getPodiumShootCommand(),
-          "shootStage", manipulatorSubsystem.getStageShootCommand(),
+          "shootWingNote", new ScheduleCommand(manipulatorSubsystem.getPodiumShootCommand()),
+          "shootStage", new ScheduleCommand(manipulatorSubsystem.getStageShootCommand()),
+          "startAim", new InstantCommand(() -> this.setAutoPathTargeting(true)),
+          "stopAim", new InstantCommand(() -> this.setAutoPathTargeting(false)),
+          "subwooferShoot", new ScheduleCommand(manipulatorSubsystem.getSubwooferShootCommand()),
           "autoShoot",
-              new AutoShootCommand(driveSubsystem, manipulatorSubsystem, poseEstimatorSubsystem));
+              new ScheduleCommand(new AutoShootCommand(driveSubsystem, manipulatorSubsystem)));
 
   public RobotContainer() {
     setupShuffleboardTab(RobotConstants.COMPETITION_TAB);
@@ -108,17 +115,21 @@ public class RobotContainer {
         driveSubsystem::getRobotRelativeSpeeds,
         driveSubsystem::driveRobotRelative,
         new HolonomicPathFollowerConfig(
-            new PIDConstants(1.0, 0.0, 0.0),
-            new PIDConstants(1.0, 0.0, 0.0),
-            2.5,
-            0.4,
-            new ReplanningConfig()),
-        () -> AllianceColor.alliance == Alliance.Red,
+            new PIDConstants(1), new PIDConstants(1), 2.5, 0.4, new ReplanningConfig()),
+        AllianceColor::isRedAlliance,
         driveSubsystem);
 
-    for (Entry<String, Command> entry : namedCommands.entrySet()) {
-      NamedCommands.registerCommand(entry.getKey(), new ScheduleCommand(entry.getValue()));
-    }
+    NamedCommands.registerCommands(namedCommands);
+
+    PPHolonomicDriveController.setRotationTargetOverride(this::getRotationTargetOverride);
+  }
+
+  public Optional<Rotation2d> getRotationTargetOverride() {
+    return isAutoPathTargeting
+        ? Optional.of(
+            LocationHelper.getRotationToTranslation(
+                driveSubsystem.getPose(), FieldPositions.getInstance().getSpeakerTranslation()))
+        : Optional.empty();
   }
 
   /** Builds the list of autonomous command options for the SendableChooser. */
@@ -180,10 +191,10 @@ public class RobotContainer {
         .rightTrigger()
         .whileTrue(
             new AutoAimCommand(
-                driveSubsystem,
-                poseEstimatorSubsystem,
-                () -> -MathUtil.applyDeadband(powWithSign(driverController.getLeftX(), 2), 0.01),
-                () -> -MathUtil.applyDeadband(powWithSign(driverController.getLeftY(), 2), 0.01)));
+                    driveSubsystem,
+                    () -> getJoystickInput(driverController, JoystickAxis.Ly),
+                    () -> getJoystickInput(driverController, JoystickAxis.Lx))
+                .repeatedly());
 
     driverController.a().onTrue(new InstantCommand(() -> driveSubsystem.resetImu()));
 
@@ -201,11 +212,11 @@ public class RobotContainer {
         .rightBumper()
         .whileTrue(
             new AutoShootCommand(
-                driveSubsystem,
-                manipulatorSubsystem,
-                poseEstimatorSubsystem,
-                () -> -MathUtil.applyDeadband(powWithSign(driverController.getLeftX(), 2), 0.01),
-                () -> -MathUtil.applyDeadband(powWithSign(driverController.getLeftY(), 2), 0.01)));
+                    driveSubsystem,
+                    manipulatorSubsystem,
+                    () -> getJoystickInput(driverController, JoystickAxis.Ly),
+                    () -> getJoystickInput(driverController, JoystickAxis.Lx))
+                .repeatedly());
 
     new Trigger(() -> manipulatorSubsystem.isNoteInRoller() && isTeleop)
         .onTrue(
@@ -225,10 +236,34 @@ public class RobotContainer {
     return new RunCommand(
         () ->
             driveSubsystem.drive(
-                -MathUtil.applyDeadband(powWithSign(driverController.getLeftY(), 2), 0.01),
-                -MathUtil.applyDeadband(powWithSign(driverController.getLeftX(), 2), 0.01),
-                -MathUtil.applyDeadband(powWithSign(driverController.getRightX(), 2), 0.01)),
+                getJoystickInput(driverController, JoystickAxis.Ly),
+                getJoystickInput(driverController, JoystickAxis.Lx),
+                getJoystickInput(driverController, JoystickAxis.Rx)),
         driveSubsystem);
+  }
+
+  private double getJoystickInput(CommandXboxController controller, JoystickAxis axis) {
+    double rawInput;
+
+    switch (axis) {
+      case Ly:
+        rawInput = driverController.getLeftY();
+        break;
+      case Lx:
+        rawInput = driverController.getLeftX();
+        break;
+      case Ry:
+        rawInput = driverController.getRightY();
+        break;
+      case Rx:
+        rawInput = driverController.getRightX();
+        break;
+      default:
+        rawInput = 0;
+    }
+
+    double flippedInput = AllianceColor.isRedAlliance() ? -rawInput : rawInput;
+    return -MathUtil.applyDeadband(powWithSign(flippedInput, 2), 0.01);
   }
 
   /**
@@ -288,5 +323,16 @@ public class RobotContainer {
   /** Initializes the robot when transitioning to the disabled state. Resets controller rumble. */
   public void disabledInit() {
     driverController.getHID().setRumble(RumbleType.kBothRumble, 0);
+  }
+
+  public void setAutoPathTargeting(boolean isAutoPathTargeting) {
+    this.isAutoPathTargeting = isAutoPathTargeting;
+  }
+
+  private enum JoystickAxis {
+    Ly,
+    Lx,
+    Ry,
+    Rx;
   }
 }

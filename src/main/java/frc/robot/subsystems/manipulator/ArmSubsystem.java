@@ -74,6 +74,7 @@ public class ArmSubsystem extends SubsystemBase {
             .withMotorPort(ArmConstants.Motor.MOTOR_PORT)
             .withMotorInverted(ArmConstants.Motor.INVERTED)
             .withCurrentLimit(ArmConstants.Motor.CURRENT_LIMIT)
+            .withNominalVoltage(ArmConstants.Motor.NOMINAL_VOLTAGE)
             .withPositionConversionFactor(
                 ArmConstants.Motor.ABSOLUTE_ENCODER_POSITION_CONVERSION_FACTOR)
             .withVelocityConversionFactor(
@@ -241,18 +242,31 @@ public class ArmSubsystem extends SubsystemBase {
         targetState);
   }
 
-  private static double getPositionFromDistance(double distance) {
+  private double getPositionFromDistance(double distance) {
     if (distance <= 1.543) {
       return 0;
-    } else if (distance <= 3) {
-      return (44.5168 * Math.pow(distance, 0.519352)) - 55.7307;
-    } else if (distance <= 4) {
-      return (-6 * Math.pow(distance, 2)) + (49 * distance) - 70;
-    } else if (distance <= 5) {
-      return (-4.5 * Math.pow(distance, 2)) + (44.25 * distance) - 75;
-    } else if (distance <= 6) {
-      return (-2.3 * Math.pow(distance, 2)) + (25.45 * distance) - 36;
     }
+
+    double baseValue = 44.5168 * Math.pow(distance, 0.519352) - 50;
+
+    if (distance <= 1.8 || distance <= 2.2) {
+      return baseValue;
+    } else if (distance <= 2.5) {
+      return baseValue - 3;
+    } else if (distance <= 3) {
+      return baseValue - 4;
+    } else if (distance <= 3.4) {
+      return -6 * Math.pow(distance, 2) + 49 * distance - 70;
+    } else if (distance <= 4) {
+      return -6 * Math.pow(distance, 2) + 49 * distance - 71.5;
+    } else if (distance <= 4.5) {
+      return -4.5 * Math.pow(distance, 2) + 44.25 * distance - 75.5;
+    } else if (distance <= 5) {
+      return -4.5 * Math.pow(distance, 2) + 44.25 * distance - 75.8;
+    } else if (distance <= 6) {
+      return -2.3 * Math.pow(distance, 2) + 25.45 * distance - 35; // 36;
+    }
+
     return 0;
   }
 

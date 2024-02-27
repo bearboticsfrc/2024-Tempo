@@ -1,7 +1,8 @@
 package frc.robot.constants.manipulator;
 
 public class ShooterConstants {
-  public static final double VELOCITY_TOLERANCE = 25;
+  public static final double VELOCITY_TOLERANCE = 50;
+  public static final double VELOCITY_COMPENSATION = 100;
 
   public static class UpperMotor {
     public static final String NAME = "Upper Shooter Motor";

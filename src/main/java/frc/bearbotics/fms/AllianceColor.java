@@ -24,4 +24,8 @@ public class AllianceColor {
       listener.updateAllianceColor(alliance);
     }
   }
+
+  public static boolean isRedAlliance() {
+    return alliance == Alliance.Red;
+  }
 }

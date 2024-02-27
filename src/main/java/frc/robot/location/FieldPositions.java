@@ -17,13 +17,14 @@ public class FieldPositions implements AllianceReadyListener {
 
   public static double FIELD_LENGTH = 16.451; // meters
   public static double FIELD_WIDTH = 8.211; // meters
+  public static double TAG_OUTSIDE_FIELD = 0.04;
 
   private AprilTagFieldLayout layout;
 
   private static FieldPositions instance = null;
 
   public FieldPositions() {
-    this(AllianceColor.alliance == Alliance.Red);
+    this(AllianceColor.isRedAlliance());
   }
 
   public FieldPositions(boolean redOrigin) {
@@ -52,12 +53,12 @@ public class FieldPositions implements AllianceReadyListener {
   }
 
   public void updateAllianceColor(Alliance alliance) {
-    initializeLayout(AllianceColor.alliance == Alliance.Red);
+    initializeLayout(AllianceColor.isRedAlliance());
   }
 
   public double getWingY() {
     double wingY = 5.87;
-    if (AllianceColor.alliance == Alliance.Red) {
+    if (AllianceColor.isRedAlliance()) {
       wingY = FIELD_LENGTH - 5.87;
     }
     return wingY;
@@ -66,7 +67,7 @@ public class FieldPositions implements AllianceReadyListener {
   public Pose2d getW1() {
     double y = (FIELD_WIDTH / 2.0) + (1.45 * 2.0);
     double x = 2.90;
-    if (AllianceColor.alliance == Alliance.Red) {
+    if (AllianceColor.isRedAlliance()) {
       x = FIELD_LENGTH - x;
     }
     return new Pose2d(x, y, new Rotation2d());
@@ -75,7 +76,7 @@ public class FieldPositions implements AllianceReadyListener {
   public Pose2d getW2() {
     double y = FIELD_WIDTH / 2.0 + 1.45;
     double x = 2.90;
-    if (AllianceColor.alliance == Alliance.Red) {
+    if (AllianceColor.isRedAlliance()) {
       x = FIELD_LENGTH - x;
     }
     return new Pose2d(x, y, new Rotation2d());
@@ -84,7 +85,7 @@ public class FieldPositions implements AllianceReadyListener {
   public Pose2d getW3() {
     double y = FIELD_WIDTH / 2.0;
     double x = 2.90;
-    if (AllianceColor.alliance == Alliance.Red) {
+    if (AllianceColor.isRedAlliance()) {
       x = FIELD_LENGTH - x;
     }
     return new Pose2d(x, y, new Rotation2d());
@@ -123,7 +124,7 @@ public class FieldPositions implements AllianceReadyListener {
   public Pose2d getSpeakerCenter() {
     int tagId = VisionConstants.TAG.BLUE_SPEAKER_CENTER.getValue();
 
-    if (AllianceColor.alliance == Alliance.Red) {
+    if (AllianceColor.isRedAlliance()) {
       tagId = VisionConstants.TAG.RED_SPEAKER_CENTER.getValue();
     }
     return getTagPose(tagId);
@@ -132,7 +133,7 @@ public class FieldPositions implements AllianceReadyListener {
   public Pose2d getSpeakerOffset() {
     int tagId = VisionConstants.TAG.BLUE_SPEAKER_LEFT.getValue();
 
-    if (AllianceColor.alliance == Alliance.Red) {
+    if (AllianceColor.isRedAlliance()) {
       tagId = VisionConstants.TAG.RED_SPEAKER_RIGHT.getValue();
     }
     return getTagPose(tagId);
@@ -141,17 +142,27 @@ public class FieldPositions implements AllianceReadyListener {
   public Translation2d getSpeakerTranslation() {
     int tagId = VisionConstants.TAG.BLUE_SPEAKER_CENTER.getValue();
 
-    if (AllianceColor.alliance == Alliance.Red) {
+    if (AllianceColor.isRedAlliance()) {
       tagId = VisionConstants.TAG.RED_SPEAKER_CENTER.getValue();
     }
 
-    return getTagPose(tagId).getTranslation().plus(new Translation2d(0.2, 0));
+    return getTagPose(tagId).getTranslation().plus(getSpeakerTranslationOffset());
+  }
+
+  public Translation2d getSpeakerTranslationOffset() {
+    Translation2d translation = new Translation2d(0.2, 0);
+
+    if (AllianceColor.isRedAlliance()) {
+      translation = new Translation2d(-0.2, 0);
+    }
+
+    return translation;
   }
 
   public Pose2d getAmp() {
     int tagId = VisionConstants.TAG.BLUE_AMP.getValue();
 
-    if (AllianceColor.alliance == Alliance.Red) {
+    if (AllianceColor.isRedAlliance()) {
       tagId = VisionConstants.TAG.RED_AMP.getValue();
     }
     return getTagPose(tagId);
@@ -160,7 +171,7 @@ public class FieldPositions implements AllianceReadyListener {
   public Pose2d getSourceLeft() {
     int tagId = VisionConstants.TAG.BLUE_SOURCE_LEFT.getValue();
 
-    if (AllianceColor.alliance == Alliance.Red) {
+    if (AllianceColor.isRedAlliance()) {
       tagId = VisionConstants.TAG.RED_SOURCE_LEFT.getValue();
     }
     return getTagPose(tagId);
@@ -169,7 +180,7 @@ public class FieldPositions implements AllianceReadyListener {
   public Pose2d getSourceRight() {
     int tagId = VisionConstants.TAG.BLUE_SOURCE_RIGHT.getValue();
 
-    if (AllianceColor.alliance == Alliance.Red) {
+    if (AllianceColor.isRedAlliance()) {
       tagId = VisionConstants.TAG.RED_SOURCE_RIGHT.getValue();
     }
     return getTagPose(tagId);
@@ -178,7 +189,7 @@ public class FieldPositions implements AllianceReadyListener {
   public Pose2d getStageLeft() {
     int tagId = VisionConstants.TAG.BLUE_STAGE_LEFT.getValue();
 
-    if (AllianceColor.alliance == Alliance.Red) {
+    if (AllianceColor.isRedAlliance()) {
       tagId = VisionConstants.TAG.RED_STAGE_LEFT.getValue();
     }
     return getTagPose(tagId);
@@ -187,7 +198,7 @@ public class FieldPositions implements AllianceReadyListener {
   public Pose2d getStageCenter() {
     int tagId = VisionConstants.TAG.BLUE_STAGE_CENTER.getValue();
 
-    if (AllianceColor.alliance == Alliance.Red) {
+    if (AllianceColor.isRedAlliance()) {
       tagId = VisionConstants.TAG.RED_STAGE_CENTER.getValue();
     }
     return getTagPose(tagId);
@@ -196,7 +207,7 @@ public class FieldPositions implements AllianceReadyListener {
   public Pose2d getStageRight() {
     int tagId = VisionConstants.TAG.BLUE_STAGE_RIGHT.getValue();
 
-    if (AllianceColor.alliance == Alliance.Red) {
+    if (AllianceColor.isRedAlliance()) {
       tagId = VisionConstants.TAG.BLUE_STAGE_RIGHT.getValue();
     }
     return getTagPose(tagId);

@@ -6,6 +6,7 @@ import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFieldLayout.OriginPosition;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Transform3d;
 import frc.robot.location.FieldPositions;
 import java.util.concurrent.atomic.AtomicReference;
 import org.photonvision.EstimatedRobotPose;
@@ -13,6 +14,7 @@ import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 import org.photonvision.targeting.PhotonPipelineResult;
+import org.photonvision.targeting.PhotonTrackedTarget;
 
 public class EstimationRunnable implements Runnable {
   /** Runnable that gets AprilTag data from PhotonVision. */
@@ -49,14 +51,23 @@ public class EstimationRunnable implements Runnable {
       return;
     }
 
+    if (photonResults.targets.size() == 1) {
+      PhotonTrackedTarget target = photonResults.getTargets().get(0);
+      Transform3d t3d = target.getBestCameraToTarget();
+      double distance = Math.hypot(t3d.getX(), t3d.getY());
+
+      if (distance > 3.5) return;
+    }
+
     photonPoseEstimator
         .update(photonResults)
         .ifPresent(
             estimatedRobotPose -> {
               Pose3d estimatedPose = estimatedRobotPose.estimatedPose;
               // Make sure the measurement is on the field
-              if (estimatedPose.getX() > 0.0
-                  && estimatedPose.getX() <= (FieldPositions.FIELD_LENGTH + .1)
+              if (estimatedPose.getX() > -FieldPositions.TAG_OUTSIDE_FIELD
+                  && estimatedPose.getX()
+                      <= (FieldPositions.FIELD_LENGTH + FieldPositions.TAG_OUTSIDE_FIELD)
                   && estimatedPose.getY() > 0.0
                   && estimatedPose.getY() <= FieldPositions.FIELD_WIDTH) {
                 atomicEstimatedRobotPose.set(estimatedRobotPose);

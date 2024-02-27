@@ -123,10 +123,10 @@ public class ShooterSubsystem extends SubsystemBase {
     if (distance <= 2) {
       return 2200;
     } else if (distance >= 5) {
-      return 3500;
+      return 3600;
     }
 
-    return (17868.1 * Math.pow(distance, 0.070036)) - 16523.3;
+    return (17868.1 * Math.pow(distance, 0.070036)) - 16423.3;
   }
 
   public void set(DoubleSupplier distanceSupplier) {
@@ -148,7 +148,7 @@ public class ShooterSubsystem extends SubsystemBase {
    * @param velocity The desired velocity for the shooter motor.
    */
   public void set(double velocity) {
-    targetVelocity = velocity;
+    targetVelocity = (velocity += ShooterConstants.VELOCITY_COMPENSATION / 2);
 
     upperShooterMotor.getPIDController().setReference(velocity, ControlType.kVelocity);
     lowerShooterMotor.getPIDController().setReference(velocity, ControlType.kVelocity);

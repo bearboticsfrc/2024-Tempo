@@ -166,7 +166,7 @@ public class ManipulatorSubsystem extends SubsystemBase {
         new InstantCommand(() -> shooterSubsystem.stop()), getArmRunCommand(ArmPosition.HOME));
   }
 
-  private SequentialCommandGroup getShootCommand() {
+  public SequentialCommandGroup getShootCommand() {
     return new SequentialCommandGroup(getIntakeFeedCommand(), getShootStopCommand());
   }
 
@@ -206,6 +206,11 @@ public class ManipulatorSubsystem extends SubsystemBase {
         new ParallelCommandGroup(
             getArmPrepareCommand(distanceSupplier), getShooterPrepareCommand(distanceSupplier)),
         getShootCommand());
+  }
+
+  public ParallelCommandGroup getShooterPrepareCommad(DoubleSupplier distanceSupplier) {
+    return new ParallelCommandGroup(
+        getArmPrepareCommand(distanceSupplier), getShooterPrepareCommand(distanceSupplier));
   }
 
   public InstantCommand getArmRunCommand(ArmPosition position) {
