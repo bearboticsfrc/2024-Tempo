@@ -16,10 +16,8 @@ import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ScheduleCommand;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.bearbotics.fms.AllianceColor;
@@ -84,14 +82,14 @@ public class RobotContainer {
       Map.of(
           "intakeAndShootPodium",
               new ScheduleCommand(
-                  new SequentialCommandGroup(
+                  Commands.sequence(
                       manipulatorSubsystem.getIntakeCommand(),
                       manipulatorSubsystem.getPodiumShootCommand())),
           "intake", manipulatorSubsystem.getIntakeCommand(),
           "shootWingNote", new ScheduleCommand(manipulatorSubsystem.getPodiumShootCommand()),
           "shootStage", new ScheduleCommand(manipulatorSubsystem.getStageShootCommand()),
-          "startAim", new InstantCommand(() -> this.setAutoPathTargeting(true)),
-          "stopAim", new InstantCommand(() -> this.setAutoPathTargeting(false)),
+          "startAim", Commands.runOnce(() -> this.setAutoPathTargeting(true)),
+          "stopAim", Commands.runOnce(() -> this.setAutoPathTargeting(false)),
           "subwooferShoot", new ScheduleCommand(manipulatorSubsystem.getSubwooferShootCommand()),
           "autoShoot",
               new ScheduleCommand(new AutoShootCommand(driveSubsystem, manipulatorSubsystem)));
@@ -150,7 +148,7 @@ public class RobotContainer {
 
   /** Builds the list of autonomous command options for the SendableChooser. */
   private void buildAutoList() {
-    autoCommandChooser.addOption("0 - NoOp", new InstantCommand());
+    autoCommandChooser.addOption("0 - NoOp", Commands.none());
     autoCommandChooser.addOption("1 - MiddleC1C2", MiddleC1C2.get(manipulatorSubsystem));
     autoCommandChooser.addOption("2 - MidleTwoNote", MiddleTwoNote.get(manipulatorSubsystem));
     autoCommandChooser.addOption("3 - Sub1TwoNote", Sub1TwoNote.get(manipulatorSubsystem));
@@ -181,18 +179,16 @@ public class RobotContainer {
     driverController
         .leftStick()
         .whileTrue(
-            new InstantCommand(() -> driveSubsystem.setSpeedMode(SpeedMode.TURBO), driveSubsystem))
+            Commands.runOnce(() -> driveSubsystem.setSpeedMode(SpeedMode.TURBO), driveSubsystem))
         .onFalse(
-            new InstantCommand(
-                () -> driveSubsystem.setSpeedMode(SpeedMode.NORMAL), driveSubsystem));
+            Commands.runOnce(() -> driveSubsystem.setSpeedMode(SpeedMode.NORMAL), driveSubsystem));
 
     driverController
         .rightStick()
         .whileTrue(
-            new InstantCommand(() -> driveSubsystem.setSpeedMode(SpeedMode.TURTLE), driveSubsystem))
+            Commands.runOnce(() -> driveSubsystem.setSpeedMode(SpeedMode.TURTLE), driveSubsystem))
         .onFalse(
-            new InstantCommand(
-                () -> driveSubsystem.setSpeedMode(SpeedMode.NORMAL), driveSubsystem));
+            Commands.runOnce(() -> driveSubsystem.setSpeedMode(SpeedMode.NORMAL), driveSubsystem));
 
     driverController
         .leftBumper()
@@ -218,7 +214,7 @@ public class RobotContainer {
                     () -> getJoystickInput(driverController, JoystickAxis.Lx))
                 .repeatedly());
 
-    driverController.a().onTrue(new InstantCommand(() -> driveSubsystem.resetImu()));
+    driverController.a().onTrue(Commands.runOnce(() -> driveSubsystem.resetImu()));
 
     driverController
         .povLeft()
@@ -235,25 +231,23 @@ public class RobotContainer {
         .whileTrue(new AutoShootCommand(driveSubsystem, manipulatorSubsystem));
 
     new Trigger(() -> manipulatorSubsystem.isNoteInFeeder())
-        .onTrue(new InstantCommand(() -> blinkinSubsystem.signalNoteInHolder()))
-        .onFalse(new InstantCommand(() -> blinkinSubsystem.reset()));
+        .onTrue(Commands.runOnce(() -> blinkinSubsystem.signalNoteInHolder()))
+        .onFalse(Commands.runOnce(() -> blinkinSubsystem.reset()));
 
     new Trigger(() -> manipulatorSubsystem.isNoteInRoller() && isTeleop)
         .onTrue(
-            new InstantCommand(
-                () -> driverController.getHID().setRumble(RumbleType.kBothRumble, 1)))
+            Commands.runOnce(() -> driverController.getHID().setRumble(RumbleType.kBothRumble, 1)))
         .onFalse(
-            new InstantCommand(
-                () -> driverController.getHID().setRumble(RumbleType.kBothRumble, 0)));
+            Commands.runOnce(() -> driverController.getHID().setRumble(RumbleType.kBothRumble, 0)));
   }
 
   /**
-   * Returns the default RunCommand for driving the robot based on controller input.
+   * Returns the default Command for driving the robot based on controller input.
    *
    * @return The default RunCommand for driving the robot.
    */
-  private RunCommand getDefaultDriveSubsystemCommand() {
-    return new RunCommand(
+  private Command getDefaultDriveSubsystemCommand() {
+    return Commands.run(
         () ->
             driveSubsystem.drive(
                 getJoystickInput(driverController, JoystickAxis.Ly),
@@ -282,7 +276,7 @@ public class RobotContainer {
         rawInput = 0;
     }
 
-    double flippedInput = AllianceColor.isRedAlliance() ? -rawInput : rawInput;
+    double flippedInput = AllianceColor.isRedAlliance() && axis.isFlipped() ? -rawInput : rawInput;
     return -MathUtil.applyDeadband(powWithSign(flippedInput, 2), 0.01);
   }
 
@@ -318,8 +312,8 @@ public class RobotContainer {
 
     operatorController
         .a()
-        .onTrue(new InstantCommand(() -> blinkinSubsystem.signalSource()))
-        .onFalse(new InstantCommand((() -> blinkinSubsystem.reset())));
+        .onTrue(Commands.runOnce(() -> blinkinSubsystem.signalSource()))
+        .onFalse(Commands.runOnce((() -> blinkinSubsystem.reset())));
   }
 
   /**
@@ -356,5 +350,9 @@ public class RobotContainer {
     Lx,
     Ry,
     Rx;
+
+    public boolean isFlipped() {
+      return this == Ly || this == Lx;
+    }
   }
 }

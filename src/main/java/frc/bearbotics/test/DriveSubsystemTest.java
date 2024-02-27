@@ -4,10 +4,10 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.bearbotics.swerve.SwerveModule;
 import frc.robot.constants.SwerveModuleConstants;
 import frc.robot.subsystems.DriveSubsystem;
@@ -80,16 +80,16 @@ public class DriveSubsystemTest extends AbstractTestCommand {
             .toArray(SequentialCommandGroup[]::new));
   }
 
-  private SequentialCommandGroup getModuleTestCommand(SwerveModule module) {
+  private Command getModuleTestCommand(SwerveModule module) {
     Rotation2d initalSteerAngle = module.getRelativeAngle();
     SwerveModuleState newState =
         new SwerveModuleState(0.5, Rotation2d.fromDegrees(90).plus(driveSubsystem.getHeading()));
 
-    return new SequentialCommandGroup(
-        new InstantCommand(() -> module.set(newState)),
-        new WaitCommand(SwerveModuleConstants.TEST_WAIT),
-        new InstantCommand(() -> outcomes.put(module + " Drive", module.getDriveVelocity() != 0)),
-        new InstantCommand(
+    return Commands.sequence(
+        Commands.runOnce(() -> module.set(newState)),
+        Commands.waitSeconds(SwerveModuleConstants.TEST_WAIT),
+        Commands.runOnce(() -> outcomes.put(module + " Drive", module.getDriveVelocity() != 0)),
+        Commands.runOnce(
             () -> outcomes.put(module + " Pivot", module.getRelativeAngle() != initalSteerAngle)));
   }
 }
