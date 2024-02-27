@@ -23,9 +23,11 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.bearbotics.fms.AllianceColor;
 import frc.bearbotics.test.DriveSubsystemTest;
+import frc.robot.commands.AutoAimCommand;
 import frc.robot.commands.AutoShootCommand;
 import frc.robot.commands.auto.MiddleC1C2;
 import frc.robot.commands.auto.MiddleTwoNote;
+import frc.robot.commands.auto.Sub1TwoNote;
 import frc.robot.commands.auto.Sub3TwoNote;
 import frc.robot.constants.DriveConstants;
 import frc.robot.constants.DriveConstants.SpeedMode;
@@ -128,7 +130,7 @@ public class RobotContainer {
     autoCommandChooser.addOption("0 - NoOp", new InstantCommand());
     autoCommandChooser.addOption("1 - MiddleC1C2", MiddleC1C2.get(manipulatorSubsystem));
     autoCommandChooser.addOption("2 - MidleTwoNote", MiddleTwoNote.get(manipulatorSubsystem));
-    autoCommandChooser.addOption("3 - Sub1TwoNote", Sub3TwoNote.get(manipulatorSubsystem));
+    autoCommandChooser.addOption("3 - Sub1TwoNote", Sub1TwoNote.get(manipulatorSubsystem));
     autoCommandChooser.addOption("4 - Sub3TwoNote", Sub3TwoNote.get(manipulatorSubsystem));
 
     RobotConstants.COMPETITION_TAB
@@ -181,18 +183,11 @@ public class RobotContainer {
     driverController
         .rightTrigger()
         .whileTrue(
-            new RunCommand(
-                () ->
-                    driveSubsystem.aimAtPoint(
-                        () ->
-                            -MathUtil.applyDeadband(
-                                powWithSign(driverController.getLeftX(), 2), 0.01),
-                        () ->
-                            -MathUtil.applyDeadband(
-                                powWithSign(driverController.getLeftY(), 2), 0.01),
-                        () -> poseEstimatorSubsystem.getPose(),
-                        FieldPositions.getInstance().getSpeakerTranslation()),
-                driveSubsystem));
+            new AutoAimCommand(
+                driveSubsystem,
+                poseEstimatorSubsystem,
+                () -> -MathUtil.applyDeadband(powWithSign(driverController.getLeftX(), 2), 0.01),
+                () -> -MathUtil.applyDeadband(powWithSign(driverController.getLeftY(), 2), 0.01)));
 
     driverController.a().onTrue(new InstantCommand(() -> driveSubsystem.resetImu()));
 
@@ -209,11 +204,12 @@ public class RobotContainer {
     driverController
         .rightBumper()
         .whileTrue(
-            manipulatorSubsystem.getAutoShootCommand(
-                () ->
-                    LocationHelper.getDistanceToPose(
-                        poseEstimatorSubsystem.getPose(),
-                        FieldPositions.getInstance().getSpeakerCenter())));
+            new AutoShootCommand(
+                driveSubsystem,
+                manipulatorSubsystem,
+                poseEstimatorSubsystem,
+                () -> -MathUtil.applyDeadband(powWithSign(driverController.getLeftX(), 2), 0.01),
+                () -> -MathUtil.applyDeadband(powWithSign(driverController.getLeftY(), 2), 0.01)));
 
     new Trigger(() -> manipulatorSubsystem.isNoteInFeeder())
         .onTrue(new InstantCommand(() -> lightsSubsystem.signalNoteInHolder()))

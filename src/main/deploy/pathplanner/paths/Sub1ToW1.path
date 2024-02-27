@@ -16,12 +16,12 @@
     },
     {
       "anchor": {
-        "x": 2.719320017812645,
-        "y": 6.874261052373746
+        "x": 3.0221706157698036,
+        "y": 6.992561413694256
       },
       "prevControl": {
-        "x": 1.7707422576043426,
-        "y": 6.37069508090514
+        "x": 2.0735928555615013,
+        "y": 6.48899544222565
       },
       "nextControl": null,
       "isLocked": false,
@@ -41,6 +41,12 @@
             {
               "type": "named",
               "data": {
+                "name": "intake"
+              }
+            },
+            {
+              "type": "named",
+              "data": {
                 "name": "autoShoot"
               }
             }
@@ -57,7 +63,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 46.847610265994554,
+    "rotation": 19.855214369321065,
     "rotateFast": false
   },
   "reversed": false,

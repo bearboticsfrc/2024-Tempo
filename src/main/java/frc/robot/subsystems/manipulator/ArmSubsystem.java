@@ -24,7 +24,7 @@ import frc.robot.util.RevUtil;
 import java.util.function.DoubleSupplier;
 
 public class ArmSubsystem extends SubsystemBase {
-  private final double ARM_POSITION_COMPENSATION = 2.5;
+  private final double ARM_POSITION_COMPENSATION = 4;
 
   private CANSparkMax armMotor;
 
