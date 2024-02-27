@@ -267,7 +267,7 @@ public class ArmSubsystem extends SubsystemBase {
       return -2.3 * Math.pow(distance, 2) + 25.45 * distance - 35; // 36;
     }
 
-    return 0;
+    throw new IllegalArgumentException("Distance must be in a range of [0, inf)!");
   }
 
   /** Enum representing different positions of the arm. */

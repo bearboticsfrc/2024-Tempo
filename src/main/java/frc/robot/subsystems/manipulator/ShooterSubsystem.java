@@ -5,6 +5,7 @@ import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkFlex;
 import com.revrobotics.CANSparkLowLevel;
 import com.revrobotics.RelativeEncoder;
+import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.bearbotics.motor.MotorBuilder;
@@ -120,6 +121,7 @@ public class ShooterSubsystem extends SubsystemBase {
   }
 
   private double getVelocityFromDistance(double distance) {
+    DataLogManager.log("Distance -> " + distance);
     if (distance <= 2) {
       return 2200;
     } else if (distance >= 5) {

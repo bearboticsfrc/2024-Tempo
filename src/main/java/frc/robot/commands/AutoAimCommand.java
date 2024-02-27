@@ -37,7 +37,8 @@ public class AutoAimCommand extends Command {
   public AutoAimCommand(DriveSubsystem driveSubsystem) {
     this.driveSubsystem = driveSubsystem;
 
-    aimPidController.setTolerance(2.5);
+    aimPidController.setTolerance(2);
+
     addRequirements(driveSubsystem);
   }
 
@@ -77,6 +78,6 @@ public class AutoAimCommand extends Command {
             currentPose.get().getRotation().plus(Rotation2d.fromRadians(Math.PI)).getDegrees(),
             targetRotation.getDegrees());
 
-    driveSubsystem.drive(xRequest.getAsDouble(), yRequest.getAsDouble(), rotateOutput);
+    driveSubsystem.drive(yRequest.getAsDouble(), xRequest.getAsDouble(), rotateOutput);
   }
 }

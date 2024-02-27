@@ -1,8 +1,6 @@
 package frc.robot.commands;
 
-import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.location.FieldPositions;
@@ -23,11 +21,13 @@ public class AutoShootCommand extends SequentialCommandGroup {
       DoubleSupplier xSupplier,
       DoubleSupplier ySupplier) {
     addCommands(
+        driveSubsystem.getDriveStopCommand(),
         new ParallelCommandGroup(
-            new AutoAimCommand(driveSubsystem, xSupplier, ySupplier),
+            new AutoAimCommand(driveSubsystem),
             getShooterPrepareCommand(manipulatorSubsystem, driveSubsystem)),
-        new InstantCommand(() -> DataLogManager.log("Auto aim + shooter prepare finished.")),
         manipulatorSubsystem.getShootCommand());
+
+    addRequirements(driveSubsystem, manipulatorSubsystem);
   }
 
   private Command getShooterPrepareCommand(

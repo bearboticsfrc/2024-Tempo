@@ -63,8 +63,7 @@ public class LocationHelper {
 
   public static Rotation2d getRotationToTranslation(Pose2d fromPose, Translation2d translation) {
     return new Rotation2d(
-            translation.getX() - fromPose.getX(), translation.getY() - fromPose.getY())
-        .minus(Rotation2d.fromDegrees(180));
+        translation.getX() - fromPose.getX(), translation.getY() - fromPose.getY());
   }
 
   public static Transform3d normalizeCameraAngle(Transform3d cameraToTarget) {

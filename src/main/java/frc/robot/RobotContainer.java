@@ -57,15 +57,22 @@ public class RobotContainer {
   private final CommandXboxController operatorController =
       new CommandXboxController(DriveConstants.OPERATOR_CONTROLLER_PORT);
 
+  @SuppressWarnings("unused")
   private final PowerDistributionSubsystem powerDistributionSubsystem =
       new PowerDistributionSubsystem();
+
   private final DriveSubsystem driveSubsystem = new DriveSubsystem();
 
   private final ManipulatorSubsystem manipulatorSubsystem = new ManipulatorSubsystem();
+
+  @SuppressWarnings("unused")
   private final ObjectDetectionSubsystem objectDetectionSubsystem =
       new ObjectDetectionSubsystem(VisionConstants.OBJECT_DETECTION_CAMERA);
+
+  @SuppressWarnings("unused")
   private final PoseEstimatorSubsystem poseEstimatorSubsystem =
       new PoseEstimatorSubsystem(driveSubsystem, FieldPositions.getInstance());
+
   private final BlinkinSubsystem blinkinSubsystem = new BlinkinSubsystem();
 
   private boolean isTeleop;
@@ -105,6 +112,11 @@ public class RobotContainer {
    */
   private void setupShuffleboardTab(ShuffleboardTab tab) {
     tab.add("Home Climber", manipulatorSubsystem.getClimberHomeCommand());
+    tab.addDouble(
+        "Distance to Speaker",
+        () ->
+            LocationHelper.getDistanceToPose(
+                driveSubsystem.getPose(), FieldPositions.getInstance().getSpeakerCenter()));
   }
 
   /**
@@ -131,7 +143,8 @@ public class RobotContainer {
     return isAutoPathTargeting
         ? Optional.of(
             LocationHelper.getRotationToTranslation(
-                driveSubsystem.getPose(), FieldPositions.getInstance().getSpeakerTranslation()))
+                    driveSubsystem.getPose(), FieldPositions.getInstance().getSpeakerTranslation())
+                .minus(Rotation2d.fromDegrees(180)))
         : Optional.empty();
   }
 
@@ -167,13 +180,19 @@ public class RobotContainer {
 
     driverController
         .leftStick()
-        .whileTrue(new InstantCommand(() -> driveSubsystem.setSpeedMode(SpeedMode.TURBO)))
-        .onFalse(new InstantCommand(() -> driveSubsystem.setSpeedMode(SpeedMode.NORMAL)));
+        .whileTrue(
+            new InstantCommand(() -> driveSubsystem.setSpeedMode(SpeedMode.TURBO), driveSubsystem))
+        .onFalse(
+            new InstantCommand(
+                () -> driveSubsystem.setSpeedMode(SpeedMode.NORMAL), driveSubsystem));
 
     driverController
         .rightStick()
-        .whileTrue(new InstantCommand(() -> driveSubsystem.setSpeedMode(SpeedMode.TURTLE)))
-        .onFalse(new InstantCommand(() -> driveSubsystem.setSpeedMode(SpeedMode.NORMAL)));
+        .whileTrue(
+            new InstantCommand(() -> driveSubsystem.setSpeedMode(SpeedMode.TURTLE), driveSubsystem))
+        .onFalse(
+            new InstantCommand(
+                () -> driveSubsystem.setSpeedMode(SpeedMode.NORMAL), driveSubsystem));
 
     driverController
         .leftBumper()
@@ -213,17 +232,7 @@ public class RobotContainer {
 
     driverController
         .rightBumper()
-        .whileTrue(
-            new AutoShootCommand(
-                    driveSubsystem,
-                    manipulatorSubsystem,
-                    () -> getJoystickInput(driverController, JoystickAxis.Ly),
-                    () -> getJoystickInput(driverController, JoystickAxis.Lx))
-                .repeatedly());
-
-    new Trigger(() -> manipulatorSubsystem.isNoteInFeeder())
-        .onTrue(new InstantCommand(() -> blinkinSubsystem.signalNoteInHolder()))
-        .onFalse(new InstantCommand(() -> blinkinSubsystem.reset()));
+        .whileTrue(new AutoShootCommand(driveSubsystem, manipulatorSubsystem));
 
     new Trigger(() -> manipulatorSubsystem.isNoteInFeeder())
         .onTrue(new InstantCommand(() -> blinkinSubsystem.signalNoteInHolder()))

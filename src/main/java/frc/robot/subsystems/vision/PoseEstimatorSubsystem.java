@@ -25,10 +25,7 @@ public class PoseEstimatorSubsystem extends SubsystemBase {
 
   private List<VisionCamera> cameras = new ArrayList<VisionCamera>();
 
-  private Pose2d initialPose = new Pose2d();
-
   private StructPublisher<Pose2d> fusedPosePublisher;
-  private StructPublisher<Pose2d> drivePosePublisher;
 
   private List<Notifier> notifiers = new ArrayList<Notifier>();
   private List<EstimationRunnable> estimationRunnables = new ArrayList<EstimationRunnable>();
@@ -81,16 +78,7 @@ public class PoseEstimatorSubsystem extends SubsystemBase {
     fusedPosePublisher =
         NetworkTableInstance.getDefault().getStructTopic("/vision/pose", Pose2d.struct).publish();
 
-    drivePosePublisher =
-        NetworkTableInstance.getDefault()
-            .getStructTopic("/vision/drivePose", Pose2d.struct)
-            .publish();
-
     tab.addString("Pose", () -> StringFormatting.poseToString(driveSubsystem.getPose()));
-  }
-
-  public void setInitialPose(Pose2d pose) {
-    this.initialPose = pose;
   }
 
   @Override
@@ -148,9 +136,14 @@ public class PoseEstimatorSubsystem extends SubsystemBase {
 
   public void estimatorChecker(EstimationRunnable estamator) {
     EstimatedRobotPose robotPose = estamator.getLatestEstimatedPose();
+
+    if (robotPose == null) {
+      return;
+    }
+
     Pose2d visionPose = robotPose.estimatedPose.toPose2d();
 
     driveSubsystem.addVisionMeasurement(
-        visionPose, robotPose.timestampSeconds, VisionConstants.VISION_STD_DEVS);
+        visionPose, robotPose.timestampSeconds, confidenceCalculator(robotPose));
   }
 }

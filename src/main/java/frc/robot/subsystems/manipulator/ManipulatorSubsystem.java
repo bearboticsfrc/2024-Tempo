@@ -208,9 +208,12 @@ public class ManipulatorSubsystem extends SubsystemBase {
         getShootCommand());
   }
 
-  public ParallelCommandGroup getShooterPrepareCommad(DoubleSupplier distanceSupplier) {
-    return new ParallelCommandGroup(
-        getArmPrepareCommand(distanceSupplier), getShooterPrepareCommand(distanceSupplier));
+  public ConditionalCommand getShooterPrepareCommad(DoubleSupplier distanceSupplier) {
+    return new ConditionalCommand(
+        new ParallelCommandGroup(
+            getArmPrepareCommand(distanceSupplier), getShooterPrepareCommand(distanceSupplier)),
+        new InstantCommand(),
+        this::isNoteInFeeder);
   }
 
   public InstantCommand getArmRunCommand(ArmPosition position) {
