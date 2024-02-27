@@ -66,7 +66,7 @@ public class RobotContainer {
       new ObjectDetectionSubsystem(VisionConstants.OBJECT_DETECTION_CAMERA);
   private final PoseEstimatorSubsystem poseEstimatorSubsystem =
       new PoseEstimatorSubsystem(driveSubsystem, FieldPositions.getInstance());
-  private final BlinkinSubsystem lightsSubsystem = new BlinkinSubsystem();
+  private final BlinkinSubsystem blinkinSubsystem = new BlinkinSubsystem();
 
   private boolean isTeleop;
   private boolean isAutoPathTargeting = false;
@@ -222,12 +222,12 @@ public class RobotContainer {
                 .repeatedly());
 
     new Trigger(() -> manipulatorSubsystem.isNoteInFeeder())
-        .onTrue(new InstantCommand(() -> lightsSubsystem.signalNoteInHolder()))
-        .onFalse(new InstantCommand(() -> lightsSubsystem.reset()));
+        .onTrue(new InstantCommand(() -> blinkinSubsystem.signalNoteInHolder()))
+        .onFalse(new InstantCommand(() -> blinkinSubsystem.reset()));
 
     new Trigger(() -> manipulatorSubsystem.isNoteInFeeder())
-        .onTrue(new InstantCommand(() -> lightsSubsystem.signalNoteInHolder()))
-        .onFalse(new InstantCommand(() -> lightsSubsystem.reset()));
+        .onTrue(new InstantCommand(() -> blinkinSubsystem.signalNoteInHolder()))
+        .onFalse(new InstantCommand(() -> blinkinSubsystem.reset()));
 
     new Trigger(() -> manipulatorSubsystem.isNoteInRoller() && isTeleop)
         .onTrue(
@@ -309,8 +309,8 @@ public class RobotContainer {
 
     operatorController
         .a()
-        .onTrue(new InstantCommand(() -> lightsSubsystem.signalSource()))
-        .onFalse(new InstantCommand((() -> lightsSubsystem.reset())));
+        .onTrue(new InstantCommand(() -> blinkinSubsystem.signalSource()))
+        .onFalse(new InstantCommand((() -> blinkinSubsystem.reset())));
   }
 
   /**
@@ -321,7 +321,7 @@ public class RobotContainer {
   public void setTeleop(boolean mode) {
     isTeleop = mode;
 
-    lightsSubsystem.reset();
+    blinkinSubsystem.reset();
   }
 
   /**
