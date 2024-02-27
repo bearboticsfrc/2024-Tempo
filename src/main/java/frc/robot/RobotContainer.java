@@ -33,8 +33,8 @@ import frc.robot.constants.RobotConstants;
 import frc.robot.constants.VisionConstants;
 import frc.robot.location.FieldPositions;
 import frc.robot.location.LocationHelper;
+import frc.robot.subsystems.BlinkinSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
-import frc.robot.subsystems.LightsSubsystem;
 import frc.robot.subsystems.PowerDistributionSubsystem;
 import frc.robot.subsystems.manipulator.IntakeSubsystem.IntakeSpeed;
 import frc.robot.subsystems.manipulator.ManipulatorSubsystem;
@@ -63,9 +63,9 @@ public class RobotContainer {
       new ObjectDetectionSubsystem(VisionConstants.OBJECT_DETECTION_CAMERA);
   private final PoseEstimatorSubsystem poseEstimatorSubsystem =
       new PoseEstimatorSubsystem(driveSubsystem, FieldPositions.getInstance());
+  private final BlinkinSubsystem lightsSubsystem = new BlinkinSubsystem();
 
   private boolean isTeleop;
-  private final LightsSubsystem lightsSubsystem = new LightsSubsystem(() -> this.isTeleop);
 
   private SendableChooser<Command> autoCommandChooser = new SendableChooser<>();
 

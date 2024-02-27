@@ -1,8 +1,8 @@
 package frc.robot.constants;
 
 public final class LightsConstants {
-  public static final int lightPortFront = 1;
-  public static final int lightPortBack = 0;
+  public static final int FRONT_BLINKIN = 1;
+  public static final int BACK_BLINKIN = 0;
 
   public static enum BlinkinPattern {
     /*
