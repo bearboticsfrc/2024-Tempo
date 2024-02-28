@@ -15,7 +15,7 @@ import java.io.IOException;
 
 public class FieldPositions implements AllianceReadyListener {
 
-  public static double FIELD_LENGTH = 16.451; // meters
+  public static double FIELD_LENGTH = 16.541; // meters
   public static double FIELD_WIDTH = 8.211; // meters
   public static double TAG_OUTSIDE_FIELD = 0.04;
 

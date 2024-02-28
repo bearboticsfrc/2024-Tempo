@@ -14,13 +14,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Sub3ToW3"
+            "pathName": "Sub3ToW3NoShoot"
           }
         },
         {
           "type": "wait",
           "data": {
-            "waitTime": 1.0
+            "waitTime": 0.5
           }
         }
       ]

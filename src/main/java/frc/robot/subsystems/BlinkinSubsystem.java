@@ -37,16 +37,6 @@ public class BlinkinSubsystem extends SubsystemBase {
   }
 
   /**
-   * Sets the color of a single Blinkin LED controller.
-   *
-   * @param blinkin The Spark controller representing a Blinkin LED.
-   * @param color The desired color from the BlinkinConstants.Color enum.
-   */
-  public void setColor(Spark blinkin, BlinkinConstants.Color color) {
-    blinkin.set(color.value);
-  }
-
-  /**
    * Sets the pattern of the specified list of Blinkin LED controllers.
    *
    * @param blinkins The list of Spark controllers representing Blinkin LEDs.
@@ -56,16 +46,6 @@ public class BlinkinSubsystem extends SubsystemBase {
     for (Spark blinkin : blinkins) {
       blinkin.set(blinkinPattern.value);
     }
-  }
-
-  /**
-   * Sets the pattern of a single Blinkin LED controller.
-   *
-   * @param blinkin The Spark controller representing a Blinkin LED.
-   * @param blinkinPattern The desired pattern from the BlinkinConstants.BlinkinPattern enum.
-   */
-  public void setPattern(Spark blinkin, BlinkinConstants.Pattern blinkinPattern) {
-    blinkin.set(blinkinPattern.value);
   }
 
   /** Signals the Blinkin LED controllers to display a strobing gold pattern. */

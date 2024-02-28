@@ -1,13 +1,10 @@
 package frc.robot.commands;
 
-import edu.wpi.first.math.controller.ProfiledPIDController;
-import edu.wpi.first.math.filter.Debouncer;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.constants.RobotConstants;
 import frc.robot.location.FieldPositions;
 import frc.robot.location.LocationHelper;
 import frc.robot.subsystems.DriveSubsystem;
@@ -16,13 +13,8 @@ import java.util.function.Supplier;
 
 public class AutoAimCommand extends Command {
   private final DriveSubsystem driveSubsystem;
-  public static final TrapezoidProfile.Constraints AIM_PID_CONSTRAINTS =
-      new TrapezoidProfile.Constraints(720, 225);
 
-  private final ProfiledPIDController aimPidController =
-      new ProfiledPIDController(0.0025, 0, 0, AIM_PID_CONSTRAINTS, RobotConstants.CYCLE_TIME);
-
-  private final Debouncer setpointDebouncer = new Debouncer(0.25);
+  private PIDController aimPidController = new PIDController(0.0025, 0, 0);
 
   private DoubleSupplier xSupplier = () -> 0.0;
   private DoubleSupplier ySupplier = () -> 0.0;
@@ -38,7 +30,6 @@ public class AutoAimCommand extends Command {
     this.driveSubsystem = driveSubsystem;
 
     aimPidController.setTolerance(2);
-
     addRequirements(driveSubsystem);
   }
 
@@ -53,7 +44,7 @@ public class AutoAimCommand extends Command {
 
   @Override
   public boolean isFinished() {
-    return setpointDebouncer.calculate(aimPidController.atSetpoint());
+    return aimPidController.atSetpoint();
   }
 
   /**
@@ -75,7 +66,7 @@ public class AutoAimCommand extends Command {
 
     double rotateOutput =
         aimPidController.calculate(
-            currentPose.get().getRotation().plus(Rotation2d.fromRadians(Math.PI)).getDegrees(),
+            currentPose.get().getRotation().plus(Rotation2d.fromDegrees(180)).getDegrees(),
             targetRotation.getDegrees());
 
     driveSubsystem.drive(yRequest.getAsDouble(), xRequest.getAsDouble(), rotateOutput);

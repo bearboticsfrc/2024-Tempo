@@ -78,9 +78,10 @@ public class ManipulatorSubsystem extends SubsystemBase {
    */
   public Command getClimberHomeCommand() {
     return Commands.sequence(
-        Commands.run(() -> climberSubsystem.set(-0.5), this),
-        Commands.waitUntil(climberSubsystem::isClimberHome),
-        Commands.run(() -> climberSubsystem.stop(), this));
+            Commands.run(() -> climberSubsystem.set(-0.5), this),
+            Commands.waitUntil(climberSubsystem::isClimberHome),
+            Commands.run(() -> climberSubsystem.stop(), this))
+        .withName("Home Climber");
   }
 
   /**

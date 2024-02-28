@@ -5,7 +5,6 @@ import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkFlex;
 import com.revrobotics.CANSparkLowLevel;
 import com.revrobotics.RelativeEncoder;
-import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.bearbotics.motor.MotorBuilder;
@@ -13,7 +12,6 @@ import frc.bearbotics.motor.MotorConfig;
 import frc.bearbotics.motor.MotorPidBuilder;
 import frc.robot.constants.RobotConstants;
 import frc.robot.constants.manipulator.ShooterConstants;
-import frc.robot.util.TunableNumber;
 import java.util.function.DoubleSupplier;
 
 public class ShooterSubsystem extends SubsystemBase {
@@ -24,8 +22,6 @@ public class ShooterSubsystem extends SubsystemBase {
   private RelativeEncoder lowerShooterMotorEncoder;
 
   private double targetVelocity;
-
-  private TunableNumber tunableNumber = new TunableNumber("Shooter Velocity", 0);
 
   public ShooterSubsystem() {
     configureMotors();
@@ -100,28 +96,18 @@ public class ShooterSubsystem extends SubsystemBase {
     shuffleboardTab.addBoolean("At Target Velocity?", this::atTargetVelocity);
   }
 
-  @Override
-  public void periodic() {
-    if (tunableNumber.hasChanged()) {
-      set(tunableNumber.get());
-    }
-  }
-
   /**
    * Check if the shooter motor is at the target velocity within a specified tolerance.
    *
    * @return True if the shooter motor is at the target velocity, false otherwise.
    */
   public boolean atTargetVelocity() {
-    return Math.abs(
-            targetVelocity
-                - (lowerShooterMotorEncoder.getVelocity() + upperShooterMotorEncoder.getVelocity())
-                    / 2)
+    return targetVelocity
+            - (lowerShooterMotorEncoder.getVelocity() + upperShooterMotorEncoder.getVelocity()) / 2
         < ShooterConstants.VELOCITY_TOLERANCE;
   }
 
   private double getVelocityFromDistance(double distance) {
-    DataLogManager.log("Distance -> " + distance);
     if (distance <= 2) {
       return 2200;
     } else if (distance >= 5) {

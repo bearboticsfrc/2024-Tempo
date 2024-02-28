@@ -16,12 +16,28 @@
     },
     {
       "anchor": {
-        "x": 2.5905008158090483,
-        "y": 4.286166175756032
+        "x": 2.7076091812668635,
+        "y": 4.344720358484939
       },
       "prevControl": {
-        "x": 2.613922488900611,
-        "y": 4.227611993027124
+        "x": 2.7310308543584263,
+        "y": 4.286166175756032
+      },
+      "nextControl": {
+        "x": 2.6841875081753006,
+        "y": 4.403274541213847
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 1.3725738150477713,
+        "y": 5.492382339971527
+      },
+      "prevControl": {
+        "x": 2.1337781905235698,
+        "y": 4.871708003045107
       },
       "nextControl": null,
       "isLocked": false,
@@ -47,6 +63,29 @@
           ]
         }
       }
+    },
+    {
+      "name": "shoot",
+      "waypointRelativePos": 1.8,
+      "command": {
+        "type": "sequential",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "subwooferShoot"
+              }
+            },
+            {
+              "type": "wait",
+              "data": {
+                "waitTime": 1.0
+              }
+            }
+          ]
+        }
+      }
     }
   ],
   "globalConstraints": {
@@ -57,7 +96,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -32.47119229084855,
+    "rotation": 0.0,
     "rotateFast": false
   },
   "reversed": false,

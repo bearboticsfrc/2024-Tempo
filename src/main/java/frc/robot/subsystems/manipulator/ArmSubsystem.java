@@ -24,7 +24,7 @@ import frc.robot.util.RevUtil;
 import java.util.function.DoubleSupplier;
 
 public class ArmSubsystem extends SubsystemBase {
-  private final double ARM_POSITION_COMPENSATION = 4;
+  private final double ARM_POSITION_COMPENSATION = -2;
 
   private CANSparkMax armMotor;
 
@@ -217,7 +217,7 @@ public class ArmSubsystem extends SubsystemBase {
   }
 
   public void set(DoubleSupplier distanceSupplier) {
-    set((getPositionFromDistance(distanceSupplier.getAsDouble()) + ARM_POSITION_COMPENSATION));
+    set(getPositionFromDistance(distanceSupplier.getAsDouble()));
   }
 
   /**
@@ -242,7 +242,7 @@ public class ArmSubsystem extends SubsystemBase {
         targetState);
   }
 
-  private double getPositionFromDistance(double distance) {
+  /*private double getPositionFromDistance(double distance) {
     if (distance <= 1.543) {
       return 0;
     }
@@ -268,14 +268,63 @@ public class ArmSubsystem extends SubsystemBase {
     }
 
     throw new IllegalArgumentException("Distance must be in a range of [0, inf)!");
+  }*/
+
+  private double getPositionFromDistance(double distance) {
+    if (distance <= 1.54) {
+      return 0;
+    } else if (distance <= 2.46) {
+      return (-20.184544405997 * Math.pow(distance, 2))
+          + (97.445213379467 * distance)
+          - 96.066435986155;
+    } else if (distance <= 2.97) {
+      return (-4.6136101499431 * Math.pow(distance, 2))
+          + (37.01268742792 * distance)
+          - 41.631487889285
+          + 1;
+    } else if (distance <= 3.26) {
+      return (4.3779580797881 * Math.pow(distance, 2))
+          - (19.10226504394 * distance)
+          + 45.716196754614
+          + 1;
+    } else if (distance <= 3.63) {
+      return (16.714082503539 * Math.pow(distance, 2))
+          - (111.48435277371 * distance)
+          + 215.77840682767
+          + 1;
+    } else if (distance <= 3.97) {
+      return (-5.8562091503112 * Math.pow(distance, 2))
+          + (47.860130718825 * distance)
+          - 65.235592156593
+          + 1;
+    } else if (distance <= 4.3) {
+      return (-13.921166552737 * Math.pow(distance, 2))
+          + (124.91592617901 * distance)
+          - 244.03611300964
+          + 0.5;
+    } else if (distance <= 4.71) {
+      return (1.0365853658576 * Math.pow(distance, 2))
+          - (4.7054878048905 * distance)
+          + 36.767134146455;
+    } else if (distance <= 5.25) {
+      return (2.4521072796883 * Math.pow(distance, 2))
+          - (23.311877394612 * distance)
+          + 93.001149425188
+          - 2;
+    } else {
+      return (2.4521072796883 * Math.pow(distance, 2))
+          - (23.311877394612 * distance)
+          + 93.001149425188
+          - 2;
+    }
   }
 
   /** Enum representing different positions of the arm. */
   public enum ArmPosition {
     HOME(Rotation2d.fromDegrees(0)),
-    PODIUM_SHOOT(Rotation2d.fromDegrees(27)),
+    PODIUM_SHOOT(Rotation2d.fromDegrees(28)),
     AMP_SHOOT(Rotation2d.fromDegrees(80)),
-    STAGE_SHOOT(Rotation2d.fromDegrees(33.75)),
+    STAGE_SHOOT(Rotation2d.fromDegrees(36)),
     SHOOT(Rotation2d.fromDegrees(90));
 
     private final Rotation2d angle;

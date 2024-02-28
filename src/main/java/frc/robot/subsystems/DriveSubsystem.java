@@ -432,9 +432,7 @@ public class DriveSubsystem extends SubsystemBase {
 
     if (maxSpeed == SpeedMode.TURTLE.getMaxSpeed()) {
       rot /= 18;
-    } else if (maxSpeed == SpeedMode.TURBO.getMaxSpeed()) {
-      rot /= 4;
-    } // TODO: refactor. Maybe make maxSpeed into a SpeedMode enum and handle logic within?
+    }
 
     ChassisSpeeds chassisSpeeds =
         fieldRelative
