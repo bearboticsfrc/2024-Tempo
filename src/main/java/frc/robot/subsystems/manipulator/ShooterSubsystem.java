@@ -12,7 +12,6 @@ import frc.bearbotics.motor.MotorConfig;
 import frc.bearbotics.motor.MotorPidBuilder;
 import frc.robot.constants.RobotConstants;
 import frc.robot.constants.manipulator.ShooterConstants;
-import frc.robot.util.TunableNumber;
 import java.util.function.DoubleSupplier;
 
 public class ShooterSubsystem extends SubsystemBase {
@@ -23,8 +22,6 @@ public class ShooterSubsystem extends SubsystemBase {
   private RelativeEncoder lowerShooterMotorEncoder;
 
   private double targetVelocity;
-
-  private TunableNumber tunableNumber = new TunableNumber("Shooter Velocity", 0);
 
   public ShooterSubsystem() {
     configureMotors();
@@ -99,23 +96,14 @@ public class ShooterSubsystem extends SubsystemBase {
     shuffleboardTab.addBoolean("At Target Velocity?", this::atTargetVelocity);
   }
 
-  @Override
-  public void periodic() {
-    if (tunableNumber.hasChanged()) {
-      set(tunableNumber.get());
-    }
-  }
-
   /**
    * Check if the shooter motor is at the target velocity within a specified tolerance.
    *
    * @return True if the shooter motor is at the target velocity, false otherwise.
    */
   public boolean atTargetVelocity() {
-    return Math.abs(
-            targetVelocity
-                - (lowerShooterMotorEncoder.getVelocity() + upperShooterMotorEncoder.getVelocity())
-                    / 2)
+    return targetVelocity
+            - (lowerShooterMotorEncoder.getVelocity() + upperShooterMotorEncoder.getVelocity()) / 2
         < ShooterConstants.VELOCITY_TOLERANCE;
   }
 
@@ -123,10 +111,10 @@ public class ShooterSubsystem extends SubsystemBase {
     if (distance <= 2) {
       return 2200;
     } else if (distance >= 5) {
-      return 3500;
+      return 3600;
     }
 
-    return (17868.1 * Math.pow(distance, 0.070036)) - 16523.3;
+    return (17868.1 * Math.pow(distance, 0.070036)) - 16423.3;
   }
 
   public void set(DoubleSupplier distanceSupplier) {
@@ -148,7 +136,7 @@ public class ShooterSubsystem extends SubsystemBase {
    * @param velocity The desired velocity for the shooter motor.
    */
   public void set(double velocity) {
-    targetVelocity = velocity;
+    targetVelocity = (velocity += ShooterConstants.VELOCITY_COMPENSATION / 2);
 
     upperShooterMotor.getPIDController().setReference(velocity, ControlType.kVelocity);
     lowerShooterMotor.getPIDController().setReference(velocity, ControlType.kVelocity);

@@ -11,6 +11,7 @@ public class ArmConstants {
     public static final String NAME = "Arm Motor";
     public static final int MOTOR_PORT = 3;
     public static final int CURRENT_LIMIT = 40;
+    public static final double NOMINAL_VOLTAGE = 11.5;
     public static final boolean INVERTED = false;
     public static final IdleMode IDLE_MODE = IdleMode.kBrake;
     public static final float FORWARD_SOFT_LIMIT = 80;
@@ -24,7 +25,7 @@ public class ArmConstants {
         RELATIVE_ENCODER_POSITION_CONVERSION_FACTOR / 60;
 
     public static class MotorPid {
-      public static final double P = 0.031;
+      public static final double P = 0.0315;
       public static final double D = 0.0001;
       public static final double MIN_OUTPUT = -0.15;
       public static final double MAX_OUTPUT = 1;
@@ -35,7 +36,7 @@ public class ArmConstants {
 
     public static class FeedForward {
       public static final double STATIC = 1.5;
-      public static final double GRAVITY = .595;
+      public static final double GRAVITY = .62;
       public static final double VELOCITY = 0.0;
     }
 

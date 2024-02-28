@@ -6,34 +6,37 @@ package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PIDConstants;
 import com.pathplanner.lib.util.ReplanningConfig;
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.ScheduleCommand;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.bearbotics.fms.AllianceColor;
 import frc.bearbotics.test.DriveSubsystemTest;
 import frc.robot.commands.AutoAimCommand;
 import frc.robot.commands.AutoShootCommand;
+import frc.robot.commands.auto.MiddleC1;
 import frc.robot.commands.auto.MiddleC1C2;
 import frc.robot.commands.auto.MiddleTwoNote;
 import frc.robot.commands.auto.Sub1TwoNote;
 import frc.robot.commands.auto.Sub3TwoNote;
+import frc.robot.commands.auto.Sub3W3W2W1;
 import frc.robot.constants.DriveConstants;
 import frc.robot.constants.DriveConstants.SpeedMode;
 import frc.robot.constants.RobotConstants;
 import frc.robot.constants.VisionConstants;
 import frc.robot.location.FieldPositions;
+import frc.robot.location.LocationHelper;
 import frc.robot.subsystems.BlinkinSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.PowerDistributionSubsystem;
@@ -42,7 +45,8 @@ import frc.robot.subsystems.manipulator.ManipulatorSubsystem;
 import frc.robot.subsystems.vision.ObjectDetectionSubsystem;
 import frc.robot.subsystems.vision.PoseEstimatorSubsystem;
 import java.util.Map;
-import java.util.Map.Entry;
+import java.util.Optional;
+import java.util.Set;
 
 /**
  * Constructs a new RobotContainer object. This constructor is responsible for initializing
@@ -55,32 +59,49 @@ public class RobotContainer {
   private final CommandXboxController operatorController =
       new CommandXboxController(DriveConstants.OPERATOR_CONTROLLER_PORT);
 
+  @SuppressWarnings("unused")
   private final PowerDistributionSubsystem powerDistributionSubsystem =
       new PowerDistributionSubsystem();
+
   private final DriveSubsystem driveSubsystem = new DriveSubsystem();
 
   private final ManipulatorSubsystem manipulatorSubsystem = new ManipulatorSubsystem();
+
+  @SuppressWarnings("unused")
   private final ObjectDetectionSubsystem objectDetectionSubsystem =
       new ObjectDetectionSubsystem(VisionConstants.OBJECT_DETECTION_CAMERA);
+
   private final PoseEstimatorSubsystem poseEstimatorSubsystem =
       new PoseEstimatorSubsystem(driveSubsystem, FieldPositions.getInstance());
-  private final BlinkinSubsystem lightsSubsystem = new BlinkinSubsystem();
+
+  private final BlinkinSubsystem blinkinSubsystem = new BlinkinSubsystem();
 
   private boolean isTeleop;
+  private boolean isAutoPathTargeting = false;
 
   private SendableChooser<Command> autoCommandChooser = new SendableChooser<>();
 
   private Map<String, Command> namedCommands =
       Map.of(
           "intakeAndShootPodium",
-              new SequentialCommandGroup(
+          new ScheduleCommand(
+              Commands.sequence(
                   manipulatorSubsystem.getIntakeCommand(),
-                  manipulatorSubsystem.getPodiumShootCommand()),
-          "intake", manipulatorSubsystem.getIntakeCommand(),
-          "shootWingNote", manipulatorSubsystem.getPodiumShootCommand(),
-          "shootStage", manipulatorSubsystem.getStageShootCommand(),
+                  manipulatorSubsystem.getPodiumShootCommand())),
+          "intake",
+          new ScheduleCommand(manipulatorSubsystem.getIntakeCommand()),
+          "shootWingNote",
+          new ScheduleCommand(manipulatorSubsystem.getPodiumShootCommand()),
+          "shootStage",
+          new ScheduleCommand(manipulatorSubsystem.getStageShootCommand()),
+          "startAim",
+          Commands.runOnce(() -> this.setAutoPathTargeting(true)),
+          "stopAim",
+          Commands.runOnce(() -> this.setAutoPathTargeting(false)),
+          "subwooferShoot",
+          new ScheduleCommand(manipulatorSubsystem.getSubwooferShootCommand()),
           "autoShoot",
-              new AutoShootCommand(driveSubsystem, manipulatorSubsystem, poseEstimatorSubsystem));
+          new ScheduleCommand(new AutoShootCommand(driveSubsystem, manipulatorSubsystem)));
 
   public RobotContainer() {
     setupShuffleboardTab(RobotConstants.COMPETITION_TAB);
@@ -98,6 +119,11 @@ public class RobotContainer {
    */
   private void setupShuffleboardTab(ShuffleboardTab tab) {
     tab.add("Home Climber", manipulatorSubsystem.getClimberHomeCommand());
+    tab.addDouble(
+        "Distance to Speaker",
+        () ->
+            LocationHelper.getDistanceToPose(
+                driveSubsystem.getPose(), FieldPositions.getInstance().getSpeakerCenter()));
   }
 
   /**
@@ -111,26 +137,44 @@ public class RobotContainer {
         driveSubsystem::getRobotRelativeSpeeds,
         driveSubsystem::driveRobotRelative,
         new HolonomicPathFollowerConfig(
-            new PIDConstants(1.0, 0.0, 0.0),
-            new PIDConstants(1.0, 0.0, 0.0),
-            2.5,
-            0.4,
+            new PIDConstants(5),
+            new PIDConstants(5),
+            3,
+            RobotConstants.SWERVE_RADIUS,
             new ReplanningConfig()),
-        () -> AllianceColor.alliance == Alliance.Red,
+        AllianceColor::isRedAlliance,
         driveSubsystem);
 
-    for (Entry<String, Command> entry : namedCommands.entrySet()) {
-      NamedCommands.registerCommand(entry.getKey(), new ScheduleCommand(entry.getValue()));
-    }
+    NamedCommands.registerCommands(namedCommands);
+
+    PPHolonomicDriveController.setRotationTargetOverride(this::getRotationTargetOverride);
+  }
+
+  public Optional<Rotation2d> getRotationTargetOverride() {
+    return isAutoPathTargeting
+        ? Optional.of(
+            LocationHelper.getRotationToTranslation(
+                    driveSubsystem.getPose(), FieldPositions.getInstance().getSpeakerTranslation())
+                .minus(Rotation2d.fromDegrees(180)))
+        : Optional.empty();
   }
 
   /** Builds the list of autonomous command options for the SendableChooser. */
   private void buildAutoList() {
     autoCommandChooser.addOption("0 - NoOp", new InstantCommand());
     autoCommandChooser.addOption("1 - MiddleC1C2", MiddleC1C2.get(manipulatorSubsystem));
+    autoCommandChooser.addOption(
+        "1.5 - MiddleC1", MiddleC1.get(driveSubsystem, manipulatorSubsystem, true));
     autoCommandChooser.addOption("2 - MidleTwoNote", MiddleTwoNote.get(manipulatorSubsystem));
-    autoCommandChooser.addOption("3 - Sub1TwoNote", Sub1TwoNote.get(manipulatorSubsystem));
+    autoCommandChooser.addOption(
+        "3 - Sub1TwoNote", Sub1TwoNote.get(driveSubsystem, manipulatorSubsystem));
     autoCommandChooser.addOption("4 - Sub3TwoNote", Sub3TwoNote.get(manipulatorSubsystem));
+    autoCommandChooser.addOption(
+        "5 - Sub3W3W2W1",
+        Sub3W3W2W1.get(driveSubsystem, manipulatorSubsystem, poseEstimatorSubsystem, false));
+    autoCommandChooser.addOption(
+        "6 - Sub3W3W2W1C1",
+        Sub3W3W2W1.get(driveSubsystem, manipulatorSubsystem, poseEstimatorSubsystem, true));
 
     RobotConstants.COMPETITION_TAB
         .add("Auto Command", autoCommandChooser)
@@ -156,13 +200,17 @@ public class RobotContainer {
 
     driverController
         .leftStick()
-        .whileTrue(new InstantCommand(() -> driveSubsystem.setSpeedMode(SpeedMode.TURBO)))
-        .onFalse(new InstantCommand(() -> driveSubsystem.setSpeedMode(SpeedMode.NORMAL)));
+        .whileTrue(
+            Commands.runOnce(() -> driveSubsystem.setSpeedMode(SpeedMode.TURBO), driveSubsystem))
+        .onFalse(
+            Commands.runOnce(() -> driveSubsystem.setSpeedMode(SpeedMode.NORMAL), driveSubsystem));
 
     driverController
         .rightStick()
-        .whileTrue(new InstantCommand(() -> driveSubsystem.setSpeedMode(SpeedMode.TURTLE)))
-        .onFalse(new InstantCommand(() -> driveSubsystem.setSpeedMode(SpeedMode.NORMAL)));
+        .whileTrue(
+            Commands.runOnce(() -> driveSubsystem.setSpeedMode(SpeedMode.TURTLE), driveSubsystem))
+        .onFalse(
+            Commands.runOnce(() -> driveSubsystem.setSpeedMode(SpeedMode.NORMAL), driveSubsystem));
 
     driverController
         .leftBumper()
@@ -183,12 +231,16 @@ public class RobotContainer {
         .rightTrigger()
         .whileTrue(
             new AutoAimCommand(
-                driveSubsystem,
-                poseEstimatorSubsystem,
-                () -> -MathUtil.applyDeadband(powWithSign(driverController.getLeftX(), 2), 0.01),
-                () -> -MathUtil.applyDeadband(powWithSign(driverController.getLeftY(), 2), 0.01)));
+                    driveSubsystem,
+                    () -> getJoystickInput(driverController, JoystickAxis.Ly),
+                    () -> getJoystickInput(driverController, JoystickAxis.Lx))
+                .repeatedly());
 
-    driverController.a().onTrue(new InstantCommand(() -> driveSubsystem.resetImu()));
+    driverController.a().onTrue(Commands.runOnce(() -> driveSubsystem.resetImu()));
+    driverController
+        .y()
+        .onTrue(manipulatorSubsystem.getPodiumShootCommand())
+        .onFalse(manipulatorSubsystem.getShootStopCommand());
 
     driverController
         .povLeft()
@@ -201,41 +253,72 @@ public class RobotContainer {
         .onFalse(manipulatorSubsystem.getIntakeStopCommand());
 
     driverController
+        .povRight()
+        .whileTrue(manipulatorSubsystem.getAmpShootCommand())
+        .onFalse(manipulatorSubsystem.getShootStopCommand());
+
+    driverController
         .rightBumper()
         .whileTrue(
-            new AutoShootCommand(
-                driveSubsystem,
-                manipulatorSubsystem,
-                poseEstimatorSubsystem,
-                () -> -MathUtil.applyDeadband(powWithSign(driverController.getLeftX(), 2), 0.01),
-                () -> -MathUtil.applyDeadband(powWithSign(driverController.getLeftY(), 2), 0.01)));
+            Commands.sequence(
+                Commands.defer(
+                    () ->
+                        manipulatorSubsystem.getShooterPrepareCommad(
+                            () ->
+                                LocationHelper.getDistanceToPose(
+                                    driveSubsystem.getPose(),
+                                    FieldPositions.getInstance().getSpeakerCenter())),
+                    Set.of(manipulatorSubsystem)),
+                manipulatorSubsystem.getShootCommand()));
 
     new Trigger(() -> manipulatorSubsystem.isNoteInFeeder())
-        .onTrue(new InstantCommand(() -> lightsSubsystem.signalNoteInHolder()))
-        .onFalse(new InstantCommand(() -> lightsSubsystem.reset()));
+        .onTrue(Commands.runOnce(() -> blinkinSubsystem.signalNoteInHolder()))
+        .onFalse(Commands.runOnce(() -> blinkinSubsystem.reset()));
 
     new Trigger(() -> manipulatorSubsystem.isNoteInRoller() && isTeleop)
         .onTrue(
-            new InstantCommand(
-                () -> driverController.getHID().setRumble(RumbleType.kBothRumble, 1)))
+            Commands.runOnce(() -> driverController.getHID().setRumble(RumbleType.kBothRumble, 1)))
         .onFalse(
-            new InstantCommand(
-                () -> driverController.getHID().setRumble(RumbleType.kBothRumble, 0)));
+            Commands.runOnce(() -> driverController.getHID().setRumble(RumbleType.kBothRumble, 0)));
   }
 
   /**
-   * Returns the default RunCommand for driving the robot based on controller input.
+   * Returns the default Command for driving the robot based on controller input.
    *
    * @return The default RunCommand for driving the robot.
    */
-  private RunCommand getDefaultDriveSubsystemCommand() {
-    return new RunCommand(
+  private Command getDefaultDriveSubsystemCommand() {
+    return Commands.run(
         () ->
             driveSubsystem.drive(
-                -MathUtil.applyDeadband(powWithSign(driverController.getLeftY(), 2), 0.01),
-                -MathUtil.applyDeadband(powWithSign(driverController.getLeftX(), 2), 0.01),
-                -MathUtil.applyDeadband(powWithSign(driverController.getRightX(), 2), 0.01)),
+                getJoystickInput(driverController, JoystickAxis.Ly),
+                getJoystickInput(driverController, JoystickAxis.Lx),
+                getJoystickInput(driverController, JoystickAxis.Rx)),
         driveSubsystem);
+  }
+
+  private double getJoystickInput(CommandXboxController controller, JoystickAxis axis) {
+    double rawInput;
+
+    switch (axis) {
+      case Ly:
+        rawInput = driverController.getLeftY();
+        break;
+      case Lx:
+        rawInput = driverController.getLeftX();
+        break;
+      case Ry:
+        rawInput = driverController.getRightY();
+        break;
+      case Rx:
+        rawInput = driverController.getRightX();
+        break;
+      default:
+        rawInput = 0;
+    }
+
+    double flippedInput = AllianceColor.isRedAlliance() && axis.isFlipped() ? -rawInput : rawInput;
+    return -MathUtil.applyDeadband(powWithSign(flippedInput, 2), 0.01);
   }
 
   /**
@@ -259,19 +342,14 @@ public class RobotContainer {
             () -> -MathUtil.applyDeadband(operatorController.getRightY(), 0.01)));
 
     operatorController
-        .x()
-        .whileTrue(manipulatorSubsystem.getPodiumShootCommand())
-        .onFalse(manipulatorSubsystem.getShootStopCommand());
-
-    operatorController
-        .b()
-        .whileTrue(manipulatorSubsystem.getSubwooferShootCommand())
-        .onFalse(manipulatorSubsystem.getShootStopCommand());
-
-    operatorController
         .a()
-        .onTrue(new InstantCommand(() -> lightsSubsystem.signalSource()))
-        .onFalse(new InstantCommand((() -> lightsSubsystem.reset())));
+        .onTrue(manipulatorSubsystem.getAmpShootCommand())
+        .onFalse(manipulatorSubsystem.getShootStopCommand());
+
+    operatorController
+        .y()
+        .onTrue(Commands.runOnce(() -> blinkinSubsystem.signalSource()))
+        .onFalse(Commands.runOnce((() -> blinkinSubsystem.reset())));
   }
 
   /**
@@ -282,7 +360,7 @@ public class RobotContainer {
   public void setTeleop(boolean mode) {
     isTeleop = mode;
 
-    lightsSubsystem.reset();
+    blinkinSubsystem.reset();
   }
 
   /**
@@ -297,5 +375,20 @@ public class RobotContainer {
   /** Initializes the robot when transitioning to the disabled state. Resets controller rumble. */
   public void disabledInit() {
     driverController.getHID().setRumble(RumbleType.kBothRumble, 0);
+  }
+
+  public void setAutoPathTargeting(boolean isAutoPathTargeting) {
+    this.isAutoPathTargeting = isAutoPathTargeting;
+  }
+
+  private enum JoystickAxis {
+    Ly,
+    Lx,
+    Ry,
+    Rx;
+
+    public boolean isFlipped() {
+      return this == Ly || this == Lx;
+    }
   }
 }
