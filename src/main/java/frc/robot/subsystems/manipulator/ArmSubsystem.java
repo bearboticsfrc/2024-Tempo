@@ -24,8 +24,6 @@ import frc.robot.util.RevUtil;
 import java.util.function.DoubleSupplier;
 
 public class ArmSubsystem extends SubsystemBase {
-  private final double ARM_POSITION_COMPENSATION = -2;
-
   private CANSparkMax armMotor;
 
   private SparkAbsoluteEncoder armAbsoluteMotorEncoder;
@@ -242,35 +240,9 @@ public class ArmSubsystem extends SubsystemBase {
         targetState);
   }
 
-  /*private double getPositionFromDistance(double distance) {
-    if (distance <= 1.543) {
-      return 0;
-    }
-
-    double baseValue = 44.5168 * Math.pow(distance, 0.519352) - 50;
-
-    if (distance <= 1.8 || distance <= 2.2) {
-      return baseValue;
-    } else if (distance <= 2.5) {
-      return baseValue - 3;
-    } else if (distance <= 3) {
-      return baseValue - 4;
-    } else if (distance <= 3.4) {
-      return -6 * Math.pow(distance, 2) + 49 * distance - 70;
-    } else if (distance <= 4) {
-      return -6 * Math.pow(distance, 2) + 49 * distance - 71.5;
-    } else if (distance <= 4.5) {
-      return -4.5 * Math.pow(distance, 2) + 44.25 * distance - 75.5;
-    } else if (distance <= 5) {
-      return -4.5 * Math.pow(distance, 2) + 44.25 * distance - 75.8;
-    } else if (distance <= 6) {
-      return -2.3 * Math.pow(distance, 2) + 25.45 * distance - 35; // 36;
-    }
-
-    throw new IllegalArgumentException("Distance must be in a range of [0, inf)!");
-  }*/
-
   private double getPositionFromDistance(double distance) {
+    distance = Math.min(distance, 6);
+
     if (distance <= 1.54) {
       return 0;
     } else if (distance <= 2.46) {
@@ -306,11 +278,6 @@ public class ArmSubsystem extends SubsystemBase {
       return (1.0365853658576 * Math.pow(distance, 2))
           - (4.7054878048905 * distance)
           + 36.767134146455;
-    } else if (distance <= 5.25) {
-      return (2.4521072796883 * Math.pow(distance, 2))
-          - (23.311877394612 * distance)
-          + 93.001149425188
-          - 2;
     } else {
       return (2.4521072796883 * Math.pow(distance, 2))
           - (23.311877394612 * distance)
