@@ -30,6 +30,8 @@ public class AutoAimCommand extends Command {
     this.driveSubsystem = driveSubsystem;
 
     aimPidController.setTolerance(2);
+    aimPidController.enableContinuousInput(-180, 180);
+
     addRequirements(driveSubsystem);
   }
 
