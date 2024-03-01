@@ -2,6 +2,7 @@ package frc.robot.subsystems.vision;
 
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
@@ -14,6 +15,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.RobotConstants;
 import frc.robot.constants.VisionConstants;
 import frc.robot.location.FieldPositions;
+import frc.robot.location.LocationHelper;
 import frc.robot.subsystems.DriveSubsystem;
 import java.util.ArrayList;
 import java.util.List;
@@ -140,6 +142,10 @@ public class PoseEstimatorSubsystem extends SubsystemBase {
     if (robotPose == null) {
       return;
     }
+
+    if ( !LocationHelper.isPoseClose(robotPose.estimatedPose.toPose2d(), driveSubsystem.getPose() ) &&
+        !LocationHelper.isPoseClose(driveSubsystem.getPose() , new Pose2d(0, 0, new Rotation2d()))  ) 
+        return;
 
     Pose2d visionPose = robotPose.estimatedPose.toPose2d();
 

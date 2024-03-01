@@ -1,5 +1,6 @@
 package frc.robot.location;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
@@ -64,6 +65,10 @@ public class LocationHelper {
   public static Rotation2d getRotationToTranslation(Pose2d fromPose, Translation2d translation) {
     return new Rotation2d(
         translation.getX() - fromPose.getX(), translation.getY() - fromPose.getY());
+  }
+
+  public static boolean isPoseClose(Pose2d fromPose, Pose2d toPose) {
+    return MathUtil.isNear( fromPose.getX() - toPose.getX(), fromPose.getY() - fromPose.getY(), 2.0);
   }
 
   public static Transform3d normalizeCameraAngle(Transform3d cameraToTarget) {
