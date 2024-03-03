@@ -233,6 +233,7 @@ public class RobotContainer {
         .whileTrue(
             new AutoAimCommand(
                     driveSubsystem,
+                    FieldPositions.getInstance().getSpeakerTranslation(),
                     () -> getJoystickInput(driverController, JoystickAxis.Ly),
                     () -> getJoystickInput(driverController, JoystickAxis.Lx))
                 .repeatedly());
