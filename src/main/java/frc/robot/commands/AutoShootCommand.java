@@ -11,7 +11,6 @@ import java.util.Set;
 import java.util.function.DoubleSupplier;
 
 public class AutoShootCommand extends SequentialCommandGroup {
-
   /**
    * Constructs the AutoShootCommand with the DriveSubsystem and ManipulatorSubsystem.
    *
