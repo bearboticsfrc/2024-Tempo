@@ -291,7 +291,7 @@ public class ManipulatorSubsystem extends SubsystemBase {
    * @param distanceSupplier The supplier for the shooter velocity.
    * @return The command.
    */
-  private Command getShooterPrepareCommand(DoubleSupplier distanceSupplier) {
+  public Command getShooterPrepareCommand(DoubleSupplier distanceSupplier) {
     return Commands.sequence(
         getShooterRunCommand(distanceSupplier),
         Commands.waitUntil(shooterSubsystem::atTargetVelocity));
