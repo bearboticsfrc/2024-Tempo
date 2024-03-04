@@ -1,8 +1,12 @@
 package frc.robot.commands;
 
+import static edu.wpi.first.units.Units.*;
+
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.units.Angle;
+import edu.wpi.first.units.Measure;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.location.LocationHelper;
 import frc.robot.subsystems.DriveSubsystem;
@@ -14,6 +18,8 @@ public class AutoAimCommand extends Command {
   private PIDController rotSpeedPidController = new PIDController(0.0025, 0, 0);
 
   private Translation2d targetPoint;
+
+  private boolean aimFront;
 
   private DoubleSupplier xSupplier = () -> 0.0;
   private DoubleSupplier ySupplier = () -> 0.0;
@@ -35,6 +41,19 @@ public class AutoAimCommand extends Command {
     this(driveSubsystem, targetPoint);
     this.xSupplier = xSupplier;
     this.ySupplier = ySupplier;
+  }
+
+  /*
+   * Constructs the AutoAimCommand with the DriveSubsystem, target point, and a boolean whether the command should aim the front or back of the robot.
+   *
+   * @param driveSubsystem The DriveSubsystem instance for robot movement control.
+   * @param targetPoint The target point for auto-aiming.
+   * @param aimFront Whether the command should aim the front or back of the robot.
+   */
+  public AutoAimCommand(
+      DriveSubsystem driveSubsystem, Translation2d targetPoint, boolean aimFront) {
+    this(driveSubsystem, targetPoint);
+    this.aimFront = aimFront;
   }
 
   /**
@@ -76,9 +95,15 @@ public class AutoAimCommand extends Command {
     Rotation2d targetRotation =
         LocationHelper.getRotationToTranslation(driveSubsystem.getPose(), targetPoint);
 
+    Measure<Angle> angularOffset = aimFront ? Degrees.of(180) : Degrees.of(0);
+
     double rotateOutput =
         rotSpeedPidController.calculate(
-            driveSubsystem.getPose().getRotation().plus(Rotation2d.fromDegrees(180)).getDegrees(),
+            driveSubsystem
+                .getPose()
+                .getRotation()
+                .plus(Rotation2d.fromDegrees(angularOffset.in(Degrees)))
+                .getDegrees(),
             targetRotation.getDegrees());
 
     driveSubsystem.drive(yRequest.getAsDouble(), xRequest.getAsDouble(), rotateOutput);
