@@ -34,7 +34,7 @@ public class AutoNotePickupCommand extends SequentialCommandGroup {
    * @return An AutoAimCommand instance.
    */
   private AutoAimCommand getAutoNoteAimCommand() {
-    return new AutoAimCommand(driveSubsystem, getPointToNearestNote());
+    return new AutoAimCommand(driveSubsystem, getPointToNearestNote(), true);
   }
 
   /**
