@@ -24,6 +24,13 @@ import frc.robot.util.RevUtil;
 import java.util.function.DoubleSupplier;
 
 public class ArmSubsystem extends SubsystemBase {
+  private static final double ROBOT_TO_SHOOTER_PIVOT = .2;
+  private static final double SPEAKER_X_OFFSET = .23;
+  private static final double SPEAKER_Z_HEIGHT = 2.032;
+  private static final double SHOOTER_ANGLE = 56.0;
+  private static final double SHOOTER_BASE_HEIGHT = .42;
+  private static final double ARM_LENGTH = .425;
+
   private CANSparkMax armMotor;
 
   private SparkAbsoluteEncoder armAbsoluteMotorEncoder;
@@ -284,6 +291,40 @@ public class ArmSubsystem extends SubsystemBase {
           + 93.001149425188
           - 2;
     }
+  }
+
+  /*
+   * Calculates the angle of the speaker to the arm pivot point plus the angle of the shooter.
+   *
+   */
+  public static double calculateAngleFromDistance(double distance) {
+
+    distance = distance - ROBOT_TO_SHOOTER_PIVOT - SPEAKER_X_OFFSET;
+    final double height = SPEAKER_Z_HEIGHT - SHOOTER_BASE_HEIGHT;
+
+    /*
+     * given the triangle composed of two sides: </p>
+     *   a - arm pivot to target </p>
+     *   b - shooter arm </p>
+     * and an angle: </p>
+     *   A - shooter angle
+     * Find the angle B to calculate the remaining angle C.
+     *
+     */
+    double angleB =
+        Math.asin(
+            Math.sin(Math.toRadians(SHOOTER_ANGLE)) * ARM_LENGTH / Math.hypot(height, distance));
+
+    double angleC = 180 - SHOOTER_ANGLE - Math.toDegrees(angleB);
+
+    /*
+     * Calculate the angle of the pivot point up to the speaker, add angleC to compute the arm angle.
+     */
+    double angle = Math.toDegrees(Math.atan(height / distance)) + angleC;
+
+    angle = 180 - angle;
+
+    return angle;
   }
 
   /** Enum representing different positions of the arm. */
