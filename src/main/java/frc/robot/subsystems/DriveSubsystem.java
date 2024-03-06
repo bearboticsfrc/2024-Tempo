@@ -10,6 +10,7 @@ import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
@@ -57,6 +58,15 @@ public class DriveSubsystem extends SubsystemBase {
   private boolean fieldRelativeMode = true;
 
   private StructPublisher<Pose2d> posePublisher;
+  private SwerveModulePosition[] previousModulePositions;
+  private SwerveModulePosition[] swerveModulePositions;
+  private SwerveModulePosition[] changedModulePositions = {
+    new SwerveModulePosition(),
+    new SwerveModulePosition(),
+    new SwerveModulePosition(),
+    new SwerveModulePosition(),
+    new SwerveModulePosition()
+  };
 
   private Notifier loggingNotifier; // To prevent mem leak.
 
@@ -73,6 +83,8 @@ public class DriveSubsystem extends SubsystemBase {
       swerveModules.put(
           corner,
           new SwerveModule(getSwerveConfigForCorner(corner), RobotConstants.DRIVE_SYSTEM_TAB));
+      swerveModulePositions = getModulePositions();
+      previousModulePositions = swerveModulePositions;
     }
 
     odometry =
@@ -121,7 +133,10 @@ public class DriveSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-    odometry.update(getHeading(), getModulePositions());
+
+    previousModulePositions = swerveModulePositions;
+    swerveModulePositions = getModulePositions();
+    odometry.update(getHeading(), swerveModulePositions);
 
     maxSpeed = competitionTabMaxSpeedEntry.getDouble(DriveConstants.MAX_VELOCITY);
     posePublisher.set(getPose());
@@ -565,5 +580,27 @@ public class DriveSubsystem extends SubsystemBase {
 
   public void driveRobotRelative(ChassisSpeeds chassisSpeeds) {
     setModuleStates(RobotConstants.DRIVE_KINEMATICS.toSwerveModuleStates(chassisSpeeds));
+  }
+
+  public SwerveModulePosition[] getPreviousModulePositions() {
+    return previousModulePositions;
+  }
+
+  public SwerveModulePosition getChangeInModulePosition(
+      SwerveModulePosition previousModulePosition, SwerveModulePosition currentModulePosition) {
+    Rotation2d angle =
+        new Rotation2d(
+            currentModulePosition.angle.getRadians() - previousModulePosition.angle.getRadians());
+    double distance = currentModulePosition.distanceMeters - previousModulePosition.distanceMeters;
+    return new SwerveModulePosition(distance, angle);
+  }
+
+  public Twist2d getRobotVelocityVector() {
+
+    for (int i = 0; i < 4; i++) {
+      changedModulePositions[i] =
+          getChangeInModulePosition(previousModulePositions[i], swerveModulePositions[i]);
+    }
+    return RobotConstants.DRIVE_KINEMATICS.toTwist2d(changedModulePositions);
   }
 }
