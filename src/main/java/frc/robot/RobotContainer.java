@@ -25,6 +25,7 @@ import frc.bearbotics.fms.AllianceColor;
 import frc.bearbotics.test.ArmSubsystemTest;
 import frc.bearbotics.test.ClimberSubsystemTest;
 import frc.bearbotics.test.DriveSubsystemTest;
+import frc.bearbotics.test.IntakeSubsystemTest;
 import frc.bearbotics.test.ShooterSubsystemTest;
 import frc.robot.commands.AutoAimCommand;
 import frc.robot.commands.AutoShootCommand;
@@ -213,6 +214,13 @@ public class RobotContainer {
             "Climber Subsystem Test",
             new ClimberSubsystemTest(
                 manipulatorSubsystem.climberSubsystem, RobotConstants.TEST_TAB))
+        .withPosition(3, 6)
+        .withSize(2, 1);
+
+    RobotConstants.TEST_TAB
+        .add(
+            "Intake Subsystem Test",
+            new IntakeSubsystemTest(manipulatorSubsystem.intakeSubsystem, RobotConstants.TEST_TAB))
         .withPosition(2, 7)
         .withSize(2, 1);
   }

@@ -125,6 +125,14 @@ public class IntakeSubsystem extends SubsystemBase {
     feederMotor.set(speed.getSpeed());
   }
 
+  public double getRollerVelocity() {
+    return rollerMotorEncoder.getVelocity();
+  }
+
+  public double getFeederVelocity() {
+    return feederMotorEncoder.getVelocity();
+  }
+
   /** Enum representing different intake speeds. */
   public enum IntakeSpeed {
     REVERSE(-1),
