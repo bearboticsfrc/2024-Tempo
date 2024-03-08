@@ -144,7 +144,7 @@ public class ArmSubsystem extends SubsystemBase {
     return currentState.velocity;
   }
 
-  private Rotation2d getPosition() {
+  public Rotation2d getPosition() {
     return Rotation2d.fromDegrees(armRelativeEncoder.getPosition());
   }
   /** Updates the arm's state periodically, ensuring smooth motion using a trapezoidal profile. */

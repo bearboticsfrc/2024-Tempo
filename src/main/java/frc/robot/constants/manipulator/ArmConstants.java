@@ -7,6 +7,13 @@ public class ArmConstants {
   public static final int LIMIT_SWITCH_CHANNEL = 3;
   public static final double POSITION_TOLERANCE = 1;
 
+  public static class Test {
+    public static final int POSITION = 30;
+    public static final int POSITION_TOLERANCE = 1;
+    public static final double WAIT = 1;
+    public static final double TIMEOUT = WAIT + 3;
+  }
+
   public class Motor {
     public static final String NAME = "Arm Motor";
     public static final int MOTOR_PORT = 3;

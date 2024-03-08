@@ -9,10 +9,10 @@ import frc.robot.subsystems.manipulator.ShooterSubsystem.ShooterVelocity;
 import java.util.function.DoubleSupplier;
 
 public class ManipulatorSubsystem extends SubsystemBase {
-  private final IntakeSubsystem intakeSubsystem;
-  private final ShooterSubsystem shooterSubsystem;
-  private final ClimberSubsystem climberSubsystem;
-  private final ArmSubsystem armSubsystem;
+  public final IntakeSubsystem intakeSubsystem;
+  public final ShooterSubsystem shooterSubsystem;
+  public final ClimberSubsystem climberSubsystem;
+  public final ArmSubsystem armSubsystem;
 
   /**
    * Constructor for the ManipulatorSubsystem class. Initializes intake, shooter, climber, and arm
@@ -78,9 +78,9 @@ public class ManipulatorSubsystem extends SubsystemBase {
    */
   public Command getClimberHomeCommand() {
     return Commands.sequence(
-            Commands.run(() -> climberSubsystem.set(-0.5), this),
+            Commands.runOnce(() -> climberSubsystem.set(-0.5), this),
             Commands.waitUntil(climberSubsystem::isClimberHome),
-            Commands.run(() -> climberSubsystem.stop(), this))
+            Commands.runOnce(() -> climberSubsystem.stop(), this))
         .withName("Home Climber");
   }
 

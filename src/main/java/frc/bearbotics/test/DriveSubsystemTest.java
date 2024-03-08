@@ -1,5 +1,6 @@
 package frc.bearbotics.test;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -16,6 +17,8 @@ import java.util.List;
 import java.util.Map;
 
 public class DriveSubsystemTest extends AbstractTestCommand {
+  private final String NAME = "Drive Subsystem Test";
+
   private final DriveSubsystem driveSubsystem;
 
   private Map<String, Boolean> outcomes =
@@ -36,6 +39,11 @@ public class DriveSubsystemTest extends AbstractTestCommand {
     this.driveSubsystem = driveSubsystem;
 
     setupShuffleboardTab(shuffleboardTab);
+  }
+
+  @Override
+  protected double getTestTimeout() {
+    return SwerveModuleConstants.Test.TIMEOUT;
   }
 
   @Override
@@ -64,11 +72,7 @@ public class DriveSubsystemTest extends AbstractTestCommand {
 
     if (failed.size() > 0) {
       DriverStation.reportError(
-          "[Drive Subsystem Test] "
-              + failed.size()
-              + " motors failed test(s): "
-              + String.join(", ", failed),
-          false);
+          NAME + failed.size() + " motors failed test(s): " + String.join(", ", failed), false);
     }
   }
 
@@ -83,13 +87,23 @@ public class DriveSubsystemTest extends AbstractTestCommand {
   private Command getModuleTestCommand(SwerveModule module) {
     Rotation2d initalSteerAngle = module.getRelativeAngle();
     SwerveModuleState newState =
-        new SwerveModuleState(0.5, Rotation2d.fromDegrees(90).plus(driveSubsystem.getHeading()));
+        new SwerveModuleState(
+            SwerveModuleConstants.Test.VELOCITY,
+            Rotation2d.fromDegrees(90).plus(driveSubsystem.getHeading()));
 
     return Commands.sequence(
         Commands.runOnce(() -> module.set(newState)),
-        Commands.waitSeconds(SwerveModuleConstants.TEST_WAIT),
-        Commands.runOnce(() -> outcomes.put(module + " Drive", module.getDriveVelocity() != 0)),
+        Commands.waitSeconds(SwerveModuleConstants.Test.WAIT),
         Commands.runOnce(
-            () -> outcomes.put(module + " Pivot", module.getRelativeAngle() != initalSteerAngle)));
+            () -> setPass(module + " Drive", isDrivePassing(module.getDriveVelocity()))),
+        Commands.runOnce(
+            () -> setPass(module + " Pivot", module.getRelativeAngle() != initalSteerAngle)));
+  }
+
+  private boolean isDrivePassing(double velocity) {
+    return MathUtil.isNear(
+        SwerveModuleConstants.Test.VELOCITY,
+        velocity,
+        SwerveModuleConstants.Test.VELOCITY_TOLERANCE);
   }
 }

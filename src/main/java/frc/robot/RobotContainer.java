@@ -22,7 +22,10 @@ import edu.wpi.first.wpilibj2.command.ScheduleCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.bearbotics.fms.AllianceColor;
+import frc.bearbotics.test.ArmSubsystemTest;
+import frc.bearbotics.test.ClimberSubsystemTest;
 import frc.bearbotics.test.DriveSubsystemTest;
+import frc.bearbotics.test.ShooterSubsystemTest;
 import frc.robot.commands.AutoAimCommand;
 import frc.robot.commands.AutoShootCommand;
 import frc.robot.commands.auto.MiddleC1;
@@ -188,6 +191,29 @@ public class RobotContainer {
         .add(
             "Drive Subsystem Test", new DriveSubsystemTest(driveSubsystem, RobotConstants.TEST_TAB))
         .withPosition(2, 1)
+        .withSize(2, 1);
+
+    RobotConstants.TEST_TAB
+        .add(
+            "Arm Subsystem Test",
+            new ArmSubsystemTest(manipulatorSubsystem.armSubsystem, RobotConstants.TEST_TAB))
+        .withPosition(2, 3)
+        .withSize(2, 1);
+
+    RobotConstants.TEST_TAB
+        .add(
+            "Shooter Subsystem Test",
+            new ShooterSubsystemTest(
+                manipulatorSubsystem.shooterSubsystem, RobotConstants.TEST_TAB))
+        .withPosition(2, 5)
+        .withSize(2, 1);
+
+    RobotConstants.TEST_TAB
+        .add(
+            "Climber Subsystem Test",
+            new ClimberSubsystemTest(
+                manipulatorSubsystem.climberSubsystem, RobotConstants.TEST_TAB))
+        .withPosition(2, 7)
         .withSize(2, 1);
   }
 

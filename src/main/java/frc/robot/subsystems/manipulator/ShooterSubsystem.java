@@ -142,10 +142,26 @@ public class ShooterSubsystem extends SubsystemBase {
     lowerShooterMotor.getPIDController().setReference(velocity, ControlType.kVelocity);
   }
 
+  /**
+   * Get the target velocity for one of the shooter motors
+   *
+   * @param motor The motor to get the velocity for
+   */
+  public double getVelocity(ShooterMotor motorType) {
+    return motorType.equals(ShooterMotor.UPPER)
+        ? upperShooterMotorEncoder.getVelocity()
+        : lowerShooterMotorEncoder.getVelocity();
+  }
+
   /** Stop both shooter motors. */
   public void stop() {
     upperShooterMotor.stopMotor();
     lowerShooterMotor.stopMotor();
+  }
+
+  public enum ShooterMotor {
+    UPPER,
+    LOWER;
   }
 
   public enum ShooterVelocity {

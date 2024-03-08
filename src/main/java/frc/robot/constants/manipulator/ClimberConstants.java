@@ -3,6 +3,13 @@ package frc.robot.constants.manipulator;
 public class ClimberConstants {
   public static final int LIMIT_SWITCH_CHANNEL = 2;
 
+  public static class Test {
+    public static final double SPEED = 0.5;
+    public static final int POSITION_TOLERANCE = 1;
+    public static final double WAIT = 2.5;
+    public static final double TIMEOUT = WAIT + 1;
+  }
+
   public class Motor {
     public static final String NAME = "Climber Motor";
     public static final int MOTOR_PORT = 14;

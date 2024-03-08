@@ -4,6 +4,13 @@ public class ShooterConstants {
   public static final double VELOCITY_TOLERANCE = 50;
   public static final double VELOCITY_COMPENSATION = 100;
 
+  public static class Test {
+    public static final int VELOCITY = 3000;
+    public static final int VELOCITY_TOLERANCE = 100;
+    public static final double WAIT = 2.5;
+    public static final double TIMEOUT = WAIT + 1;
+  }
+
   public static class UpperMotor {
     public static final String NAME = "Upper Shooter Motor";
     public static final int MOTOR_PORT = 11;
