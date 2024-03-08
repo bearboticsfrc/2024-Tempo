@@ -50,6 +50,8 @@ public class DriveSubsystem extends SubsystemBase {
   // Linked to maintain order.
   private final LinkedHashMap<SwerveCorner, SwerveModule> swerveModules = new LinkedHashMap<>();
   private final Pigeon2 pigeonImu = new Pigeon2(RobotConstants.PIGEON_CAN_ID);
+  private double velocityX;
+  private double velocityY;
 
   private final SwerveDrivePoseEstimator odometry;
   private GenericEntry competitionTabMaxSpeedEntry;
@@ -133,6 +135,8 @@ public class DriveSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
+    velocityX = ((pigeonImu.getAccelerationX().getValueAsDouble() / 9.8) * 0.02) + velocityX;
+    velocityY = ((pigeonImu.getAccelerationY().getValueAsDouble() / 9.8) * 0.02) + velocityY;
 
     previousModulePositions = swerveModulePositions;
     swerveModulePositions = getModulePositions();
@@ -602,5 +606,10 @@ public class DriveSubsystem extends SubsystemBase {
           getChangeInModulePosition(previousModulePositions[i], swerveModulePositions[i]);
     }
     return RobotConstants.DRIVE_KINEMATICS.toTwist2d(changedModulePositions);
+  }
+
+  public Twist2d getRobotVelocityVectorFromImu() {
+    return new Twist2d(
+        velocityX, velocityY, pigeonImu.getAngularVelocityZDevice().getValueAsDouble());
   }
 }
