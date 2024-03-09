@@ -201,11 +201,7 @@ public class ManipulatorSubsystem extends SubsystemBase {
    * @return The command.
    */
   public Command getPodiumShootCommand() {
-    return Commands.sequence(
-        Commands.parallel(
-            getArmPrepareCommand(ArmPosition.PODIUM_SHOOT),
-            getShooterPrepareCommand(ShooterVelocity.PODIUM_SHOOT)),
-        getShootCommand());
+    return getShootCommand(ArmPosition.PODIUM_SHOOT, ShooterVelocity.PODIUM_SHOOT);
   }
 
   /**
@@ -214,11 +210,7 @@ public class ManipulatorSubsystem extends SubsystemBase {
    * @return The command.
    */
   public Command getStageShootCommand() {
-    return Commands.sequence(
-        Commands.parallel(
-            getArmPrepareCommand(ArmPosition.STAGE_SHOOT),
-            getShooterPrepareCommand(ShooterVelocity.STAGE_SHOOT)),
-        getShootCommand());
+    return getShootCommand(ArmPosition.STAGE_SHOOT, ShooterVelocity.STAGE_SHOOT);
   }
 
   /**
@@ -227,11 +219,7 @@ public class ManipulatorSubsystem extends SubsystemBase {
    * @return The command.
    */
   public Command getAmpShootCommand() {
-    return Commands.sequence(
-        Commands.parallel(
-            getArmPrepareCommand(ArmPosition.AMP_SHOOT),
-            getShooterPrepareCommand(ShooterVelocity.AMP_SHOOT)),
-        getShootCommand());
+    return getShootCommand(ArmPosition.AMP_SHOOT, ShooterVelocity.AMP_SHOOT);
   }
 
   /**
@@ -240,8 +228,13 @@ public class ManipulatorSubsystem extends SubsystemBase {
    * @return The command.
    */
   public Command getSubwooferShootCommand() {
+    return getShootCommand(ArmPosition.HOME, ShooterVelocity.SUBWOOFER_SHOOT);
+  }
+
+  private Command getShootCommand(ArmPosition armPosition, ShooterVelocity shooterVelocity) {
     return Commands.sequence(
-        Commands.parallel(getShooterPrepareCommand(ShooterVelocity.SUBWOOFER_SHOOT)),
+        Commands.parallel(
+            getArmPrepareCommand(armPosition), getShooterPrepareCommand(shooterVelocity)),
         getShootCommand());
   }
 
