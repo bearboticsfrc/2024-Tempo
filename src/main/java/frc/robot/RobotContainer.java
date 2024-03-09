@@ -236,7 +236,7 @@ public class RobotContainer {
                     () -> getJoystickInput(driverController, JoystickAxis.Lx))
                 .repeatedly());
 
-    driverController.a().onTrue(Commands.runOnce(() -> driveSubsystem.resetImu()));
+    driverController.a().onTrue(Commands.runOnce(driveSubsystem::resetImu));
     driverController
         .y()
         .onTrue(manipulatorSubsystem.getPodiumShootCommand())
@@ -271,9 +271,9 @@ public class RobotContainer {
                     Set.of(manipulatorSubsystem)),
                 manipulatorSubsystem.getShootCommand()));
 
-    new Trigger(() -> manipulatorSubsystem.isNoteInFeeder())
-        .onTrue(Commands.runOnce(() -> candleSubsystem.signalNoteInHolder()))
-        .onFalse(Commands.runOnce(() -> candleSubsystem.reset()));
+    new Trigger(manipulatorSubsystem::isNoteInFeeder)
+        .onTrue(Commands.runOnce(candleSubsystem::signalNoteInHolder))
+        .onFalse(Commands.runOnce(candleSubsystem::reset));
 
     new Trigger(
             () ->
