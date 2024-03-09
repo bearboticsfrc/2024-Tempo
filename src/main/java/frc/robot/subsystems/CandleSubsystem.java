@@ -87,13 +87,16 @@ public class CandleSubsystem extends SubsystemBase {
     segment.disableLEDs();
   }
 
-  /** Signals a specific source by activating a strobe animation on the MainStrip segment. */
+  /**
+   * Signals to human players to drop a note from the source by activating a strobe animation on the
+   * MainStrip segment.
+   */
   public void signalSource() {
     LEDSegment.MainStrip.setStrobeAnimation(YELLOW, 10);
   }
 
   /**
-   * Signals that a note is in the holder by setting the color of the MainStrip segment to green.
+   * Signals that a note is in the intake by setting the color of the MainStrip segment to green.
    */
   public void signalNoteInHolder() {
     LEDSegment.MainStrip.setColor(GREEN);
@@ -115,7 +118,7 @@ public class CandleSubsystem extends SubsystemBase {
   }
 
   /**
-   * Signals a note based on the position of a tracked target.
+   * Signals a note's position based on where it is relative to the robot.
    *
    * @param note The tracked target representing the note.
    */
