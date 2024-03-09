@@ -202,16 +202,16 @@ public class RobotContainer {
     driverController
         .leftStick()
         .whileTrue(
-            Commands.runOnce(() -> driveSubsystem.setSpeedMode(SpeedMode.TURBO), driveSubsystem))
+            Commands.runOnce(() -> driveSubsystem.setSpeedMode(SpeedMode.NORMAL), driveSubsystem))
         .onFalse(
-            Commands.runOnce(() -> driveSubsystem.setSpeedMode(SpeedMode.NORMAL), driveSubsystem));
+            Commands.runOnce(() -> driveSubsystem.setSpeedMode(SpeedMode.TURBO), driveSubsystem));
 
     driverController
         .rightStick()
         .whileTrue(
             Commands.runOnce(() -> driveSubsystem.setSpeedMode(SpeedMode.TURTLE), driveSubsystem))
         .onFalse(
-            Commands.runOnce(() -> driveSubsystem.setSpeedMode(SpeedMode.NORMAL), driveSubsystem));
+            Commands.runOnce(() -> driveSubsystem.setSpeedMode(SpeedMode.TURBO), driveSubsystem));
 
     driverController
         .leftBumper()
