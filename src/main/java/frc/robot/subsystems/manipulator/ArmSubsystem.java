@@ -244,7 +244,7 @@ public class ArmSubsystem extends SubsystemBase {
    * Calculates the angle of the speaker to the arm pivot point plus the angle of the shooter.
    *
    * @param distance The current distance to the speaker.
-   * @return The calculated angle to the
+   * @return The calculated angle to the pivot point of the arm up to the speaker.
    */
   private Rotation2d calculateAngleFromDistance(double distance) {
     distance = (distance - ArmConstants.ROBOT_TO_SHOOTER_PIVOT) - ArmConstants.SPEAKER_X_OFFSET;
