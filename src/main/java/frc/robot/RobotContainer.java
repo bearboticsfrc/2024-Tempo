@@ -24,6 +24,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.bearbotics.fms.AllianceColor;
 import frc.bearbotics.test.DriveSubsystemTest;
 import frc.robot.commands.AutoAimCommand;
+import frc.robot.commands.AutoNotePickupCommand;
 import frc.robot.commands.AutoShootCommand;
 import frc.robot.commands.auto.MiddleC1;
 import frc.robot.commands.auto.MiddleC1C2;
@@ -352,6 +353,10 @@ public class RobotContainer {
         .y()
         .onTrue(Commands.runOnce(() -> blinkinSubsystem.signalSource()))
         .onFalse(Commands.runOnce(() -> blinkinSubsystem.reset()));
+
+    operatorController
+        .x()
+        .whileTrue(new AutoNotePickupCommand(driveSubsystem, objectDetectionSubsystem));
 
     operatorController.povUp().onTrue(manipulatorSubsystem.getArmRunCommand(ArmPosition.AMP_SHOOT));
 
