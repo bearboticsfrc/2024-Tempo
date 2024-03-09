@@ -3,7 +3,6 @@ package frc.bearbotics.swerve;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.revrobotics.CANSparkBase;
 import com.revrobotics.CANSparkBase.ControlType;
-import com.revrobotics.CANSparkFlex;
 import com.revrobotics.CANSparkLowLevel;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
@@ -36,7 +35,7 @@ public class SwerveModule {
   private String moduleName;
 
   // Drive motor and pivot motor
-  private CANSparkFlex driveMotor;
+  private CANSparkMax driveMotor;
   private CANSparkMax pivotMotor;
 
   // Encoders for drive and pivot motors
@@ -64,7 +63,7 @@ public class SwerveModule {
     this.moduleName = swerveModule.getModuleName();
 
     this.driveMotor =
-        new CANSparkFlex(
+        new CANSparkMax(
             swerveModule.getDriveMotor().getMotorPort(), CANSparkLowLevel.MotorType.kBrushless);
 
     this.pivotMotor =
