@@ -274,16 +274,20 @@ public class RobotContainer {
     new Trigger(() -> manipulatorSubsystem.isNoteInFeeder())
         .onTrue(Commands.runOnce(() -> candleSubsystem.signalNoteInHolder()))
         .onFalse(Commands.runOnce(() -> candleSubsystem.reset()));
+
     new Trigger(
             () ->
-                (!manipulatorSubsystem.isNoteInFeeder()
-                    && objectDetectionSubsystem.hasNoteInView()))
+                !manipulatorSubsystem.isNoteInFeeder() && objectDetectionSubsystem.hasNoteInView())
         .onTrue(
             Commands.runOnce(
+                () -> candleSubsystem.signalNote(objectDetectionSubsystem.getBestTarget().get())))
+        .onFalse(
+            Commands.either(
+                Commands.none(),
+                Commands.runOnce(candleSubsystem::reset),
                 () ->
-                    candleSubsystem.signalNote(
-                        objectDetectionSubsystem.getNotesRotation(
-                            objectDetectionSubsystem.getNoteSeenOnTrue()))));
+                    manipulatorSubsystem.isNoteInFeeder()
+                        || manipulatorSubsystem.isNoteInRoller()));
 
     new Trigger(() -> manipulatorSubsystem.isNoteInRoller() && isTeleop)
         .onTrue(
