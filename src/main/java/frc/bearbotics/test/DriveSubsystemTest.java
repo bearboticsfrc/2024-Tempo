@@ -90,10 +90,12 @@ public class DriveSubsystemTest extends AbstractTestCommand {
         new SwerveModuleState(
             SwerveModuleConstants.Test.VELOCITY,
             Rotation2d.fromDegrees(90).plus(driveSubsystem.getHeading()));
+    Command runCommand = Commands.run(() -> module.set(newState));
 
     return Commands.sequence(
-        Commands.runOnce(() -> module.set(newState)),
+        runCommand,
         Commands.waitSeconds(SwerveModuleConstants.Test.WAIT),
+        Commands.runOnce(() -> runCommand.end(true)),
         Commands.runOnce(
             () -> setPass(module + " Drive", isDrivePassing(module.getDriveVelocity()))),
         Commands.runOnce(
