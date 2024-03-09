@@ -107,7 +107,7 @@ public class ShooterSubsystem extends SubsystemBase {
         < ShooterConstants.VELOCITY_TOLERANCE;
   }
 
-  private double getVelocityFromDistance(double distance) {
+  public static double getVelocityFromDistance(double distance) {
     if (distance <= 2) {
       return 2200;
     } else if (distance >= 5) {

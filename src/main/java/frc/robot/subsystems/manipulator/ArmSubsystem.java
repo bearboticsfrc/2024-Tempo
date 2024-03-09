@@ -215,7 +215,7 @@ public class ArmSubsystem extends SubsystemBase {
   }
 
   public void set(DoubleSupplier distanceSupplier) {
-    set(calculateAngleFromDistance(distanceSupplier.getAsDouble()).getDegrees());
+    set(calculateAngleFromDistanceDegrees(distanceSupplier.getAsDouble()));
   }
 
   /**
@@ -246,8 +246,10 @@ public class ArmSubsystem extends SubsystemBase {
    * @param distance The current distance to the speaker.
    * @return The calculated angle to the pivot point of the arm up to the speaker.
    */
-  private Rotation2d calculateAngleFromDistance(double distance) {
+  private double calculateAngleFromDistanceDegrees(double distance) {
     distance = (distance - ArmConstants.ROBOT_TO_SHOOTER_PIVOT) - ArmConstants.SPEAKER_X_OFFSET;
+    double launchVelocity =
+        ShooterSubsystem.getVelocityFromDistance(distance) * ArmConstants.FLYWHEEL_RADIUS;
 
     /*
      * given the triangle composed of two sides: </p>
@@ -258,19 +260,19 @@ public class ArmSubsystem extends SubsystemBase {
      * Find the angle B to calculate the remaining angle C.
      *
      */
-    double angleB =
+    double h = (ArmConstants.SPEAKER_Z_HEIGHT - ArmConstants.SHOOTER_BASE_HEIGHT);
+    double d = distance;
+    double aR = ArmConstants.ARM_RADIUS;
+
+    double theta =
         Math.asin(
-            Math.sin(Math.toRadians(ArmConstants.SHOOTER_ANGLE))
-                * ArmConstants.ARM_LENGTH
-                / Math.hypot(ArmConstants.SHOOTER_TO_SPEAKER_HEIGHT, distance));
-    double angleC = 180 - ArmConstants.SHOOTER_ANGLE - Math.toDegrees(angleB);
+            (h
+                    + (4.9
+                        * (Math.pow(h, 2) + Math.pow(d, 2))
+                        / ShooterSubsystem.getVelocityFromDistance(distance)))
+                / (aR + Math.hypot(d, h)));
 
-    // Calculate the angle of the pivot point up to the speaker,
-    // Add angleC to compute the arm angle.
-    double angle =
-        Math.toDegrees(Math.atan(ArmConstants.SHOOTER_TO_SPEAKER_HEIGHT / distance)) + angleC;
-
-    return Rotation2d.fromDegrees(180 - angle);
+    return Math.toDegrees(theta);
   }
 
   /** Enum representing different positions of the arm. */

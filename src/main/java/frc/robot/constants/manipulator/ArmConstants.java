@@ -6,6 +6,8 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 public class ArmConstants {
   public static final int LIMIT_SWITCH_CHANNEL = 3;
   public static final double POSITION_TOLERANCE = 1;
+  public static final double FLYWHEEL_RADIUS = 0.0508;
+  public static final double ARM_RADIUS = 0.3782314;
 
   public static final double ROBOT_TO_SHOOTER_PIVOT = .2;
   public static final double SPEAKER_X_OFFSET = .23;
