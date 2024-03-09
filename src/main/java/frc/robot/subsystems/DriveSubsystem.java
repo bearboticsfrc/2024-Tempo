@@ -53,7 +53,7 @@ public class DriveSubsystem extends SubsystemBase {
   private final SwerveDrivePoseEstimator odometry;
   private GenericEntry competitionTabMaxSpeedEntry;
 
-  private double maxSpeed = DriveConstants.DRIVE_VELOCITY;
+  private double maxSpeed = SpeedMode.TURBO.getMaxSpeed();
   private boolean fieldRelativeMode = true;
 
   private StructPublisher<Pose2d> posePublisher;

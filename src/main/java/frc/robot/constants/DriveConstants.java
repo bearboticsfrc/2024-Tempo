@@ -9,7 +9,7 @@ public class DriveConstants {
   public static final int OPERATOR_CONTROLLER_PORT = 1;
 
   // Max free spin for the Spark (taken from docs)
-  public static final int MAX_MOTOR_FREE_SPEED_RPM = 6784;
+  public static final int MAX_MOTOR_FREE_SPEED_RPM = 5676;
 
   // Wheel circumference based on the wheel diameter constant
   public static final double WHEEL_CIRCUMFERENCE = RobotConstants.WHEEL_DIAMETER * Math.PI;

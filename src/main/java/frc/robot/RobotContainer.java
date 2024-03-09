@@ -40,6 +40,7 @@ import frc.robot.location.LocationHelper;
 import frc.robot.subsystems.BlinkinSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.PowerDistributionSubsystem;
+import frc.robot.subsystems.manipulator.ArmSubsystem.ArmPosition;
 import frc.robot.subsystems.manipulator.IntakeSubsystem.IntakeSpeed;
 import frc.robot.subsystems.manipulator.ManipulatorSubsystem;
 import frc.robot.subsystems.vision.ObjectDetectionSubsystem;
@@ -201,16 +202,16 @@ public class RobotContainer {
     driverController
         .leftStick()
         .whileTrue(
-            Commands.runOnce(() -> driveSubsystem.setSpeedMode(SpeedMode.TURBO), driveSubsystem))
+            Commands.runOnce(() -> driveSubsystem.setSpeedMode(SpeedMode.NORMAL), driveSubsystem))
         .onFalse(
-            Commands.runOnce(() -> driveSubsystem.setSpeedMode(SpeedMode.NORMAL), driveSubsystem));
+            Commands.runOnce(() -> driveSubsystem.setSpeedMode(SpeedMode.TURBO), driveSubsystem));
 
     driverController
         .rightStick()
         .whileTrue(
             Commands.runOnce(() -> driveSubsystem.setSpeedMode(SpeedMode.TURTLE), driveSubsystem))
         .onFalse(
-            Commands.runOnce(() -> driveSubsystem.setSpeedMode(SpeedMode.NORMAL), driveSubsystem));
+            Commands.runOnce(() -> driveSubsystem.setSpeedMode(SpeedMode.TURBO), driveSubsystem));
 
     driverController
         .leftBumper()
@@ -350,7 +351,11 @@ public class RobotContainer {
     operatorController
         .y()
         .onTrue(Commands.runOnce(() -> blinkinSubsystem.signalSource()))
-        .onFalse(Commands.runOnce((() -> blinkinSubsystem.reset())));
+        .onFalse(Commands.runOnce(() -> blinkinSubsystem.reset()));
+
+    operatorController.povUp().onTrue(manipulatorSubsystem.getArmRunCommand(ArmPosition.AMP_SHOOT));
+
+    operatorController.povDown().onTrue(manipulatorSubsystem.getArmRunCommand(ArmPosition.HOME));
   }
 
   /**
