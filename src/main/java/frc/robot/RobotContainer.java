@@ -74,7 +74,7 @@ public class RobotContainer {
   private final PoseEstimatorSubsystem poseEstimatorSubsystem =
       new PoseEstimatorSubsystem(driveSubsystem, FieldPositions.getInstance());
 
-  private final CandleSubsystem blinkinSubsystem = new CandleSubsystem();
+  private final CandleSubsystem candleSubsystem = new CandleSubsystem();
 
   private boolean isTeleop;
   private boolean isAutoPathTargeting = false;
@@ -272,8 +272,18 @@ public class RobotContainer {
                 manipulatorSubsystem.getShootCommand()));
 
     new Trigger(() -> manipulatorSubsystem.isNoteInFeeder())
-        .onTrue(Commands.runOnce(() -> blinkinSubsystem.signalNoteInHolder()))
-        .onFalse(Commands.runOnce(() -> blinkinSubsystem.reset()));
+        .onTrue(Commands.runOnce(() -> candleSubsystem.signalNoteInHolder()))
+        .onFalse(Commands.runOnce(() -> candleSubsystem.reset()));
+    new Trigger(
+            () ->
+                (!manipulatorSubsystem.isNoteInFeeder()
+                    && objectDetectionSubsystem.hasNoteInView()))
+        .onTrue(
+            Commands.runOnce(
+                () ->
+                    candleSubsystem.signalNote(
+                        objectDetectionSubsystem.getNotesRotation(
+                            objectDetectionSubsystem.getNoteSeenOnTrue()))));
 
     new Trigger(() -> manipulatorSubsystem.isNoteInRoller() && isTeleop)
         .onTrue(
@@ -348,8 +358,8 @@ public class RobotContainer {
 
     operatorController
         .y()
-        .onTrue(Commands.runOnce(() -> blinkinSubsystem.signalSource()))
-        .onFalse(Commands.runOnce((() -> blinkinSubsystem.reset())));
+        .onTrue(Commands.runOnce(() -> candleSubsystem.signalSource()))
+        .onFalse(Commands.runOnce((() -> candleSubsystem.reset())));
   }
 
   /**
@@ -360,7 +370,7 @@ public class RobotContainer {
   public void setTeleop(boolean mode) {
     isTeleop = mode;
 
-    blinkinSubsystem.reset();
+    candleSubsystem.reset();
   }
 
   /**

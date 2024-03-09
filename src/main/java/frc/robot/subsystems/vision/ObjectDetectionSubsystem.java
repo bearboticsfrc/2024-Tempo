@@ -16,6 +16,7 @@ import org.photonvision.targeting.PhotonTrackedTarget;
 public class ObjectDetectionSubsystem extends SubsystemBase {
   private PhotonCamera photonCamera;
   private boolean driverCameraMode;
+  private PhotonTrackedTarget noteSeenOnTrue;
 
   public ObjectDetectionSubsystem(String cameraName) {
     photonCamera = new PhotonCamera(cameraName);
@@ -26,7 +27,15 @@ public class ObjectDetectionSubsystem extends SubsystemBase {
   }
 
   public boolean hasNoteInView() {
-    return photonCamera.getLatestResult().hasTargets();
+    if (photonCamera.getLatestResult().hasTargets()) {
+      noteSeenOnTrue = photonCamera.getLatestResult().getBestTarget();
+      return true;
+    }
+    return false;
+  }
+
+  public PhotonTrackedTarget getNoteSeenOnTrue() {
+    return noteSeenOnTrue;
   }
 
   private PhotonTrackedTarget getBestTarget() {
@@ -39,6 +48,10 @@ public class ObjectDetectionSubsystem extends SubsystemBase {
 
   public Optional<Transform3d> getTransformToNearestNote() {
     return Optional.ofNullable(getBestTarget().getBestCameraToTarget());
+  }
+
+  public Rotation2d getNotesRotation(PhotonTrackedTarget note) {
+    return Rotation2d.fromDegrees(-note.getYaw());
   }
 
   public Optional<Pose2d> getPoseToNearestNote(Pose2d currentPose) {
