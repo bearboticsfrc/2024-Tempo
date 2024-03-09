@@ -37,7 +37,7 @@ import frc.robot.constants.RobotConstants;
 import frc.robot.constants.VisionConstants;
 import frc.robot.location.FieldPositions;
 import frc.robot.location.LocationHelper;
-import frc.robot.subsystems.BlinkinSubsystem;
+import frc.robot.subsystems.CandleSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.PowerDistributionSubsystem;
 import frc.robot.subsystems.manipulator.IntakeSubsystem.IntakeSpeed;
@@ -74,7 +74,7 @@ public class RobotContainer {
   private final PoseEstimatorSubsystem poseEstimatorSubsystem =
       new PoseEstimatorSubsystem(driveSubsystem, FieldPositions.getInstance());
 
-  private final BlinkinSubsystem blinkinSubsystem = new BlinkinSubsystem();
+  private final CandleSubsystem blinkinSubsystem = new CandleSubsystem();
 
   private boolean isTeleop;
   private boolean isAutoPathTargeting = false;

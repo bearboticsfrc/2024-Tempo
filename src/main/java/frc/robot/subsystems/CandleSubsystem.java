@@ -9,18 +9,23 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.motorcontrol.Spark;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.bearbotics.fms.AllianceColor;
-import frc.robot.constants.BlinkinConstants;
+import frc.robot.constants.CandleConstants;
 import java.util.List;
 
-public class BlinkinSubsystem extends SubsystemBase {
+public class CandleSubsystem extends SubsystemBase {
+
+
+
+
+  
   private final List<Spark> blinkins =
-      List.of(new Spark(BlinkinConstants.FRONT_BLINKIN), new Spark(BlinkinConstants.BACK_BLINKIN));
+      List.of(new Spark(CandleConstants.FRONT_BLINKIN), new Spark(CandleConstants.BACK_BLINKIN));
 
   /**
    * Constructs the BlinkinSubsystem and initializes the Blinkin LED controllers. Resets the Blinkin
    * LEDs to the alliance color.
    */
-  public BlinkinSubsystem() {
+  public CandleSubsystem() {
     reset();
   }
 
@@ -30,7 +35,7 @@ public class BlinkinSubsystem extends SubsystemBase {
    * @param blinkins The list of Spark controllers representing Blinkin LEDs.
    * @param color The desired color from the BlinkinConstants.Color enum.
    */
-  public void setColor(List<Spark> blinkins, BlinkinConstants.Color color) {
+  public void setColor(List<Spark> blinkins, CandleConstants.Color color) {
     for (Spark blinkin : blinkins) {
       blinkin.set(color.value);
     }
@@ -42,7 +47,7 @@ public class BlinkinSubsystem extends SubsystemBase {
    * @param blinkins The list of Spark controllers representing Blinkin LEDs.
    * @param blinkinPattern The desired pattern from the BlinkinConstants.BlinkinPattern enum.
    */
-  public void setPattern(List<Spark> blinkins, BlinkinConstants.Pattern blinkinPattern) {
+  public void setPattern(List<Spark> blinkins, CandleConstants.Pattern blinkinPattern) {
     for (Spark blinkin : blinkins) {
       blinkin.set(blinkinPattern.value);
     }
@@ -50,27 +55,27 @@ public class BlinkinSubsystem extends SubsystemBase {
 
   /** Signals the Blinkin LED controllers to display a strobing gold pattern. */
   public void signalSource() {
-    setPattern(blinkins, BlinkinConstants.Pattern.STROBE_GOLD);
+    setPattern(blinkins, CandleConstants.Pattern.STROBE_GOLD);
   }
 
   /** Sets the color of the Blinkin LED controllers to blue. */
   public void setBlue() {
-    setColor(blinkins, BlinkinConstants.Color.BLUE);
+    setColor(blinkins, CandleConstants.Color.BLUE);
   }
 
   /** Sets the color of the Blinkin LED controllers to red. */
   public void setRed() {
-    setColor(blinkins, BlinkinConstants.Color.RED);
+    setColor(blinkins, CandleConstants.Color.RED);
   }
 
   /** Sets the pattern of the Blinkin LED controllers to a red heartbeat animation. */
   public void setRedAutoAnimation() {
-    setPattern(blinkins, BlinkinConstants.Pattern.HEARTBEAT_RED);
+    setPattern(blinkins, CandleConstants.Pattern.HEARTBEAT_RED);
   }
 
   /** Sets the pattern of the Blinkin LED controllers to a blue heartbeat animation. */
   public void setBlueAutoAnimation() {
-    setPattern(blinkins, BlinkinConstants.Pattern.HEARTBEAT_BLUE);
+    setPattern(blinkins, CandleConstants.Pattern.HEARTBEAT_BLUE);
   }
 
   /**
@@ -78,7 +83,7 @@ public class BlinkinSubsystem extends SubsystemBase {
    * signal).
    */
   public void signalNoteInHolder() {
-    setColor(blinkins, BlinkinConstants.Color.GREEN);
+    setColor(blinkins, CandleConstants.Color.GREEN);
   }
 
   /**
