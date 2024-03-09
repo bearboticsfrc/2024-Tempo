@@ -352,13 +352,9 @@ public class RobotContainer {
         .onTrue(Commands.runOnce(() -> blinkinSubsystem.signalSource()))
         .onFalse(Commands.runOnce(() -> blinkinSubsystem.reset()));
 
-    operatorController
-        .povUp()
-        .onTrue(manipulatorSubsystem.getArmRunCommand(ArmPosition.AMP_SHOOT));
+    operatorController.povUp().onTrue(manipulatorSubsystem.getArmRunCommand(ArmPosition.AMP_SHOOT));
 
-    operatorController
-        .povDown()
-        .onTrue(manipulatorSubsystem.getArmRunCommand(ArmPosition.HOME));
+    operatorController.povDown().onTrue(manipulatorSubsystem.getArmRunCommand(ArmPosition.HOME));
   }
 
   /**

@@ -234,8 +234,7 @@ public class ManipulatorSubsystem extends SubsystemBase {
   private Command getShootCommand(ArmPosition armPosition, ShooterVelocity shooterVelocity) {
     return Commands.sequence(
         Commands.parallel(
-            getArmPrepareCommand(armPosition),
-            getShooterPrepareCommand(shooterVelocity)),
+            getArmPrepareCommand(armPosition), getShooterPrepareCommand(shooterVelocity)),
         getShootCommand());
   }
 
