@@ -24,13 +24,6 @@ import frc.robot.util.RevUtil;
 import java.util.function.DoubleSupplier;
 
 public class ArmSubsystem extends SubsystemBase {
-  private static final double ROBOT_TO_SHOOTER_PIVOT = .2;
-  private static final double SPEAKER_X_OFFSET = .23;
-  private static final double SPEAKER_Z_HEIGHT = 2.032;
-  private static final double SHOOTER_ANGLE = 56.0;
-  private static final double SHOOTER_BASE_HEIGHT = .42;
-  private static final double ARM_LENGTH = .425;
-
   private CANSparkMax armMotor;
 
   private SparkAbsoluteEncoder armAbsoluteMotorEncoder;
@@ -222,7 +215,7 @@ public class ArmSubsystem extends SubsystemBase {
   }
 
   public void set(DoubleSupplier distanceSupplier) {
-    set(getPositionFromDistance(distanceSupplier.getAsDouble()));
+    set(calculateAngleFromDistance(distanceSupplier.getAsDouble()).getDegrees());
   }
 
   /**
@@ -247,60 +240,14 @@ public class ArmSubsystem extends SubsystemBase {
         targetState);
   }
 
-  private double getPositionFromDistance(double distance) {
-    distance = Math.min(distance, 6);
-
-    if (distance <= 1.54) {
-      return 0;
-    } else if (distance <= 2.46) {
-      return (-20.184544405997 * Math.pow(distance, 2))
-          + (97.445213379467 * distance)
-          - 96.066435986155;
-    } else if (distance <= 2.97) {
-      return (-4.6136101499431 * Math.pow(distance, 2))
-          + (37.01268742792 * distance)
-          - 41.631487889285
-          + 1;
-    } else if (distance <= 3.26) {
-      return (4.3779580797881 * Math.pow(distance, 2))
-          - (19.10226504394 * distance)
-          + 45.716196754614
-          + 1;
-    } else if (distance <= 3.63) {
-      return (16.714082503539 * Math.pow(distance, 2))
-          - (111.48435277371 * distance)
-          + 215.77840682767
-          + 1;
-    } else if (distance <= 3.97) {
-      return (-5.8562091503112 * Math.pow(distance, 2))
-          + (47.860130718825 * distance)
-          - 65.235592156593
-          + 1;
-    } else if (distance <= 4.3) {
-      return (-13.921166552737 * Math.pow(distance, 2))
-          + (124.91592617901 * distance)
-          - 244.03611300964
-          + 0.5;
-    } else if (distance <= 4.71) {
-      return (1.0365853658576 * Math.pow(distance, 2))
-          - (4.7054878048905 * distance)
-          + 36.767134146455;
-    } else {
-      return (2.4521072796883 * Math.pow(distance, 2))
-          - (23.311877394612 * distance)
-          + 93.001149425188
-          - 2;
-    }
-  }
-
-  /*
+  /**
    * Calculates the angle of the speaker to the arm pivot point plus the angle of the shooter.
    *
+   * @param distance The current distance to the speaker.
+   * @return The calculated angle to the
    */
-  public static double calculateAngleFromDistance(double distance) {
-
-    distance = distance - ROBOT_TO_SHOOTER_PIVOT - SPEAKER_X_OFFSET;
-    final double height = SPEAKER_Z_HEIGHT - SHOOTER_BASE_HEIGHT;
+  private Rotation2d calculateAngleFromDistance(double distance) {
+    distance = (distance - ArmConstants.ROBOT_TO_SHOOTER_PIVOT) - ArmConstants.SPEAKER_X_OFFSET;
 
     /*
      * given the triangle composed of two sides: </p>
@@ -313,18 +260,17 @@ public class ArmSubsystem extends SubsystemBase {
      */
     double angleB =
         Math.asin(
-            Math.sin(Math.toRadians(SHOOTER_ANGLE)) * ARM_LENGTH / Math.hypot(height, distance));
+            Math.sin(Math.toRadians(ArmConstants.SHOOTER_ANGLE))
+                * ArmConstants.ARM_LENGTH
+                / Math.hypot(ArmConstants.SHOOTER_TO_SPEAKER_HEIGHT, distance));
+    double angleC = 180 - ArmConstants.SHOOTER_ANGLE - Math.toDegrees(angleB);
 
-    double angleC = 180 - SHOOTER_ANGLE - Math.toDegrees(angleB);
+    // Calculate the angle of the pivot point up to the speaker,
+    // Add angleC to compute the arm angle.
+    double angle =
+        Math.toDegrees(Math.atan(ArmConstants.SHOOTER_TO_SPEAKER_HEIGHT / distance)) + angleC;
 
-    /*
-     * Calculate the angle of the pivot point up to the speaker, add angleC to compute the arm angle.
-     */
-    double angle = Math.toDegrees(Math.atan(height / distance)) + angleC;
-
-    angle = 180 - angle;
-
-    return angle;
+    return Rotation2d.fromDegrees(180 - angle);
   }
 
   /** Enum representing different positions of the arm. */

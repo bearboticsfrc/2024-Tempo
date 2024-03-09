@@ -7,6 +7,14 @@ public class ArmConstants {
   public static final int LIMIT_SWITCH_CHANNEL = 3;
   public static final double POSITION_TOLERANCE = 1;
 
+  public static final double ROBOT_TO_SHOOTER_PIVOT = .2;
+  public static final double SPEAKER_X_OFFSET = .23;
+  public static final double SPEAKER_Z_HEIGHT = 2.032;
+  public static final double SHOOTER_ANGLE = 56.0;
+  public static final double SHOOTER_BASE_HEIGHT = .42;
+  public static final double ARM_LENGTH = .425;
+  public static final double SHOOTER_TO_SPEAKER_HEIGHT = SPEAKER_Z_HEIGHT - SHOOTER_BASE_HEIGHT;
+
   public class Motor {
     public static final String NAME = "Arm Motor";
     public static final int MOTOR_PORT = 3;
