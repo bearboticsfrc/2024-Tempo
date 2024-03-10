@@ -1,15 +1,17 @@
 package frc.robot.commands;
 
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.vision.ObjectDetectionSubsystem;
-import java.util.Optional;
+import org.photonvision.targeting.PhotonTrackedTarget;
 
-public class AutoNotePickupCommand extends SequentialCommandGroup {
+public class AutoNotePickupCommand extends Command {
   private final DriveSubsystem driveSubsystem;
   private final ObjectDetectionSubsystem objectDetectionSubsystem;
+
+  private final PIDController yawPidController = new PIDController(0.002, 0, 0);
+  private final PIDController pitchPidController = new PIDController(0.002, 0, 0);
 
   /**
    * Constructs the AutoNotePickupCommand.
@@ -21,44 +23,30 @@ public class AutoNotePickupCommand extends SequentialCommandGroup {
       DriveSubsystem driveSubsystem, ObjectDetectionSubsystem objectDetectionSubsystem) {
     this.driveSubsystem = driveSubsystem;
     this.objectDetectionSubsystem = objectDetectionSubsystem;
-
-    addCommands(
-        driveSubsystem.getDriveStopCommand(), getAutoNoteAimCommand(), getAutoNoteDriveCommand());
-    addRequirements(driveSubsystem);
   }
 
-  /**
-   * Creates an AutoAimCommand instance to the nearest note point.
-   *
-   * @param point The target point for auto-aiming.
-   * @return An AutoAimCommand instance.
-   */
-  private AutoAimCommand getAutoNoteAimCommand() {
-    return new AutoAimCommand(driveSubsystem, getPointToNearestNote(), true);
+  @Override
+  public void execute() {
+    if (!objectDetectionSubsystem.hasNoteInView()) {
+      driveSubsystem.drive(0, 0, 0);
+      return;
+    }
+
+    PhotonTrackedTarget target = objectDetectionSubsystem.getTargetToNearestNote().get();
+
+    double rot = yawPidController.calculate(target.getYaw(), 0);
+    double xSpeed = pitchPidController.calculate(target.getYaw(), 0);
+
+    driveSubsystem.drive(xSpeed, 0, rot, false);
   }
 
-  /**
-   * Creates an AutoDriveCommand instance to the nearest note point.
-   *
-   * @return An AutoDriveCommand instance.
-   */
-  private AutoDriveCommand getAutoNoteDriveCommand() {
-    return new AutoDriveCommand(driveSubsystem, getPointToNearestNote());
+  @Override
+  public boolean isFinished() {
+    return yawPidController.atSetpoint() && pitchPidController.atSetpoint();
   }
 
-  /**
-   * Retrieves the target point for auto-aiming and autonomous driving, based on the pose to nearest
-   * note information from the ObjectDetectionSubsystem.
-   *
-   * @return The target note point.
-   */
-  private Translation2d getPointToNearestNote() {
-    Optional<Pose2d> notePose =
-        objectDetectionSubsystem.getPoseToNearestNote(driveSubsystem.getPose());
-
-    // TODO: This might be invalid since PhotonVision was not returning X or Y components.
-    return notePose.isPresent()
-        ? notePose.get().getTranslation()
-        : driveSubsystem.getPose().getTranslation();
+  @Override
+  public void end(boolean interrupted) {
+    driveSubsystem.drive(0, 0, 0);
   }
 }
