@@ -35,10 +35,10 @@ public class EstimationRunnable implements Runnable {
     this.photonPoseEstimator =
         new PhotonPoseEstimator(
             layout,
-            PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
+            PoseStrategy.LOWEST_AMBIGUITY,
             photonCamera,
             camera.getRobotToCameraTransform());
-    this.photonPoseEstimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
+   // this.photonPoseEstimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
   }
 
   @Override
@@ -46,7 +46,7 @@ public class EstimationRunnable implements Runnable {
     PhotonPipelineResult photonResults = photonCamera.getLatestResult();
 
     if (!photonResults.hasTargets()
-        || (photonResults.targets.size() == 1
+        || (photonResults.targets.size() >= 1
             && photonResults.targets.get(0).getPoseAmbiguity() > APRILTAG_AMBIGUITY_THRESHOLD)) {
       return;
     }
