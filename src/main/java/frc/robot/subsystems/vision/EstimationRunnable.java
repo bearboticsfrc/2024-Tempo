@@ -51,12 +51,12 @@ public class EstimationRunnable implements Runnable {
       return;
     }
 
-    if (photonResults.targets.size() == 1) {
+    if (photonResults.targets.size() >= 1) {
       PhotonTrackedTarget target = photonResults.getTargets().get(0);
       Transform3d t3d = target.getBestCameraToTarget();
       double distance = Math.hypot(t3d.getX(), t3d.getY());
 
-      if (distance > 3.5) return;
+      if (distance > 3.3) return;
     }
 
     photonPoseEstimator
