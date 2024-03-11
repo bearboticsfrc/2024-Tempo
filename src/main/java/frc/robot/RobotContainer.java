@@ -71,7 +71,7 @@ public class RobotContainer {
 
   @SuppressWarnings("unused")
   private final ObjectDetectionSubsystem objectDetectionSubsystem =
-      new ObjectDetectionSubsystem(VisionConstants.OBJECT_DETECTION_CAMERA);
+      new ObjectDetectionSubsystem(VisionConstants.OBJECT_DETECTION_CAMERA, driveSubsystem);
 
   private final PoseEstimatorSubsystem poseEstimatorSubsystem =
       new PoseEstimatorSubsystem(driveSubsystem, FieldPositions.getInstance());
