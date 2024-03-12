@@ -40,6 +40,7 @@ import frc.robot.location.LocationHelper;
 import frc.robot.subsystems.BlinkinSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.PowerDistributionSubsystem;
+import frc.robot.subsystems.manipulator.ArmSubsystem.ArmPosition;
 import frc.robot.subsystems.manipulator.IntakeSubsystem.IntakeSpeed;
 import frc.robot.subsystems.manipulator.ManipulatorSubsystem;
 import frc.robot.subsystems.vision.ObjectDetectionSubsystem;
@@ -349,7 +350,11 @@ public class RobotContainer {
     operatorController
         .y()
         .onTrue(Commands.runOnce(() -> blinkinSubsystem.signalSource()))
-        .onFalse(Commands.runOnce((() -> blinkinSubsystem.reset())));
+        .onFalse(Commands.runOnce(() -> blinkinSubsystem.reset()));
+
+    operatorController.povUp().onTrue(manipulatorSubsystem.getArmRunCommand(ArmPosition.AMP_SHOOT));
+
+    operatorController.povDown().onTrue(manipulatorSubsystem.getArmRunCommand(ArmPosition.HOME));
   }
 
   /**

@@ -27,12 +27,12 @@ public final class VisionConstants {
   public static final Transform3d ROBOT_TO_BACK_LEFT_CAMERA =
       new Transform3d(
           new Translation3d(.0178, 0.3072, 0.40311),
-          new Rotation3d(Math.toRadians(0.0), Math.toRadians(-30.0), Math.toRadians(164.0)));
+          new Rotation3d(Math.toRadians(0.0), Math.toRadians(-30.0), Math.toRadians(166.1)));
 
   public static final Transform3d ROBOT_TO_BACK_RIGHT_CAMERA =
       new Transform3d(
           new Translation3d(.0178, -0.3072, 0.40311),
-          new Rotation3d(Math.toRadians(0.0), Math.toRadians(-30.0), Math.toRadians(-167.0)));
+          new Rotation3d(Math.toRadians(0.0), Math.toRadians(-30.0), Math.toRadians(-163.0)));
 
   // verify pitch, should front be positive and back negative ?   or 30+180 ???? 210
   //
@@ -54,7 +54,7 @@ public final class VisionConstants {
   public static final double NOISY_DISTANCE_METERS = 3.5;
   public static final double DISTANCE_WEIGHT = 7;
 
-  public static final double APRILTAG_AMBIGUITY_THRESHOLD = 0.1;
+  public static final double APRILTAG_AMBIGUITY_THRESHOLD = 0.08;
 
   public static final String OBJECT_DETECTION_CAMERA = "OV9782NoteCamera";
   public static final String CAMERA2_NAME = "OV9281_2";

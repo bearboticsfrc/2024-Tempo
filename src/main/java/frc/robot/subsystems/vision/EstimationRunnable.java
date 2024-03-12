@@ -35,10 +35,9 @@ public class EstimationRunnable implements Runnable {
     this.photonPoseEstimator =
         new PhotonPoseEstimator(
             layout,
-            PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
+            PoseStrategy.LOWEST_AMBIGUITY,
             photonCamera,
             camera.getRobotToCameraTransform());
-    this.photonPoseEstimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
   }
 
   @Override
@@ -46,17 +45,17 @@ public class EstimationRunnable implements Runnable {
     PhotonPipelineResult photonResults = photonCamera.getLatestResult();
 
     if (!photonResults.hasTargets()
-        || (photonResults.targets.size() == 1
+        || (photonResults.targets.size() >= 1
             && photonResults.targets.get(0).getPoseAmbiguity() > APRILTAG_AMBIGUITY_THRESHOLD)) {
       return;
     }
 
-    if (photonResults.targets.size() == 1) {
+    if (photonResults.targets.size() >= 1) {
       PhotonTrackedTarget target = photonResults.getTargets().get(0);
       Transform3d t3d = target.getBestCameraToTarget();
       double distance = Math.hypot(t3d.getX(), t3d.getY());
 
-      if (distance > 3.5) return;
+      if (distance > 3.3) return;
     }
 
     photonPoseEstimator

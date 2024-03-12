@@ -30,8 +30,8 @@ public class DriveConstants {
   public static final double DRIVE_VELOCITY = MAX_VELOCITY / 2;
 
   // Max linear and angular acceleration and deceleration limits
-  public static final double MAX_ACCELERATION_PER_SECOND = 3;
-  public static final double MAX_ANGULAR_ACCELERATION_PER_SECOND = 6 * (Math.PI * 2);
+  public static final double MAX_ACCELERATION_PER_SECOND = 7;
+  public static final double MAX_ANGULAR_ACCELERATION_PER_SECOND = 1.5 * (Math.PI * 2);
   public static final double MAX_ANGULAR_DECELERATION_PER_SECOND = 20;
 
   // Rate limiters for acceleration
