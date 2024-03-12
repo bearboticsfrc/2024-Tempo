@@ -7,7 +7,6 @@ package frc.robot.subsystems.vision;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform3d;
-import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.location.LocationHelper;
 import frc.robot.subsystems.DriveSubsystem;
@@ -34,6 +33,7 @@ public class ObjectDetectionSubsystem extends SubsystemBase {
   }
 
   private PhotonTrackedTarget getBestTarget() {
+    if (!photonCamera.getLatestResult().hasTargets()) return null;
     return photonCamera.getLatestResult().getBestTarget();
   }
 
@@ -61,6 +61,6 @@ public class ObjectDetectionSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-    DataLogManager.log(getPoseToNearestNote().toString());
+    // DataLogManager.log(getPoseToNearestNote().toString());
   }
 }

@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ScheduleCommand;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.bearbotics.fms.AllianceColor;
@@ -356,7 +357,13 @@ public class RobotContainer {
 
     operatorController
         .x()
-        .whileTrue(new AutoNotePickupCommand(driveSubsystem, objectDetectionSubsystem));
+        .whileTrue(
+            new AutoNotePickupCommand(driveSubsystem, objectDetectionSubsystem, true)
+            .andThen(new WaitCommand(5.0))
+                .andThen(
+                    new AutoNotePickupCommand(driveSubsystem, objectDetectionSubsystem, false)
+                        .until(() -> manipulatorSubsystem.isNoteInRoller())));
+               // .alongWith(manipulatorSubsystem.getIntakeCommand()));
 
     operatorController.povUp().onTrue(manipulatorSubsystem.getArmRunCommand(ArmPosition.AMP_SHOOT));
 
