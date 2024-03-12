@@ -38,7 +38,6 @@ public class EstimationRunnable implements Runnable {
             PoseStrategy.LOWEST_AMBIGUITY,
             photonCamera,
             camera.getRobotToCameraTransform());
-   // this.photonPoseEstimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
   }
 
   @Override
