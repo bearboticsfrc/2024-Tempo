@@ -5,11 +5,9 @@
 package frc.robot.subsystems.vision;
 
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.location.LocationHelper;
 import frc.robot.subsystems.DriveSubsystem;
 import java.util.Optional;
 import org.photonvision.PhotonCamera;
@@ -19,6 +17,8 @@ public class ObjectDetectionSubsystem extends SubsystemBase {
   private PhotonCamera photonCamera;
   private boolean driverCameraMode;
   private final DriveSubsystem drive;
+  double cameraHeight = 0.5334;
+  double cameraangle = 40;
 
   public ObjectDetectionSubsystem(String cameraName, DriveSubsystem driveSubsystem) {
     drive = driveSubsystem;
@@ -46,17 +46,17 @@ public class ObjectDetectionSubsystem extends SubsystemBase {
   }
 
   public Optional<Pose2d> getPoseToNearestNote() {
-    Pose2d currentPose = drive.getPose();
 
     if (!hasNoteInView()) {
       return Optional.empty();
     }
+    double yaw = getTargetToNearestNote().get().getYaw();
+    double pitch = getTargetToNearestNote().get().getPitch() + cameraangle;
+    double xDistance = cameraHeight * Math.tan(Math.toRadians(pitch));
+    double yDistance = xDistance * Math.tan(Math.toRadians(yaw));
+    Pose2d pose = drive.getPose();
 
-    return Optional.of(
-        LocationHelper.getPoseByDistanceAndAngleToPose(
-            currentPose,
-            getTransformToNearestNote().get().getX(),
-            Rotation2d.fromDegrees(getTargetToNearestNote().get().getYaw())));
+    return Optional.of(new Pose2d(xDistance, yDistance, pose.getRotation()));
   }
 
   @Override
