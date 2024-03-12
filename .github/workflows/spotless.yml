@@ -5,6 +5,7 @@ on:
 
 jobs:
   build:
+    name: Spotless Check
     runs-on: ubuntu-latest
 
     steps:
