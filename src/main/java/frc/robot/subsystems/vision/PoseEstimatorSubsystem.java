@@ -54,6 +54,13 @@ public class PoseEstimatorSubsystem extends SubsystemBase {
             new PhotonCamera(VisionConstants.BACK_RIGHT_CAMERA_NAME),
             VisionConstants.ROBOT_TO_BACK_RIGHT_CAMERA));
 
+    // Back Left
+    cameras.add(
+        new VisionCamera(
+            "BackLeft",
+            new PhotonCamera(VisionConstants.BACK_LEFT_CAMERA_NAME),
+            VisionConstants.ROBOT_TO_BACK_LEFT_CAMERA));
+
     ShuffleboardTab tab = Shuffleboard.getTab("Vision");
 
     for (VisionCamera robotCamera : cameras) {
