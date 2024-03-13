@@ -19,7 +19,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ScheduleCommand;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.bearbotics.fms.AllianceColor;
@@ -49,7 +48,6 @@ import frc.robot.subsystems.vision.ObjectDetectionSubsystem;
 import frc.robot.subsystems.vision.PoseEstimatorSubsystem;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 
 /**
  * Constructs a new RobotContainer object. This constructor is responsible for initializing
@@ -72,7 +70,7 @@ public class RobotContainer {
 
   @SuppressWarnings("unused")
   private final ObjectDetectionSubsystem objectDetectionSubsystem =
-      new ObjectDetectionSubsystem(VisionConstants.OBJECT_DETECTION_CAMERA, driveSubsystem);
+      new ObjectDetectionSubsystem(VisionConstants.OBJECT_DETECTION_CAMERA);
 
   private final PoseEstimatorSubsystem poseEstimatorSubsystem =
       new PoseEstimatorSubsystem(driveSubsystem, FieldPositions.getInstance());
@@ -207,14 +205,6 @@ public class RobotContainer {
             Commands.runOnce(() -> driveSubsystem.setSpeedMode(SpeedMode.NORMAL), driveSubsystem))
         .onFalse(
             Commands.runOnce(() -> driveSubsystem.setSpeedMode(SpeedMode.TURBO), driveSubsystem));
-
-    driverController
-        .rightStick()
-        .whileTrue(
-            Commands.runOnce(() -> driveSubsystem.setSpeedMode(SpeedMode.TURTLE), driveSubsystem))
-        .onFalse(
-            Commands.runOnce(() -> driveSubsystem.setSpeedMode(SpeedMode.TURBO), driveSubsystem));
-
     driverController
         .leftBumper()
         .whileTrue(manipulatorSubsystem.getSubwooferShootCommand())
@@ -241,6 +231,7 @@ public class RobotContainer {
                 .repeatedly());
 
     driverController.a().onTrue(Commands.runOnce(() -> driveSubsystem.resetImu()));
+
     driverController
         .y()
         .onTrue(manipulatorSubsystem.getPodiumShootCommand())
@@ -264,16 +255,13 @@ public class RobotContainer {
     driverController
         .rightBumper()
         .whileTrue(
-            Commands.sequence(
-                Commands.defer(
+            manipulatorSubsystem
+                .getShooterPrepareCommad(
                     () ->
-                        manipulatorSubsystem.getShooterPrepareCommad(
-                            () ->
-                                LocationHelper.getDistanceToPose(
-                                    driveSubsystem.getPose(),
-                                    FieldPositions.getInstance().getSpeakerCenter())),
-                    Set.of(manipulatorSubsystem)),
-                manipulatorSubsystem.getShootCommand()));
+                        LocationHelper.getDistanceToPose(
+                            driveSubsystem.getPose(),
+                            FieldPositions.getInstance().getSpeakerCenter()))
+                .andThen(manipulatorSubsystem.getShootCommand()));
 
     new Trigger(() -> manipulatorSubsystem.isNoteInFeeder())
         .onTrue(Commands.runOnce(() -> blinkinSubsystem.signalNoteInHolder()))
@@ -358,12 +346,14 @@ public class RobotContainer {
     operatorController
         .x()
         .whileTrue(
-            new AutoNotePickupCommand(driveSubsystem, objectDetectionSubsystem, true)
-            .andThen(new WaitCommand(5.0))
-                .andThen(
-                    new AutoNotePickupCommand(driveSubsystem, objectDetectionSubsystem, false)
-                        .until(() -> manipulatorSubsystem.isNoteInRoller())));
-               // .alongWith(manipulatorSubsystem.getIntakeCommand()));
+            Commands.parallel(
+                    new AutoNotePickupCommand(
+                        driveSubsystem,
+                        objectDetectionSubsystem,
+                        manipulatorSubsystem::isNoteInRoller),
+                    manipulatorSubsystem.getRollerRunCommand(IntakeSpeed.FULL))
+                .andThen(manipulatorSubsystem.getIntakeCommand()))
+        .onFalse(manipulatorSubsystem.getIntakeStopCommand());
 
     operatorController.povUp().onTrue(manipulatorSubsystem.getArmRunCommand(ArmPosition.AMP_SHOOT));
 

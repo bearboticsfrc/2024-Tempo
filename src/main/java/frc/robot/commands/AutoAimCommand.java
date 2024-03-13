@@ -19,7 +19,7 @@ public class AutoAimCommand extends Command {
 
   private Translation2d targetPoint;
 
-  private boolean aimFront;
+  private boolean aimFront = true;
 
   private DoubleSupplier xSupplier = () -> 0.0;
   private DoubleSupplier ySupplier = () -> 0.0;
