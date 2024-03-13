@@ -20,7 +20,11 @@ import frc.bearbotics.motor.MotorPidBuilder;
 import frc.bearbotics.motor.MotorSoftLimit;
 import frc.robot.constants.RobotConstants;
 import frc.robot.constants.manipulator.ArmConstants;
+import frc.robot.util.CalculateAnExponentialCurve;
 import frc.robot.util.RevUtil;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
 import java.util.function.DoubleSupplier;
 
 public class ArmSubsystem extends SubsystemBase {
@@ -243,7 +247,7 @@ public class ArmSubsystem extends SubsystemBase {
   private double getPositionFromDistance(double distance) {
     distance = Math.min(distance, 6);
 
-    if (distance <= 1.54) {
+    /*if (distance <= 1.54) {
       return 0;
     } else if (distance <= 2.46) {
       return (-20.184544405997 * Math.pow(distance, 2))
@@ -283,7 +287,38 @@ public class ArmSubsystem extends SubsystemBase {
           - (23.311877394612 * distance)
           + 93.001149425188
           - 2;
-    }
+    }*/
+
+    HashMap<Double, Double> table = new HashMap<>();
+    table.put(1.95, 17.2);
+    table.put(2.13, 19.8);
+    table.put(2.3, 19.5);
+    table.put(2.46, 21.5);
+    table.put(2.63, 23.8);
+    table.put(2.97, 27.6);
+    table.put(3.14, 28.9);
+    table.put(3.26, 29.97);
+    table.put(3.44, 30.06);
+    table.put(3.63, 31.33);
+    table.put(3.88, 32.3);
+    table.put(3.97, 32.47);
+    table.put(4.16, 34.7);
+    table.put(4.3, 35.7);
+    table.put(4.46, 36.4);
+    table.put(4.71, 37.6);
+    table.put(4.96, 37.7);
+    table.put(5.25, 38.2);
+
+    Double[] arr = {
+      1.95, 2.13, 2.3, 2.46, 2.63, 2.97, 3.14, 3.26, 3.44, 3.63, 3.88, 3.97, 4.16, 4.3, 4.46, 4.71,
+      4.96, 5.25
+    };
+
+    List<Double> inputs = Arrays.asList(arr);
+
+    CalculateAnExponentialCurve calculate = new CalculateAnExponentialCurve(table, inputs);
+
+    return calculate.calculate(distance);
   }
 
   /** Enum representing different positions of the arm. */
