@@ -27,14 +27,14 @@ public class ObjectDetectionSubsystem extends SubsystemBase {
   }
 
   public Optional<PhotonTrackedTarget> getBestTarget() {
-    return Optional.ofNullable(photonCamera.getLatestResult().getBestTarget());
+    return hasTargetInView()
+        ? Optional.of(photonCamera.getLatestResult().getBestTarget())
+        : Optional.empty();
   }
 
   public Optional<Transform3d> getTransformToBestTarget() {
-    if (!hasTargetInView()) {
-      return Optional.empty();
-    }
-
-    return Optional.of(getBestTarget().get().getBestCameraToTarget());
+    return hasTargetInView()
+        ? Optional.of(getBestTarget().get().getBestCameraToTarget())
+        : Optional.empty();
   }
 }
