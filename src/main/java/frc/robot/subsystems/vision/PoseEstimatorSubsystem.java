@@ -2,9 +2,11 @@ package frc.robot.subsystems.vision;
 
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.networktables.DoublePublisher;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.wpilibj.Notifier;
@@ -26,6 +28,7 @@ public class PoseEstimatorSubsystem extends SubsystemBase {
   private List<VisionCamera> cameras = new ArrayList<VisionCamera>();
 
   private StructPublisher<Pose2d> fusedPosePublisher;
+  private DoublePublisher headingPublisher;
 
   private List<Notifier> notifiers = new ArrayList<Notifier>();
   private List<EstimationRunnable> estimationRunnables = new ArrayList<EstimationRunnable>();
@@ -85,6 +88,9 @@ public class PoseEstimatorSubsystem extends SubsystemBase {
     fusedPosePublisher =
         NetworkTableInstance.getDefault().getStructTopic("/vision/pose", Pose2d.struct).publish();
 
+    headingPublisher =
+        NetworkTableInstance.getDefault().getDoubleTopic("/vision/heading").publish();
+
     tab.addString("Pose", () -> StringFormatting.poseToString(driveSubsystem.getPose()));
   }
 
@@ -95,6 +101,7 @@ public class PoseEstimatorSubsystem extends SubsystemBase {
     }
 
     fusedPosePublisher.set(driveSubsystem.getPose());
+    headingPublisher.set(driveSubsystem.getPose().getRotation().plus(Rotation2d.fromDegrees(180)).getDegrees());
   }
 
   public String getPoseString(Pose2d pose) {

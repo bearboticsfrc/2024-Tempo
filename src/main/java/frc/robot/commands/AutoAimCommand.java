@@ -5,6 +5,8 @@ import static edu.wpi.first.units.Units.*;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.networktables.DoublePublisher;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.units.Angle;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -15,7 +17,7 @@ import java.util.function.DoubleSupplier;
 public class AutoAimCommand extends Command {
   private final DriveSubsystem driveSubsystem;
 
-  private PIDController rotSpeedPidController = new PIDController(0.0025, 0, 0);
+  private PIDController rotSpeedPidController = new PIDController(0.01,0.01, 0.0005);
 
   private Translation2d targetPoint;
 
@@ -23,6 +25,8 @@ public class AutoAimCommand extends Command {
 
   private DoubleSupplier xSupplier = () -> 0.0;
   private DoubleSupplier ySupplier = () -> 0.0;
+
+  private DoublePublisher targetRotationPublisher;
 
   /*
    * Constructs the AutoAimCommand with the DriveSubsystem, target point, and optional
@@ -68,6 +72,10 @@ public class AutoAimCommand extends Command {
 
     rotSpeedPidController.setTolerance(2);
     rotSpeedPidController.enableContinuousInput(-180, 180);
+    rotSpeedPidController.setIZone(5.0);
+   
+    targetRotationPublisher =
+        NetworkTableInstance.getDefault().getDoubleTopic("/vision/targetRotation").publish();
 
     addRequirements(driveSubsystem);
   }
@@ -94,6 +102,8 @@ public class AutoAimCommand extends Command {
       DoubleSupplier xRequest, DoubleSupplier yRequest, Translation2d targetPoint) {
     Rotation2d targetRotation =
         LocationHelper.getRotationToTranslation(driveSubsystem.getPose(), targetPoint);
+
+    targetRotationPublisher.set(targetRotation.getDegrees());
 
     Measure<Angle> angularOffset = aimFront ? Degrees.of(180) : Degrees.of(0);
 
