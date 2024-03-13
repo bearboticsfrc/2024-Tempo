@@ -24,6 +24,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.bearbotics.fms.AllianceColor;
 import frc.bearbotics.test.DriveSubsystemTest;
 import frc.robot.commands.AutoAimCommand;
+import frc.robot.commands.AutoNotePickupCommand;
 import frc.robot.commands.AutoShootCommand;
 import frc.robot.commands.auto.MiddleC1;
 import frc.robot.commands.auto.MiddleC1C2;
@@ -47,7 +48,6 @@ import frc.robot.subsystems.vision.ObjectDetectionSubsystem;
 import frc.robot.subsystems.vision.PoseEstimatorSubsystem;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 
 /**
  * Constructs a new RobotContainer object. This constructor is responsible for initializing
@@ -205,14 +205,6 @@ public class RobotContainer {
             Commands.runOnce(() -> driveSubsystem.setSpeedMode(SpeedMode.NORMAL), driveSubsystem))
         .onFalse(
             Commands.runOnce(() -> driveSubsystem.setSpeedMode(SpeedMode.TURBO), driveSubsystem));
-
-    driverController
-        .rightStick()
-        .whileTrue(
-            Commands.runOnce(() -> driveSubsystem.setSpeedMode(SpeedMode.TURTLE), driveSubsystem))
-        .onFalse(
-            Commands.runOnce(() -> driveSubsystem.setSpeedMode(SpeedMode.TURBO), driveSubsystem));
-
     driverController
         .leftBumper()
         .whileTrue(manipulatorSubsystem.getSubwooferShootCommand())
@@ -233,11 +225,13 @@ public class RobotContainer {
         .whileTrue(
             new AutoAimCommand(
                     driveSubsystem,
+                    FieldPositions.getInstance().getSpeakerTranslation(),
                     () -> getJoystickInput(driverController, JoystickAxis.Ly),
                     () -> getJoystickInput(driverController, JoystickAxis.Lx))
                 .repeatedly());
 
     driverController.a().onTrue(Commands.runOnce(() -> driveSubsystem.resetImu()));
+
     driverController
         .y()
         .onTrue(manipulatorSubsystem.getPodiumShootCommand())
@@ -261,16 +255,13 @@ public class RobotContainer {
     driverController
         .rightBumper()
         .whileTrue(
-            Commands.sequence(
-                Commands.defer(
+            manipulatorSubsystem
+                .getShooterPrepareCommad(
                     () ->
-                        manipulatorSubsystem.getShooterPrepareCommad(
-                            () ->
-                                LocationHelper.getDistanceToPose(
-                                    driveSubsystem.getPose(),
-                                    FieldPositions.getInstance().getSpeakerCenter())),
-                    Set.of(manipulatorSubsystem)),
-                manipulatorSubsystem.getShootCommand()));
+                        LocationHelper.getDistanceToPose(
+                            driveSubsystem.getPose(),
+                            FieldPositions.getInstance().getSpeakerCenter()))
+                .andThen(manipulatorSubsystem.getShootCommand()));
 
     new Trigger(() -> manipulatorSubsystem.isNoteInFeeder())
         .onTrue(Commands.runOnce(() -> blinkinSubsystem.signalNoteInHolder()))
@@ -351,6 +342,18 @@ public class RobotContainer {
         .y()
         .onTrue(Commands.runOnce(() -> blinkinSubsystem.signalSource()))
         .onFalse(Commands.runOnce(() -> blinkinSubsystem.reset()));
+
+    operatorController
+        .x()
+        .whileTrue(
+            Commands.parallel(
+                    new AutoNotePickupCommand(
+                        driveSubsystem,
+                        objectDetectionSubsystem,
+                        manipulatorSubsystem::isNoteInRoller),
+                    manipulatorSubsystem.getRollerRunCommand(IntakeSpeed.FULL))
+                .andThen(manipulatorSubsystem.getIntakeCommand()))
+        .onFalse(manipulatorSubsystem.getIntakeStopCommand());
 
     operatorController.povUp().onTrue(manipulatorSubsystem.getArmRunCommand(ArmPosition.AMP_SHOOT));
 
