@@ -30,6 +30,7 @@ import frc.robot.commands.auto.MiddleC1;
 import frc.robot.commands.auto.MiddleC1C2;
 import frc.robot.commands.auto.MiddleTwoNote;
 import frc.robot.commands.auto.Sub1TwoNote;
+import frc.robot.commands.auto.Sub3ToC5;
 import frc.robot.commands.auto.Sub3TwoNote;
 import frc.robot.commands.auto.Sub3W3W2W1;
 import frc.robot.constants.DriveConstants;
@@ -102,7 +103,14 @@ public class RobotContainer {
           "subwooferShoot",
           new ScheduleCommand(manipulatorSubsystem.getSubwooferShootCommand()),
           "autoShoot",
-          new ScheduleCommand(new AutoShootCommand(driveSubsystem, manipulatorSubsystem)));
+          new ScheduleCommand(new AutoShootCommand(driveSubsystem, manipulatorSubsystem)),
+          "autoNotePickup",
+          new ScheduleCommand(
+              new AutoNotePickupCommand(
+                      driveSubsystem,
+                      objectDetectionSubsystem,
+                      manipulatorSubsystem::isNoteInRoller)
+                  .alongWith(manipulatorSubsystem.getIntakeCommand())));
 
   public RobotContainer() {
     setupShuffleboardTab(RobotConstants.COMPETITION_TAB);
@@ -140,7 +148,7 @@ public class RobotContainer {
         new HolonomicPathFollowerConfig(
             new PIDConstants(5),
             new PIDConstants(5),
-            3,
+            DriveConstants.MAX_VELOCITY,
             RobotConstants.SWERVE_RADIUS,
             new ReplanningConfig()),
         AllianceColor::isRedAlliance,
@@ -176,6 +184,9 @@ public class RobotContainer {
     autoCommandChooser.addOption(
         "6 - Sub3W3W2W1C1",
         Sub3W3W2W1.get(driveSubsystem, manipulatorSubsystem, poseEstimatorSubsystem, true));
+    autoCommandChooser.addOption(
+        "7 - Sub3ToC5",
+        Sub3ToC5.get(driveSubsystem, manipulatorSubsystem, objectDetectionSubsystem));
 
     RobotConstants.COMPETITION_TAB
         .add("Auto Command", autoCommandChooser)
