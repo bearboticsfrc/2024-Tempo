@@ -2,11 +2,10 @@ name: assemble
 
 on:
   push:
-  pull_request:
-    types: [ opened, reopened, synchronize ]
 
 jobs:
   build:
+    name: Gradle Assemble
     runs-on: ubuntu-latest
     container: wpilib/roborio-cross-ubuntu:2023-22.04
 

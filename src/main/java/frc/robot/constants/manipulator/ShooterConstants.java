@@ -1,6 +1,7 @@
 package frc.robot.constants.manipulator;
 
 public class ShooterConstants {
+  public static final double MAX_DISTANCE = 5.26;
   public static final double VELOCITY_TOLERANCE = 50;
   public static final double VELOCITY_COMPENSATION = 100;
 

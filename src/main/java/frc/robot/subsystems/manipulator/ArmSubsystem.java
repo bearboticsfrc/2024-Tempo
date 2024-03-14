@@ -20,12 +20,14 @@ import frc.bearbotics.motor.MotorPidBuilder;
 import frc.bearbotics.motor.MotorSoftLimit;
 import frc.robot.constants.RobotConstants;
 import frc.robot.constants.manipulator.ArmConstants;
+import frc.robot.constants.manipulator.ShooterConstants;
+import frc.robot.util.CalculateAnExponentialCurve;
 import frc.robot.util.RevUtil;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.function.DoubleSupplier;
 
 public class ArmSubsystem extends SubsystemBase {
-  private final double ARM_POSITION_COMPENSATION = -2;
-
   private CANSparkMax armMotor;
 
   private SparkAbsoluteEncoder armAbsoluteMotorEncoder;
@@ -41,6 +43,8 @@ public class ArmSubsystem extends SubsystemBase {
       new TrapezoidProfile(ArmConstants.Motor.TrapezoidProfile.constraints);
   private TrapezoidProfile.State targetState = new TrapezoidProfile.State(0, 0);
   private TrapezoidProfile.State currentState = new TrapezoidProfile.State(0, 0);
+
+  private double newAngle = 0.0;
 
   /**
    * Constructor for the ArmSubsystem class. Initializes the motors, encoders, and sets up the
@@ -126,12 +130,18 @@ public class ArmSubsystem extends SubsystemBase {
     shuffleboardTab.addDouble("Arm Abs Pos", armAbsoluteMotorEncoder::getPosition);
     shuffleboardTab.addDouble("Arm Rel Pos", armRelativeEncoder::getPosition);
     shuffleboardTab.addDouble("Arm Goal", this::getGoal);
+    shuffleboardTab.addDouble("Arm New Goal", this::getNewGoal);
+
     shuffleboardTab.addDouble("Arm current pos", this::getCurrentPosition);
     shuffleboardTab.addDouble("Arm current vel", this::getCurrentVelocity);
     shuffleboardTab.addDouble("Arm amps", armMotor::getOutputCurrent);
     shuffleboardTab.addDouble("Arm Temp", armMotor::getMotorTemperature);
     shuffleboardTab.addBoolean("Is Arm Home", this::isArmHome);
     shuffleboardTab.addBoolean("Is Arm Setpoint", this::atTargetSetpoint);
+  }
+
+  private double getNewGoal() {
+    return newAngle;
   }
 
   private double getGoal() {
@@ -217,7 +227,9 @@ public class ArmSubsystem extends SubsystemBase {
   }
 
   public void set(DoubleSupplier distanceSupplier) {
-    set(getPositionFromDistance(distanceSupplier.getAsDouble()));
+    newAngle = getPositionFromDistance(distanceSupplier.getAsDouble());
+
+    set(getNewPositionFromDistance(distanceSupplier.getAsDouble()));
   }
 
   /**
@@ -242,35 +254,9 @@ public class ArmSubsystem extends SubsystemBase {
         targetState);
   }
 
-  /*private double getPositionFromDistance(double distance) {
-    if (distance <= 1.543) {
-      return 0;
-    }
-
-    double baseValue = 44.5168 * Math.pow(distance, 0.519352) - 50;
-
-    if (distance <= 1.8 || distance <= 2.2) {
-      return baseValue;
-    } else if (distance <= 2.5) {
-      return baseValue - 3;
-    } else if (distance <= 3) {
-      return baseValue - 4;
-    } else if (distance <= 3.4) {
-      return -6 * Math.pow(distance, 2) + 49 * distance - 70;
-    } else if (distance <= 4) {
-      return -6 * Math.pow(distance, 2) + 49 * distance - 71.5;
-    } else if (distance <= 4.5) {
-      return -4.5 * Math.pow(distance, 2) + 44.25 * distance - 75.5;
-    } else if (distance <= 5) {
-      return -4.5 * Math.pow(distance, 2) + 44.25 * distance - 75.8;
-    } else if (distance <= 6) {
-      return -2.3 * Math.pow(distance, 2) + 25.45 * distance - 35; // 36;
-    }
-
-    throw new IllegalArgumentException("Distance must be in a range of [0, inf)!");
-  }*/
-
   private double getPositionFromDistance(double distance) {
+    distance = Math.min(distance, 6);
+
     if (distance <= 1.54) {
       return 0;
     } else if (distance <= 2.46) {
@@ -306,17 +292,48 @@ public class ArmSubsystem extends SubsystemBase {
       return (1.0365853658576 * Math.pow(distance, 2))
           - (4.7054878048905 * distance)
           + 36.767134146455;
-    } else if (distance <= 5.25) {
-      return (2.4521072796883 * Math.pow(distance, 2))
-          - (23.311877394612 * distance)
-          + 93.001149425188
-          - 2;
     } else {
       return (2.4521072796883 * Math.pow(distance, 2))
           - (23.311877394612 * distance)
           + 93.001149425188
           - 2;
     }
+  }
+
+  private double getNewPositionFromDistance(double distance) {
+    distance = Math.min(distance, ShooterConstants.MAX_DISTANCE);
+
+    Map<Double, Double> table = new HashMap<>();
+    table.put(0.0, 0.0);
+    table.put(1.787, 13.5);
+    table.put(1.95, 17.2);
+    table.put(2.13, 19.8);
+    table.put(2.29, 21.27);
+    table.put(2.46, 21.5);
+    table.put(2.55, 24.1);
+    table.put(2.63, 23.8);
+    table.put(2.81, 27.13);
+    table.put(2.97, 27.6);
+    table.put(3.14, 28.9);
+    table.put(3.2, 30.46);
+    table.put(3.26, 30.5);
+    table.put(3.45, 31.1);
+    table.put(3.63, 31.33);
+    table.put(3.77, 33.5);
+    table.put(3.88, 33.8);
+    table.put(4.0, 34.2);
+    table.put(4.16, 34.8);
+    table.put(4.3, 35.6);
+    table.put(4.46, 36.2);
+    table.put(4.71, 37.5);
+    table.put(4.96, 37.9);
+    table.put(5.25, 38.1);
+    table.put(5.26, 38.22);
+    table.put(5.27, 38.24);
+
+    CalculateAnExponentialCurve calculate = new CalculateAnExponentialCurve(table);
+
+    return calculate.calculate(distance);
   }
 
   /** Enum representing different positions of the arm. */

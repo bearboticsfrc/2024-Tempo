@@ -2,11 +2,10 @@ name: spotless
 
 on:
   push:
-  pull_request:
-    types: [ opened, reopened, synchronize ]
 
 jobs:
   build:
+    name: Spotless Check
     runs-on: ubuntu-latest
 
     steps:

@@ -4,11 +4,8 @@
 
 package frc.robot.subsystems.vision;
 
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.location.LocationHelper;
 import java.util.Optional;
 import org.photonvision.PhotonCamera;
 import org.photonvision.targeting.PhotonTrackedTarget;
@@ -25,31 +22,19 @@ public class ObjectDetectionSubsystem extends SubsystemBase {
     photonCamera.setDriverMode(driverCameraMode ^= true);
   }
 
-  public boolean hasNoteInView() {
+  public boolean hasTargetInView() {
     return photonCamera.getLatestResult().hasTargets();
   }
 
-  private PhotonTrackedTarget getBestTarget() {
-    return photonCamera.getLatestResult().getBestTarget();
+  public Optional<PhotonTrackedTarget> getBestTarget() {
+    return hasTargetInView()
+        ? Optional.of(photonCamera.getLatestResult().getBestTarget())
+        : Optional.empty();
   }
 
-  public Optional<PhotonTrackedTarget> getTargetToNearestNote() {
-    return Optional.ofNullable(getBestTarget());
-  }
-
-  public Optional<Transform3d> getTransformToNearestNote() {
-    return Optional.ofNullable(getBestTarget().getBestCameraToTarget());
-  }
-
-  public Optional<Pose2d> getPoseToNearestNote(Pose2d currentPose) {
-    if (!hasNoteInView()) {
-      return Optional.empty();
-    }
-
-    return Optional.of(
-        LocationHelper.getPoseByDistanceAndAngleToPose(
-            currentPose,
-            getTransformToNearestNote().get().getX(),
-            Rotation2d.fromDegrees(getTargetToNearestNote().get().getYaw())));
+  public Optional<Transform3d> getTransformToBestTarget() {
+    return hasTargetInView()
+        ? Optional.of(getBestTarget().get().getBestCameraToTarget())
+        : Optional.empty();
   }
 }
