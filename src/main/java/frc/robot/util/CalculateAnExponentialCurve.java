@@ -1,16 +1,19 @@
 package frc.robot.util;
 
 import frc.robot.constants.manipulator.ShooterConstants;
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 public class CalculateAnExponentialCurve {
-  HashMap<Double, Double> inputToOutput;
+  Map<Double, Double> inputToOutput;
   List<Double> inputsList;
 
-  public CalculateAnExponentialCurve(HashMap<Double, Double> table, List<Double> inputs) {
+  public CalculateAnExponentialCurve(Map<Double, Double> table) {
     inputToOutput = table;
-    inputsList = inputs;
+    inputsList = new ArrayList<Double>(table.keySet());
+    Collections.sort(inputsList);
   }
 
   public double calculate(double input) {
@@ -22,26 +25,30 @@ public class CalculateAnExponentialCurve {
     double y3;
     double center = nearestKey(input);
     System.out.println("center = " + center);
-    if (inputsList.get(inputsList.indexOf(center))==0){
-      x1=0;
-      y1=0;
-      x2 = center;
-    }
-    else{
+    x2 = center;
+    if (inputsList.get(inputsList.indexOf(center)) == 0) {
+      x1 = 0;
+      y1 = 0;
+      x3 = inputsList.get(inputsList.indexOf(center) + 1);
+
+    } else if (inputsList.get(inputsList.indexOf(center)) == (inputsList.size() - 1)) {
       x1 = inputsList.get(inputsList.indexOf(center) - 1);
-      x2 = center;
       y1 = inputToOutput.get(x1);
+      x3 = ShooterConstants.MAX_DISTANCE;
+
+    } else {
+      x1 = inputsList.get(inputsList.indexOf(center) - 1);
+      y1 = inputToOutput.get(x1);
+      x3 = inputsList.get(inputsList.indexOf(center) + 1);
     }
- 
-    x3 = inputsList.get(inputsList.indexOf(center) + 1);
-    
+
     y2 = inputToOutput.get(x2);
     y3 = inputToOutput.get(x3);
     Equation equation = new Equation(x1, x2, x3, y1, y2, y3);
     return equation.getValue(input);
   }
 
-  public double nearestKey( double target) {
+  public double nearestKey(double target) {
     double minDiff = ShooterConstants.MAX_DISTANCE;
     double nearest = 0;
     for (double key : inputsList) {

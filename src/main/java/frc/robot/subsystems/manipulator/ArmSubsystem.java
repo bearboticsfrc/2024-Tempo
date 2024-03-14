@@ -20,14 +20,11 @@ import frc.bearbotics.motor.MotorPidBuilder;
 import frc.bearbotics.motor.MotorSoftLimit;
 import frc.robot.constants.RobotConstants;
 import frc.robot.constants.manipulator.ArmConstants;
+import frc.robot.constants.manipulator.ShooterConstants;
 import frc.robot.util.CalculateAnExponentialCurve;
 import frc.robot.util.RevUtil;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
+import java.util.Map;
 import java.util.function.DoubleSupplier;
 
 public class ArmSubsystem extends SubsystemBase {
@@ -304,27 +301,27 @@ public class ArmSubsystem extends SubsystemBase {
   }
 
   private double getNewPositionFromDistance(double distance) {
-    distance = Math.min(distance, 5.25);
+    distance = Math.min(distance, ShooterConstants.MAX_DISTANCE);
 
-    HashMap<Double, Double> table = new HashMap<>();
-    table.put(0.0,0.0);
-    table.put(1.787,13.5);
+    Map<Double, Double> table = new HashMap<>();
+    table.put(0.0, 0.0);
+    table.put(1.787, 13.5);
     table.put(1.95, 17.2);
     table.put(2.13, 19.8);
-    table.put(2.29,21.27);
+    table.put(2.29, 21.27);
     table.put(2.46, 21.5);
-    table.put(2.55,24.1);
+    table.put(2.55, 24.1);
     table.put(2.63, 23.8);
-    table.put(2.81,27.13);
+    table.put(2.81, 27.13);
     table.put(2.97, 27.6);
     table.put(3.14, 28.9);
-    table.put(3.2,30.46);
+    table.put(3.2, 30.46);
     table.put(3.26, 30.5);
-    table.put(3.45,31.1);
+    table.put(3.45, 31.1);
     table.put(3.63, 31.33);
-    table.put(3.77,33.5);
+    table.put(3.77, 33.5);
     table.put(3.88, 33.8);
-    table.put(4.0,34.2);
+    table.put(4.0, 34.2);
     table.put(4.16, 34.8);
     table.put(4.3, 35.6);
     table.put(4.46, 36.2);
@@ -333,11 +330,8 @@ public class ArmSubsystem extends SubsystemBase {
     table.put(5.25, 38.1);
     table.put(5.26, 38.22);
     table.put(5.27, 38.24);
-    
-    List<Double> inputs = new ArrayList<Double>(table.keySet());
-    Collections.sort(inputs);
 
-    CalculateAnExponentialCurve calculate = new CalculateAnExponentialCurve(table, inputs);
+    CalculateAnExponentialCurve calculate = new CalculateAnExponentialCurve(table);
 
     return calculate.calculate(distance);
   }
