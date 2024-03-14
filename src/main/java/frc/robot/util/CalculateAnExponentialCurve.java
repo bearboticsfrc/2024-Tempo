@@ -14,21 +14,37 @@ public class CalculateAnExponentialCurve {
   }
 
   public double calculate(double input) {
-    double center = nearestKey(inputToOutput, input);
-    double x1 = inputsList.get(inputsList.indexOf(center) - 1);
-    double x2 = center;
-    double x3 = inputsList.get(inputsList.indexOf(center) - 1);
-    double y1 = inputToOutput.get(x1);
-    double y2 = inputToOutput.get(x2);
-    double y3 = inputToOutput.get(x3);
+    double x1;
+    double x2;
+    double x3;
+    double y1;
+    double y2;
+    double y3;
+    double center = nearestKey(input);
+    System.out.println("center = " + center);
+    if (inputsList.get(inputsList.indexOf(center))==0){
+      x1=0;
+      y1=0;
+      x2 = center;
+    }
+    else{
+      x1 = inputsList.get(inputsList.indexOf(center) - 1);
+      x2 = center;
+      y1 = inputToOutput.get(x1);
+    }
+ 
+    x3 = inputsList.get(inputsList.indexOf(center) + 1);
+    
+    y2 = inputToOutput.get(x2);
+    y3 = inputToOutput.get(x3);
     Equation equation = new Equation(x1, x2, x3, y1, y2, y3);
     return equation.getValue(input);
   }
 
-  public double nearestKey(HashMap<Double, Double> map, double target) {
+  public double nearestKey( double target) {
     double minDiff = ShooterConstants.MAX_DISTANCE;
     double nearest = 0;
-    for (double key : map.keySet()) {
+    for (double key : inputsList) {
       double diff = Math.abs((double) target - (double) key);
       if (diff < minDiff) {
         nearest = key;
