@@ -22,7 +22,6 @@ import frc.bearbotics.motor.MotorSoftLimit;
 import frc.robot.constants.RobotConstants;
 import frc.robot.constants.manipulator.ArmConstants;
 import frc.robot.util.RevUtil;
-import frc.robot.util.math.CalculateLocalizedQuadraticCurve;
 import java.util.function.DoubleSupplier;
 
 public class ArmSubsystem extends SubsystemBase {
@@ -42,8 +41,8 @@ public class ArmSubsystem extends SubsystemBase {
   private TrapezoidProfile.State targetState = new TrapezoidProfile.State(0, 0);
   private TrapezoidProfile.State currentState = new TrapezoidProfile.State(0, 0);
 
-  private final CalculateLocalizedQuadraticCurve shootAngleInterpolator =
-      new CalculateLocalizedQuadraticCurve(ArmConstants.SHOOT_ANGLE_MAP);
+  private final ExponentialCurveInterpolator shootAngleInterpolator =
+      new ExponentialCurveInterpolator(ArmConstants.SHOOT_ANGLE_MAP);
 
   /**
    * Constructor for the ArmSubsystem class. Initializes the motors, encoders, and sets up the
