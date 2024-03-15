@@ -59,7 +59,7 @@ public class QuadraticCurveInterpolator {
 
     // Calculate a quadratic based off of the calculated x, y, and z
     return new Quadratic(solvedSystem.getX(), solvedSystem.getY(), solvedSystem.getZ())
-        .calculate(input);
+        .solve(input);
   }
 
   /**
@@ -82,34 +82,5 @@ public class QuadraticCurveInterpolator {
     return inputKeys.stream()
         .min(Comparator.comparingDouble(key -> Math.abs(target - key)))
         .orElse(0.0);
-  }
-
-  /**
-   * builds a quadratic off of a b and c coefficients
-   *
-   * @param a a cof.
-   * @param b b cof.
-   * @param C c cof.
-   */
-  private class Quadratic {
-    double a;
-    double b;
-    double c;
-
-    public Quadratic(double a, double b, double c) {
-      this.a = a;
-      this.b = b;
-      this.c = c;
-    }
-
-    /**
-     * calculates the output of the quadratic.
-     *
-     * @param input The input value.
-     * @return the output value.
-     */
-    private double calculate(double input) {
-      return (a * Math.pow(input, 2)) + (b * input) + c;
-    }
   }
 }
