@@ -12,7 +12,6 @@ import frc.robot.commands.AutoShootCommand;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.manipulator.ManipulatorSubsystem;
 import frc.robot.subsystems.manipulator.ShooterSubsystem.ShooterVelocity;
-
 import java.util.Set;
 
 public class Sub2W3W2W1 {
@@ -22,18 +21,16 @@ public class Sub2W3W2W1 {
   static PathPlannerPath w1toc1Path = PathPlannerPath.fromPathFile("W1toC1");
 
   public static Command get(
-      DriveSubsystem driveSubsystem,
-      ManipulatorSubsystem manipulatorSubsystem,
-      boolean plusC1) {
+      DriveSubsystem driveSubsystem, ManipulatorSubsystem manipulatorSubsystem, boolean plusC1) {
     return new SequentialCommandGroup(
-        manipulatorSubsystem.getSubwooferShootCommand()
-        .andThen(manipulatorSubsystem.getShooterRunCommand(ShooterVelocity.PODIUM_SHOOT)),
-        new PathPlannerAuto("Sub2W3NoteNoShoot"),
-        new DeferredCommand(
-            () -> new AutoShootCommand(driveSubsystem, manipulatorSubsystem)
+        manipulatorSubsystem
+            .getSubwooferShootCommand()
             .andThen(manipulatorSubsystem.getShooterRunCommand(ShooterVelocity.PODIUM_SHOOT)),
-            Set.of(driveSubsystem))
-     ,
+        new PathPlannerAuto("Sub2W3NoteNoShoot"),
+                new AutoShootCommand(driveSubsystem, manipulatorSubsystem)
+                 .andThen(
+                     manipulatorSubsystem.getShooterRunCommand(ShooterVelocity.PODIUM_SHOOT))
+            /* ,
         new DeferredCommand(
             () ->
                 new InstantCommand(
@@ -73,7 +70,6 @@ public class Sub2W3W2W1 {
                     Set.of())
                 .andThen(AutoBuilder.followPath(w1toc1Path)),
             new InstantCommand(),
-            () -> plusC1)
-            );
+            () -> plusC1) */);
   }
 }

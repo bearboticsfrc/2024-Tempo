@@ -179,8 +179,7 @@ public class RobotContainer {
         "6 - Sub3W3W2W1C1",
         Sub3W3W2W1.get(driveSubsystem, manipulatorSubsystem, poseEstimatorSubsystem, true));
     autoCommandChooser.addOption(
-        "6.5 - Sub2W3W2W1",
-        Sub2W3W2W1.get(driveSubsystem, manipulatorSubsystem, false));
+        "6.5 - Sub2W3W2W1", Sub2W3W2W1.get(driveSubsystem, manipulatorSubsystem, false));
     autoCommandChooser.addOption(
         "7 - Sub3ToC5",
         Sub3ToC5.get(driveSubsystem, manipulatorSubsystem, objectDetectionSubsystem));
@@ -263,13 +262,17 @@ public class RobotContainer {
     driverController
         .rightBumper()
         .whileTrue(
-            manipulatorSubsystem
-                .getArmAndShooterPrepareCommand(
-                    () ->
-                        LocationHelper.getDistanceToPose(
-                            driveSubsystem.getPose(),
-                            FieldPositions.getInstance().getSpeakerCenter()))
-                .andThen(manipulatorSubsystem.getShootCommand()));
+            new AutoShootCommand(driveSubsystem, manipulatorSubsystem)
+
+
+//            manipulatorSubsystem
+//                .getArmAndShooterPrepareCommand(
+//                    () ->
+//                        LocationHelper.getDistanceToPose(
+//                            driveSubsystem.getPose(),
+//                            FieldPositions.getInstance().getSpeakerCenter()))
+//                .andThen(manipulatorSubsystem.getShootCommand())
+);
 
     new Trigger(() -> manipulatorSubsystem.isNoteInFeeder())
         .onTrue(Commands.runOnce(() -> blinkinSubsystem.signalNoteInHolder()))

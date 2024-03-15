@@ -58,12 +58,13 @@ public class AutoShootCommand extends SequentialCommandGroup {
    */
   private Command getShooterPrepareCommand(
       ManipulatorSubsystem manipulatorSubsystem, DriveSubsystem driveSubsystem) {
-    return Commands.defer(
-        () ->
-            manipulatorSubsystem.getArmAndShooterPrepareCommand(
+ //   return Commands.defer(
+ //       () ->
+   return         manipulatorSubsystem.getArmAndShooterPrepareCommand(
                 () ->
                     LocationHelper.getDistanceToPose(
-                        driveSubsystem.getPose(), FieldPositions.getInstance().getSpeakerCenter())),
-        Set.of(manipulatorSubsystem));
+                        driveSubsystem.getPose(), FieldPositions.getInstance().getSpeakerCenter()));
+                        //),
+ //       Set.of());
   }
 }
