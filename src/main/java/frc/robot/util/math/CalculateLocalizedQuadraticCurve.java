@@ -2,11 +2,12 @@ package frc.robot.util.math;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
 public class CalculateLocalizedQuadraticCurve {
-  Map<Double, Double> inputToOutput;
+  Map<Double, Double> inputMap;
   List<Double> inputsList;
   double maxValue;
 
@@ -15,40 +16,27 @@ public class CalculateLocalizedQuadraticCurve {
    * CalculateLocalizedQuadraticCurve based off of its input it draws a quadratic equation around
    * the nearest three points including the center to the input
    *
-   * @param table the table of values to approximate the function off of.
+   * @param inputMap the table of values to approximate the function off of.
    */
-  public CalculateLocalizedQuadraticCurve(Map<Double, Double> table) {
-    inputToOutput = table;
-    inputsList = new ArrayList<Double>(table.keySet());
+  public CalculateLocalizedQuadraticCurve(Map<Double, Double> inputMap) {
+    this.inputMap = inputMap;
+    this.inputsList = new ArrayList<Double>(inputMap.keySet());
     Collections.sort(inputsList);
-    maxValue = inputsList.get(inputsList.size() - 2);
+    this.maxValue = inputsList.get(inputsList.size() - 2);
   }
 
   public double calculate(double input) {
-    input = Math.min(input, maxValue);
-    double x1;
-    double x2;
-    double x3;
-    double y1;
-    double y2;
-    double y3;
-    double center = nearestKey(input);
-    System.out.println("center = " + center);
-    x2 = center;
-    if (inputsList.get(inputsList.indexOf(center)) == 0) {
-      x1 = 0;
-      y1 = 0;
+    double center = getNearestTarget(input);
+    int centerIndex = inputsList.indexOf(center);
 
-      x3 = inputsList.get(inputsList.indexOf(center) + 1);
+    double x2 = center;
+    double x1 = centerIndex > 0 ? inputsList.get(centerIndex - 1) : 0;
+    double x3 = centerIndex < inputsList.size() - 1 ? inputsList.get(centerIndex + 1) : maxValue;
 
-    } else {
-      x1 = inputsList.get(inputsList.indexOf(center) - 1);
-      y1 = inputToOutput.get(x1);
-      x3 = inputsList.get(inputsList.indexOf(center) + 1);
-    }
+    double y1 = (centerIndex > 0) ? inputMap.get(x1) : 0;
+    double y2 = inputMap.get(x2);
+    double y3 = inputMap.get(x3);
 
-    y2 = inputToOutput.get(x2);
-    y3 = inputToOutput.get(x3);
     SystemOfThreeEquations equationCoefficients =
         new SystemOfThreeEquations(
             Math.pow(x1, 2), Math.pow(x2, 2), Math.pow(x3, 2), x1, x2, x3, 1, 1, 1, y1, y2, y3);
@@ -60,16 +48,9 @@ public class CalculateLocalizedQuadraticCurve {
     return localizQuadraticCurve.getValue(input);
   }
 
-  private double nearestKey(double target) {
-    double minDiff = maxValue;
-    double nearest = 0;
-    for (double key : inputsList) {
-      double diff = Math.abs((double) target - (double) key);
-      if (diff < minDiff) {
-        nearest = key;
-        minDiff = diff;
-      }
-    }
-    return nearest;
+  private double getNearestTarget(double target) {
+    return inputsList.stream()
+        .min(Comparator.comparingDouble(key -> Math.abs(target - key)))
+        .orElse(0.0);
   }
 }
