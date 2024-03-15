@@ -14,7 +14,7 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.bearbotics.math.ExponentialCurveInterpolator;
+import frc.bearbotics.math.QuadraticCurveInterpolator;
 import frc.bearbotics.motor.MotorBuilder;
 import frc.bearbotics.motor.MotorConfig;
 import frc.bearbotics.motor.MotorPidBuilder;
@@ -41,8 +41,8 @@ public class ArmSubsystem extends SubsystemBase {
   private TrapezoidProfile.State targetState = new TrapezoidProfile.State(0, 0);
   private TrapezoidProfile.State currentState = new TrapezoidProfile.State(0, 0);
 
-  private final ExponentialCurveInterpolator shootAngleInterpolator =
-      new ExponentialCurveInterpolator(ArmConstants.SHOOT_ANGLE_MAP);
+  private final QuadraticCurveInterpolator shootAngleInterpolator =
+      new QuadraticCurveInterpolator(ArmConstants.SHOOT_ANGLE_MAP);
 
   /**
    * Constructor for the ArmSubsystem class. Initializes the motors, encoders, and sets up the
