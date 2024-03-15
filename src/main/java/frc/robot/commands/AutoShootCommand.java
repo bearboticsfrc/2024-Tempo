@@ -60,7 +60,7 @@ public class AutoShootCommand extends SequentialCommandGroup {
       ManipulatorSubsystem manipulatorSubsystem, DriveSubsystem driveSubsystem) {
     return Commands.defer(
         () ->
-            manipulatorSubsystem.getShooterPrepareCommad(
+            manipulatorSubsystem.getArmAndShooterPrepareCommand(
                 () ->
                     LocationHelper.getDistanceToPose(
                         driveSubsystem.getPose(), FieldPositions.getInstance().getSpeakerCenter())),

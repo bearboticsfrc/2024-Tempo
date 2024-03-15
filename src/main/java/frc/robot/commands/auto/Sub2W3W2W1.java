@@ -11,6 +11,8 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.commands.AutoShootCommand;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.manipulator.ManipulatorSubsystem;
+import frc.robot.subsystems.manipulator.ShooterSubsystem.ShooterVelocity;
+
 import java.util.Set;
 
 public class Sub2W3W2W1 {
@@ -24,10 +26,12 @@ public class Sub2W3W2W1 {
       ManipulatorSubsystem manipulatorSubsystem,
       boolean plusC1) {
     return new SequentialCommandGroup(
-        manipulatorSubsystem.getSubwooferShootCommand(),
+        manipulatorSubsystem.getSubwooferShootCommand()
+        .andThen(manipulatorSubsystem.getShooterRunCommand(ShooterVelocity.PODIUM_SHOOT)),
         new PathPlannerAuto("Sub2W3NoteNoShoot"),
         new DeferredCommand(
-            () -> new AutoShootCommand(driveSubsystem, manipulatorSubsystem),
+            () -> new AutoShootCommand(driveSubsystem, manipulatorSubsystem)
+            .andThen(manipulatorSubsystem.getShooterRunCommand(ShooterVelocity.PODIUM_SHOOT)),
             Set.of(driveSubsystem))
      ,
         new DeferredCommand(
