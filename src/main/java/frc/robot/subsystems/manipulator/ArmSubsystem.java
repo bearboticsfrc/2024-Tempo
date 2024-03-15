@@ -14,13 +14,13 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.bearbotics.math.ExponentialCurveInterpolator;
 import frc.bearbotics.motor.MotorBuilder;
 import frc.bearbotics.motor.MotorConfig;
 import frc.bearbotics.motor.MotorPidBuilder;
 import frc.bearbotics.motor.MotorSoftLimit;
 import frc.robot.constants.RobotConstants;
 import frc.robot.constants.manipulator.ArmConstants;
-import frc.robot.util.ExponentialCurveInterpolator;
 import frc.robot.util.RevUtil;
 import java.util.function.DoubleSupplier;
 
