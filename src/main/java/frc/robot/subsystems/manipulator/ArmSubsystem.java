@@ -20,9 +20,8 @@ import frc.bearbotics.motor.MotorPidBuilder;
 import frc.bearbotics.motor.MotorSoftLimit;
 import frc.robot.constants.RobotConstants;
 import frc.robot.constants.manipulator.ArmConstants;
-import frc.robot.constants.manipulator.ShooterConstants;
-import frc.robot.util.CalculateAnExponentialCurve;
 import frc.robot.util.RevUtil;
+import frc.robot.util.math.CalculateLocalizedQuadraticCurve;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.DoubleSupplier;
@@ -301,7 +300,6 @@ public class ArmSubsystem extends SubsystemBase {
   }
 
   private double getNewPositionFromDistance(double distance) {
-    distance = Math.min(distance, ShooterConstants.MAX_DISTANCE);
 
     Map<Double, Double> table = new HashMap<>();
     table.put(0.0, 0.0);
@@ -331,7 +329,7 @@ public class ArmSubsystem extends SubsystemBase {
     table.put(5.26, 38.22);
     table.put(5.27, 38.24);
 
-    CalculateAnExponentialCurve calculate = new CalculateAnExponentialCurve(table);
+    CalculateLocalizedQuadraticCurve calculate = new CalculateLocalizedQuadraticCurve(table);
 
     return calculate.calculate(distance);
   }
