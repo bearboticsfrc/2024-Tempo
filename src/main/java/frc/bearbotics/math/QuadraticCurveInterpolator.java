@@ -11,7 +11,7 @@ import java.util.Map;
  * pairs.
  */
 public class QuadraticCurveInterpolator {
-  private final double C = 1; // the coefficient for c in any quadratic equation is one
+  private final double C = 1; // the coefficient for c in any quadratic is one
 
   private final Map<Double, Double> inputMap;
   private final List<Double> inputKeys;
@@ -49,27 +49,19 @@ public class QuadraticCurveInterpolator {
     double y2 = inputMap.get(x2);
     double y3 = inputMap.get(x3);
 
+    // Build the coefficients
     double x[] = {Math.pow(x1, 2), Math.pow(x2, 2), Math.pow(x3, 2)};
-    double y[] = {y1, y2, y3};
+    double y[] = {x1, x2, x3};
     double z[] = {C, C, C};
     double d[] = {y1, y2, y3};
 
+    // Solve the system
     SystemOfThreeEquations system = new SystemOfThreeEquations(x, y, z, d);
     SolvedSystem solvedSystem = system.solve();
 
     // Calculate a quadratic based off of the calculated x, y, and z
     return new Quadratic(solvedSystem.getX(), solvedSystem.getY(), solvedSystem.getZ())
         .solve(input);
-  }
-
-  /**
-   * Clamp the provided index to always be in-bounds.
-   *
-   * @param index The index to clamp.
-   * @return The clamped index.
-   */
-  private int clampIndex(int index) {
-    return MathUtil.clamp(index, 0, inputKeys.size() - 1);
   }
 
   /**
@@ -82,5 +74,15 @@ public class QuadraticCurveInterpolator {
     return inputKeys.stream()
         .min(Comparator.comparingDouble(key -> Math.abs(target - key)))
         .orElse(0.0);
+  }
+
+  /**
+   * Clamp the provided index to always be in-bounds.
+   *
+   * @param index The index to clamp.
+   * @return The clamped index.
+   */
+  private int clampIndex(int index) {
+    return MathUtil.clamp(index, 0, inputKeys.size() - 1);
   }
 }

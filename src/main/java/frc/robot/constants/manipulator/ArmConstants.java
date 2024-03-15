@@ -3,6 +3,7 @@ package frc.robot.constants.manipulator;
 import com.revrobotics.CANSparkBase.IdleMode;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import java.util.Map;
+import java.util.SortedMap;
 import java.util.TreeMap;
 
 public class ArmConstants {
@@ -11,7 +12,7 @@ public class ArmConstants {
 
   public static final double MAX_DISTANCE = 5.26;
 
-  public static final Map<Double, Double> SHOOT_ANGLE_MAP =
+  public static final SortedMap<Double, Double> SHOOT_ANGLE_MAP =
       new TreeMap<>(
           Map.ofEntries(
               Map.entry(0.0, 0.0),

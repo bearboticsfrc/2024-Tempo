@@ -27,10 +27,10 @@ public class SystemOfThreeEquations {
       {x[2], y[2], z[2]}
     };
 
-    double[][] constantsArray = {{d[0]}, {d[1]}, {d[2]}};
+    double[] constantsArray = {d[0], d[1], d[2]};
 
     this.coefficients = new Matrix(coefficientsArray);
-    this.constants = new Matrix(constantsArray);
+    this.constants = new Matrix(constantsArray, 3);
   }
 
   /**
