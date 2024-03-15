@@ -1,5 +1,6 @@
 package frc.bearbotics.math;
 
+import edu.wpi.first.math.MathUtil;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -10,10 +11,10 @@ import java.util.Map;
  * pairs.
  */
 public class QuadraticCurveInterpolator {
-  private final double c = 1;
-  // the coefficient for c in any quadratic equation is one
-  private Map<Double, Double> inputMap;
-  private List<Double> inputKeys;
+  private final double C = 1; // the coefficient for c in any quadratic equation is one
+
+  private final Map<Double, Double> inputMap;
+  private final List<Double> inputKeys;
 
   /**
    * Constructs an QuadraticCurveInterpolator object with the given input-output map.
@@ -39,37 +40,36 @@ public class QuadraticCurveInterpolator {
     int centerIndex = inputKeys.indexOf(center);
 
     // Find the keys to the left (idx - 1) and right (idx + 1) of our center key
-    double x1 = centerIndex == 0 ? inputKeys.get(0) : inputKeys.get(centerIndex - 1);
+    double x1 = inputKeys.get(clampIndex(centerIndex - 1));
     double x2 = center;
-    double x3 =
-        centerIndex == (inputKeys.size() - 1)
-            ? inputKeys.get(centerIndex)
-            : inputKeys.get(centerIndex + 1);
+    double x3 = inputKeys.get(clampIndex(centerIndex + 1));
 
     // Find the respective values
     double y1 = inputMap.get(x1);
     double y2 = inputMap.get(x2);
     double y3 = inputMap.get(x3);
 
-    // Interpolate a quadratic from the three points
+    double x[] = {Math.pow(x1, 2), Math.pow(x2, 2), Math.pow(x3, 2)};
+    double y[] = {y1, y2, y3};
+    double z[] = {C, C, C};
+    double d[] = {y1, y2, y3};
 
-    SystemOfThreeEquations coefficients =
-        new SystemOfThreeEquations(
-            Math.pow(x1, 2),
-            Math.pow(x2, 2),
-            Math.pow(x3, 2), // represents the x-squared in a quadratic
-            x1,
-            x2,
-            x3, // represents the x in a quadratic
-            c,
-            c,
-            c, // represents the coeffecient that multiplys c in a quadratic
-            y1,
-            y2,
-            y3); // represents the output values of the quadratic for the given value x
-    // constructs quadratic based off of now calculated a b and c and calculates output
-    return new Quadratic(coefficients.getX(), coefficients.getY(), coefficients.getZ())
+    SystemOfThreeEquations system = new SystemOfThreeEquations(x, y, z, d);
+    SolvedSystem solvedSystem = system.solve();
+
+    // Calculate a quadratic based off of the calculated x, y, and z
+    return new Quadratic(solvedSystem.getX(), solvedSystem.getY(), solvedSystem.getZ())
         .calculate(input);
+  }
+
+  /**
+   * Clamp the provided index to always be in-bounds.
+   *
+   * @param index The index to clamp.
+   * @return The clamped index.
+   */
+  private int clampIndex(int index) {
+    return MathUtil.clamp(index, 0, inputKeys.size() - 1);
   }
 
   /**
@@ -89,7 +89,7 @@ public class QuadraticCurveInterpolator {
    *
    * @param a a cof.
    * @param b b cof.
-   * @param c c cof.
+   * @param C c cof.
    */
   private class Quadratic {
     double a;

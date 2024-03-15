@@ -30,11 +30,10 @@ public class ArmSubsystem extends SubsystemBase {
   private SparkAbsoluteEncoder armAbsoluteMotorEncoder;
   private RelativeEncoder armRelativeEncoder;
 
-  private SparkPIDController armPidController;
-
-  private ArmFeedforward armFeedforward;
-
   private DigitalInput armLimitSwtich = new DigitalInput(ArmConstants.LIMIT_SWITCH_CHANNEL);
+
+  private SparkPIDController armPidController;
+  private ArmFeedforward armFeedforward;
 
   private TrapezoidProfile trapezoidProfile =
       new TrapezoidProfile(ArmConstants.Motor.TrapezoidProfile.constraints);
