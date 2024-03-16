@@ -78,12 +78,18 @@ public class CandleSegment {
    * Applies a strobe animation to this LED segment.
    *
    * @param color The color of the strobe effect.
-   * @param speed The speed of the strobe effect. Note: For StrobeAnimation, speed is currently not
-   *     utilized in the CTRE Phoenix library, but it's included for future compatibility.
+   * @param speed The speed of the strobe effect.
    */
   public void setStrobeAnimation(Color color, double speed) {
     StrobeAnimation animation =
-        new StrobeAnimation((int) color.red * 255, (int) color.green * 255, (int) color.blue * 255);
+        new StrobeAnimation(
+            (int) (color.red * 255),
+            (int) (color.green * 255),
+            (int) (color.blue * 255),
+            0,
+            speed,
+            segmentSize,
+            startIndex);
 
     setAnimation(animation, animationSlot);
   }

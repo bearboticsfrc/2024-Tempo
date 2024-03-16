@@ -62,10 +62,12 @@ public class CandleSubsystem extends SubsystemBase {
    */
   public void setPattern(CandlePattern pattern, Color color) {
     clearSegment(entireSegment);
+    //          new StrobeAnimation(
+    //         color.red, color.green, color.blue, 0, speed, segmentSize, startIndex)
 
     switch (pattern) {
       case STROBE:
-        entireSegment.setStrobeAnimation(color, 0.5);
+        entireSegment.setStrobeAnimation(color, 10);
         break;
       case LARSON:
         entireSegment.setLarsonAnimation(color, 0.1);
