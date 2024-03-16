@@ -57,7 +57,6 @@ public class DriveSubsystem extends SubsystemBase {
   private boolean fieldRelativeMode = true;
 
   private StructPublisher<Pose2d> posePublisher;
-  private SwerveModulePosition[] swerveModulePositions;
 
   private Notifier loggingNotifier; // To prevent mem leak.
 
@@ -74,8 +73,6 @@ public class DriveSubsystem extends SubsystemBase {
       swerveModules.put(
           corner,
           new SwerveModule(getSwerveConfigForCorner(corner), RobotConstants.DRIVE_SYSTEM_TAB));
-
-      swerveModulePositions = getModulePositions();
     }
 
     odometry =
