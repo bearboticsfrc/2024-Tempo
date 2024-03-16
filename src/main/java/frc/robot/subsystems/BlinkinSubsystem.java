@@ -6,22 +6,28 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.motorcontrol.Spark;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.PWM;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.bearbotics.fms.AllianceColor;
 import frc.robot.constants.BlinkinConstants;
 import java.util.List;
+import java.util.function.BooleanSupplier;
 
 public class BlinkinSubsystem extends SubsystemBase {
-  private final List<Spark> blinkins =
-      List.of(new Spark(BlinkinConstants.FRONT_BLINKIN), new Spark(BlinkinConstants.BACK_BLINKIN));
+  private final BooleanSupplier blueSupplier =
+      () -> AllianceColor.alliance == Alliance.Blue ? true : false;
+
+  private final BooleanSupplier isNoteInFeeder;
+  private final List<PWM> blinkinsPWM =
+      List.of(new PWM(BlinkinConstants.FRONT_BLINKIN), new PWM(BlinkinConstants.BACK_BLINKIN));
 
   /**
    * Constructs the BlinkinSubsystem and initializes the Blinkin LED controllers. Resets the Blinkin
    * LEDs to the alliance color.
    */
-  public BlinkinSubsystem() {
-    reset();
+  public BlinkinSubsystem(BooleanSupplier isNoteInFeeder) {
+    this.isNoteInFeeder = isNoteInFeeder;
   }
 
   /**
@@ -30,9 +36,12 @@ public class BlinkinSubsystem extends SubsystemBase {
    * @param blinkins The list of Spark controllers representing Blinkin LEDs.
    * @param color The desired color from the BlinkinConstants.Color enum.
    */
-  public void setColor(List<Spark> blinkins, BlinkinConstants.Color color) {
-    for (Spark blinkin : blinkins) {
-      blinkin.set(color.value);
+  public void setColor(BlinkinConstants.Color color) {
+    for (PWM pwm : this.blinkinsPWM) {
+      pwm.setPulseTimeMicroseconds(2125);
+      pwm.setSpeed(BlinkinConstants.Pattern.CP1_STROBE.value);
+
+      pwm.setSpeed(color.value);
     }
   }
 
@@ -42,35 +51,37 @@ public class BlinkinSubsystem extends SubsystemBase {
    * @param blinkins The list of Spark controllers representing Blinkin LEDs.
    * @param blinkinPattern The desired pattern from the BlinkinConstants.BlinkinPattern enum.
    */
-  public void setPattern(List<Spark> blinkins, BlinkinConstants.Pattern blinkinPattern) {
-    for (Spark blinkin : blinkins) {
-      blinkin.set(blinkinPattern.value);
+  public void setPattern(BlinkinConstants.Pattern blinkinPattern) {
+    for (PWM pwm : this.blinkinsPWM) {
+      pwm.setPulseTimeMicroseconds(2125);
+      pwm.setSpeed(BlinkinConstants.Pattern.CP1_STROBE.value);
+      pwm.setSpeed(blinkinPattern.value);
     }
   }
 
   /** Signals the Blinkin LED controllers to display a strobing gold pattern. */
   public void signalSource() {
-    setPattern(blinkins, BlinkinConstants.Pattern.STROBE_GOLD);
+    setPattern(BlinkinConstants.Pattern.STROBE_GOLD);
   }
 
   /** Sets the color of the Blinkin LED controllers to blue. */
   public void setBlue() {
-    setColor(blinkins, BlinkinConstants.Color.BLUE);
+    setColor(BlinkinConstants.Color.BLUE);
   }
 
   /** Sets the color of the Blinkin LED controllers to red. */
   public void setRed() {
-    setColor(blinkins, BlinkinConstants.Color.RED);
+    setColor(BlinkinConstants.Color.RED);
   }
 
   /** Sets the pattern of the Blinkin LED controllers to a red heartbeat animation. */
   public void setRedAutoAnimation() {
-    setPattern(blinkins, BlinkinConstants.Pattern.HEARTBEAT_RED);
+    setPattern(BlinkinConstants.Pattern.HEARTBEAT_RED);
   }
 
   /** Sets the pattern of the Blinkin LED controllers to a blue heartbeat animation. */
   public void setBlueAutoAnimation() {
-    setPattern(blinkins, BlinkinConstants.Pattern.HEARTBEAT_BLUE);
+    setPattern(BlinkinConstants.Pattern.HEARTBEAT_BLUE);
   }
 
   /**
@@ -78,7 +89,7 @@ public class BlinkinSubsystem extends SubsystemBase {
    * signal).
    */
   public void signalNoteInHolder() {
-    setColor(blinkins, BlinkinConstants.Color.GREEN);
+    setColor(BlinkinConstants.Color.GREEN);
   }
 
   /**
@@ -97,16 +108,20 @@ public class BlinkinSubsystem extends SubsystemBase {
    * Displays the alliance color in teleop mode by setting the color based on the alliance color.
    */
   public void displayAllianceColor() {
-    if (AllianceColor.isRedAlliance()) {
-      setRed();
+    if (blueSupplier.getAsBoolean()) {
+      setBlue();
       return;
     }
-    setBlue();
+    setRed();
   }
 
   /** Resets the Blinkin LED controllers based on the operating mode (teleop or autonomous). */
   public void reset() {
-    if (DriverStation.isTeleop()) {
+
+    if (isNoteInFeeder.getAsBoolean() == true) {
+      signalNoteInHolder();
+      return;
+    } else if (DriverStation.isTeleop()) {
       displayAllianceColor();
       return;
     }

@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.ScheduleCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -75,7 +76,8 @@ public class RobotContainer {
   private final PoseEstimatorSubsystem poseEstimatorSubsystem =
       new PoseEstimatorSubsystem(driveSubsystem, FieldPositions.getInstance());
 
-  private final BlinkinSubsystem blinkinSubsystem = new BlinkinSubsystem();
+  private final BlinkinSubsystem blinkinSubsystem =
+      new BlinkinSubsystem(() -> this.manipulatorSubsystem.isNoteInFeeder());
 
   private boolean isTeleop;
   private boolean isAutoPathTargeting = false;
@@ -264,7 +266,7 @@ public class RobotContainer {
                 .andThen(manipulatorSubsystem.getShootCommand()));
 
     new Trigger(() -> manipulatorSubsystem.isNoteInFeeder())
-        .onTrue(Commands.runOnce(() -> blinkinSubsystem.signalNoteInHolder()))
+        .onTrue(Commands.runOnce(() -> blinkinSubsystem.reset()))
         .onFalse(Commands.runOnce(() -> blinkinSubsystem.reset()));
 
     new Trigger(() -> manipulatorSubsystem.isNoteInRoller() && isTeleop)
@@ -377,11 +379,13 @@ public class RobotContainer {
    * @return The selected autonomous command.
    */
   public Command getAutonomousCommand() {
-    return autoCommandChooser.getSelected();
+    return new ParallelCommandGroup(
+        autoCommandChooser.getSelected(), Commands.runOnce(blinkinSubsystem::reset));
   }
 
   /** Initializes the robot when transitioning to the disabled state. Resets controller rumble. */
   public void disabledInit() {
+    blinkinSubsystem.reset();
     driverController.getHID().setRumble(RumbleType.kBothRumble, 0);
   }
 
