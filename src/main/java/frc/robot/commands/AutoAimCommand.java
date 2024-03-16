@@ -5,11 +5,11 @@ import static edu.wpi.first.units.Units.*;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.networktables.DoublePublisher;
-import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.units.Angle;
 import edu.wpi.first.units.Measure;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.constants.RobotConstants;
 import frc.robot.location.LocationHelper;
 import frc.robot.subsystems.DriveSubsystem;
 import java.util.function.DoubleSupplier;
@@ -26,7 +26,7 @@ public class AutoAimCommand extends Command {
   private DoubleSupplier xSupplier = () -> 0.0;
   private DoubleSupplier ySupplier = () -> 0.0;
 
-  private DoublePublisher targetRotationPublisher;
+  private Rotation2d targetRotation;
 
   /*
    * Constructs the AutoAimCommand with the DriveSubsystem, target point, and optional
@@ -74,10 +74,12 @@ public class AutoAimCommand extends Command {
     rotSpeedPidController.enableContinuousInput(-180, 180);
     rotSpeedPidController.setIZone(5.0);
 
-    targetRotationPublisher =
-        NetworkTableInstance.getDefault().getDoubleTopic("/vision/targetRotation").publish();
-
+    setupShuffleboardTab(RobotConstants.VISION_SYSTEM_TAB);
     addRequirements(driveSubsystem);
+  }
+
+  private void setupShuffleboardTab(ShuffleboardTab tab) {
+    tab.addDouble("Target Rotation", () -> this.targetRotation.getDegrees());
   }
 
   /**
@@ -100,10 +102,7 @@ public class AutoAimCommand extends Command {
    */
   public void aimAtPoint(
       DoubleSupplier xRequest, DoubleSupplier yRequest, Translation2d targetPoint) {
-    Rotation2d targetRotation =
-        LocationHelper.getRotationToTranslation(driveSubsystem.getPose(), targetPoint);
-
-    targetRotationPublisher.set(targetRotation.getDegrees());
+    targetRotation = LocationHelper.getRotationToTranslation(driveSubsystem.getPose(), targetPoint);
 
     Measure<Angle> angularOffset = aimFront ? Degrees.of(180) : Degrees.of(0);
 
