@@ -68,7 +68,6 @@ public class RobotContainer {
 
   private final ManipulatorSubsystem manipulatorSubsystem = new ManipulatorSubsystem();
 
-  @SuppressWarnings("unused")
   private final ObjectDetectionSubsystem objectDetectionSubsystem =
       new ObjectDetectionSubsystem(VisionConstants.OBJECT_DETECTION_CAMERA);
 
