@@ -21,6 +21,7 @@ public class Robot extends TimedRobot {
     updateAllianceColor();
 
     robotContainer = new RobotContainer();
+    robotContainer.robotInit();
   }
 
   @Override

@@ -15,6 +15,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -38,9 +39,10 @@ import frc.robot.constants.RobotConstants;
 import frc.robot.constants.VisionConstants;
 import frc.robot.location.FieldPositions;
 import frc.robot.location.LocationHelper;
-import frc.robot.subsystems.BlinkinSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.PowerDistributionSubsystem;
+import frc.robot.subsystems.candle.CandlePattern;
+import frc.robot.subsystems.candle.CandleSubsystem;
 import frc.robot.subsystems.manipulator.ArmSubsystem.ArmPosition;
 import frc.robot.subsystems.manipulator.IntakeSubsystem.IntakeSpeed;
 import frc.robot.subsystems.manipulator.ManipulatorSubsystem;
@@ -50,8 +52,10 @@ import java.util.Map;
 import java.util.Optional;
 
 /**
- * Constructs a new RobotContainer object. This constructor is responsible for initializing
- * controllers, subsystems, shuffleboard tabs, and configuring bindings.
+ * The RobotContainer class serves as the central hub for the robot's system configurations and
+ * operations. It initializes all robot subsystems, configures command bindings for both the driver
+ * and operator controllers, and sets up autonomous command choices. This class also handles the
+ * integration with the Shuffleboard for real-time data display and control adjustments.
  */
 public class RobotContainer {
   private final CommandXboxController driverController =
@@ -68,14 +72,13 @@ public class RobotContainer {
 
   private final ManipulatorSubsystem manipulatorSubsystem = new ManipulatorSubsystem();
 
-  @SuppressWarnings("unused")
   private final ObjectDetectionSubsystem objectDetectionSubsystem =
       new ObjectDetectionSubsystem(VisionConstants.OBJECT_DETECTION_CAMERA);
 
   private final PoseEstimatorSubsystem poseEstimatorSubsystem =
       new PoseEstimatorSubsystem(driveSubsystem, FieldPositions.getInstance());
 
-  private final BlinkinSubsystem blinkinSubsystem = new BlinkinSubsystem();
+  private final CandleSubsystem candleSubsystem = new CandleSubsystem();
 
   private boolean isTeleop;
   private boolean isAutoPathTargeting = false;
@@ -114,9 +117,8 @@ public class RobotContainer {
   }
 
   /**
-   * Sets up the Shuffleboard tab with the specified commands.
-   *
-   * @param tab The ShuffleboardTab to add commands to.
+   * Initializes a new RobotContainer. This constructor initializes all subsystems, configures
+   * command bindings, and prepares autonomous selections and Shuffleboard tabs.
    */
   private void setupShuffleboardTab(ShuffleboardTab tab) {
     tab.add("Home Climber", manipulatorSubsystem.getClimberHomeCommand());
@@ -128,8 +130,10 @@ public class RobotContainer {
   }
 
   /**
-   * Configures the path planner for autonomous routines. This method sets up holonomic path
-   * following with specified PID constants, replanning configurations, etc.
+   * Configures the Shuffleboard tab for competition use. This includes displaying subsystem
+   * commands and providing real-time feedback from sensors or subsystem states.
+   *
+   * @param tab The ShuffleboardTab to add commands and data to.
    */
   private void configurePathPlanner() {
     AutoBuilder.configureHolonomic(
@@ -151,6 +155,11 @@ public class RobotContainer {
     PPHolonomicDriveController.setRotationTargetOverride(this::getRotationTargetOverride);
   }
 
+  /**
+   * Sets up the path planner for autonomous operation. This includes configuring the holonomic path
+   * following with appropriate PID constants, setting up replanning configurations, and
+   * establishing any global overrides.
+   */
   public Optional<Rotation2d> getRotationTargetOverride() {
     return isAutoPathTargeting
         ? Optional.of(
@@ -160,7 +169,13 @@ public class RobotContainer {
         : Optional.empty();
   }
 
-  /** Builds the list of autonomous command options for the SendableChooser. */
+  /**
+   * Provides an override for the robot's rotation target during autonomous path following. This can
+   * be used to dynamically adjust the robot's orientation based on strategic needs.
+   *
+   * @return An Optional containing the new rotation target, or an empty Optional if no override is
+   *     needed.
+   */
   private void buildAutoList() {
     autoCommandChooser.addOption("0 - NoOp", new InstantCommand());
     autoCommandChooser.addOption("1 - MiddleC1C2", MiddleC1C2.get(manipulatorSubsystem));
@@ -183,7 +198,10 @@ public class RobotContainer {
         .withPosition(0, 1);
   }
 
-  /** Builds the list of test commands for the Test tab. */
+  /**
+   * Builds and configures the list of autonomous commands available for selection. This method
+   * populates the SendableChooser with pre-defined autonomous routines.
+   */
   private void buildTestList() {
     RobotConstants.TEST_TAB
         .add(
@@ -193,8 +211,8 @@ public class RobotContainer {
   }
 
   /**
-   * Configures button bindings for the driver controller, setting up commands for different button
-   * combinations.
+   * Sets up a list of test commands for debugging and calibration purposes. These commands are
+   * accessible from the Test tab on the Shuffleboard.
    */
   private void configureDriverBindings() {
     driveSubsystem.setDefaultCommand(getDefaultDriveSubsystemCommand());
@@ -264,8 +282,9 @@ public class RobotContainer {
                 .andThen(manipulatorSubsystem.getShootCommand()));
 
     new Trigger(() -> manipulatorSubsystem.isNoteInFeeder())
-        .onTrue(Commands.runOnce(() -> blinkinSubsystem.signalNoteInHolder()))
-        .onFalse(Commands.runOnce(() -> blinkinSubsystem.reset()));
+        .onTrue(Commands.runOnce(() -> candleSubsystem.setColor(Color.kGreen)))
+        .onFalse(
+            Commands.runOnce(() -> candleSubsystem.setAllianceColor(AllianceColor::isRedAlliance)));
 
     new Trigger(() -> manipulatorSubsystem.isNoteInRoller() && isTeleop)
         .onTrue(
@@ -275,9 +294,8 @@ public class RobotContainer {
   }
 
   /**
-   * Returns the default Command for driving the robot based on controller input.
-   *
-   * @return The default RunCommand for driving the robot.
+   * Configures the button bindings for the driver's Xbox controller. This method maps controller
+   * inputs to robot commands for driving, manipulation, and other teleoperated actions.
    */
   private Command getDefaultDriveSubsystemCommand() {
     return Commands.run(
@@ -289,6 +307,15 @@ public class RobotContainer {
         driveSubsystem);
   }
 
+  /**
+   * Retrieves joystick input from a specified axis, applies deadband and scaling, and optionally
+   * flips the direction based on alliance color. This method helps with processing raw joystick
+   * inputs for driving commands.
+   *
+   * @param controller The CommandXboxController from which to read the input.
+   * @param axis The axis (e.g., Ly, Lx) to read from the controller.
+   * @return Processed input value from the specified joystick axis.
+   */
   private double getJoystickInput(CommandXboxController controller, JoystickAxis axis) {
     double rawInput;
 
@@ -314,19 +341,20 @@ public class RobotContainer {
   }
 
   /**
-   * Raise the first argument to the power of the second argument, keeping the sign of the first.
+   * Raises a value to a power while preserving the sign, useful for non-linear joystick response
+   * curves.
    *
-   * @param x A double.
-   * @param b A double.
-   * @return The result of x^b with the sign of x.
+   * @param x The base value.
+   * @param b The exponent.
+   * @return The result of raising `x` to the power `b`, maintaining the original sign of `x`.
    */
   private double powWithSign(double x, double b) {
     return Math.copySign(Math.pow(x, b), x);
   }
 
   /**
-   * Configures button bindings for the operator controller, setting up commands for different
-   * button combinations.
+   * Configures button bindings for the operator's Xbox controller. Similar to driver bindings, this
+   * method maps operator inputs to commands for robot manipulation and other functions.
    */
   private void configureOperatorBindings() {
     manipulatorSubsystem.setDefaultCommand(
@@ -340,8 +368,10 @@ public class RobotContainer {
 
     operatorController
         .y()
-        .onTrue(Commands.runOnce(() -> blinkinSubsystem.signalSource()))
-        .onFalse(Commands.runOnce(() -> blinkinSubsystem.reset()));
+        .onTrue(
+            Commands.runOnce(() -> candleSubsystem.setPattern(CandlePattern.STROBE, Color.kGold)))
+        .onFalse(
+            Commands.runOnce(() -> candleSubsystem.setAllianceColor(AllianceColor::isRedAlliance)));
 
     operatorController
         .x()
@@ -361,40 +391,56 @@ public class RobotContainer {
   }
 
   /**
-   * Sets the robot to teleop mode and optionally resets the odometry if `mode` is true.
+   * Sets the robot's operational mode to teleoperated and optionally resets odometry.
    *
-   * @param mode If true, sets the robot to teleop mode and resets odometry.
+   * @param mode If true, the robot is set to teleop mode and odometry is reset.
    */
   public void setTeleop(boolean mode) {
     isTeleop = mode;
-
-    blinkinSubsystem.reset();
   }
 
   /**
-   * Gets the selected autonomous command from the SendableChooser.
+   * Retrieves the autonomous command selected from the SendableChooser on the Shuffleboard.
    *
-   * @return The selected autonomous command.
+   * @return The Command selected to run in autonomous mode.
    */
   public Command getAutonomousCommand() {
     return autoCommandChooser.getSelected();
   }
 
-  /** Initializes the robot when transitioning to the disabled state. Resets controller rumble. */
+  /**
+   * Performs initialization tasks when the robot is first started. This includes setting initial
+   * subsystem states and configuring global settings.
+   */
+  public void robotInit() {
+    candleSubsystem.setAllianceColor(AllianceColor::isRedAlliance);
+  }
+
+  /** Prepares the robot for being disabled, including stopping any rumble on the controllers. */
   public void disabledInit() {
     driverController.getHID().setRumble(RumbleType.kBothRumble, 0);
   }
-
+  /**
+   * Enables or disables the auto path targeting mode, which affects autonomous path following
+   * behavior.
+   *
+   * @param isAutoPathTargeting If true, enables auto path targeting mode.
+   */
   public void setAutoPathTargeting(boolean isAutoPathTargeting) {
     this.isAutoPathTargeting = isAutoPathTargeting;
   }
-
+  /** Enum defining joystick axes for clearer code when handling joystick inputs. */
   private enum JoystickAxis {
     Ly,
     Lx,
     Ry,
     Rx;
 
+    /**
+     * Determines if the axis input should be flipped based on the robot's alliance color.
+     *
+     * @return true if the axis input is inverted, false otherwise.
+     */
     public boolean isFlipped() {
       return this == Ly || this == Lx;
     }
