@@ -439,7 +439,7 @@ public class DriveSubsystem extends SubsystemBase {
 
     ChassisSpeeds chassisSpeeds =
         fieldRelative
-            ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rot, getPose().getRotation())
+            ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rot, getHeading())
             : new ChassisSpeeds(xSpeed, ySpeed, rot);
 
     SwerveModuleState[] swerveModuleStates =
@@ -550,6 +550,7 @@ public class DriveSubsystem extends SubsystemBase {
    * @param pose The pose to which to set the odometry.
    */
   public void resetOdometry(Pose2d pose) {
+    setImuYaw(pose.getRotation().getDegrees());
     odometry.resetPosition(getHeading(), getModulePositions(), pose);
   }
 
@@ -557,9 +558,13 @@ public class DriveSubsystem extends SubsystemBase {
     odometry.addVisionMeasurement(visionPose, timestamp, stdDevs);
   }
 
+  public void setImuYaw(double yaw) {
+    pigeonImu.setYaw(yaw);
+  }
   /** Resets the IMU to a heading of zero. */
   public void resetImu() {
-    pigeonImu.reset();
+    //pigeonImu.reset();
+    setImuYaw(getPose().getRotation().getDegrees());
   }
 
   public ChassisSpeeds getRobotRelativeSpeeds() {
