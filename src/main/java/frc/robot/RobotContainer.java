@@ -251,6 +251,16 @@ public class RobotContainer {
     driverController.a().onTrue(Commands.runOnce(() -> driveSubsystem.resetImu()));
 
     driverController
+        .x()
+        .whileTrue(
+            new AutoAimCommand(
+                    driveSubsystem,
+                    () -> getJoystickInput(driverController, JoystickAxis.Ly),
+                    () -> getJoystickInput(driverController, JoystickAxis.Lx),
+                    Rotation2d.fromDegrees(90))
+                .repeatedly());
+
+    driverController
         .y()
         .onTrue(manipulatorSubsystem.getPodiumShootCommand())
         .onFalse(manipulatorSubsystem.getShootStopCommand());
