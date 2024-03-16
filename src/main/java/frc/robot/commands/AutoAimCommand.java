@@ -15,6 +15,8 @@ import frc.robot.subsystems.DriveSubsystem;
 import java.util.function.DoubleSupplier;
 
 public class AutoAimCommand extends Command {
+  private static boolean RAN_SHUFFLEBOARD_SETUP = false;
+
   private final DriveSubsystem driveSubsystem;
 
   private PIDController rotSpeedPidController = new PIDController(0.01, 0.01, 0.0005);
@@ -74,11 +76,16 @@ public class AutoAimCommand extends Command {
     rotSpeedPidController.enableContinuousInput(-180, 180);
     rotSpeedPidController.setIZone(5.0);
 
-    setupShuffleboardTab(RobotConstants.VISION_SYSTEM_TAB);
+    if (!RAN_SHUFFLEBOARD_SETUP) {
+      setupShuffleboardTab(RobotConstants.VISION_SYSTEM_TAB);
+    }
+
     addRequirements(driveSubsystem);
   }
 
   private void setupShuffleboardTab(ShuffleboardTab tab) {
+    RAN_SHUFFLEBOARD_SETUP = true;
+
     tab.addDouble("Target Rotation", () -> this.targetRotation.getDegrees());
   }
 
