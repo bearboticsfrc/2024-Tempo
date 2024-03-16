@@ -30,6 +30,8 @@ import frc.robot.commands.auto.MiddleC1;
 import frc.robot.commands.auto.MiddleC1C2;
 import frc.robot.commands.auto.MiddleTwoNote;
 import frc.robot.commands.auto.Sub1TwoNote;
+import frc.robot.commands.auto.Sub2W3W2W1;
+import frc.robot.commands.auto.Sub3ToC5;
 import frc.robot.commands.auto.Sub3TwoNote;
 import frc.robot.commands.auto.Sub3W3W2W1;
 import frc.robot.constants.DriveConstants;
@@ -176,6 +178,12 @@ public class RobotContainer {
     autoCommandChooser.addOption(
         "6 - Sub3W3W2W1C1",
         Sub3W3W2W1.get(driveSubsystem, manipulatorSubsystem, poseEstimatorSubsystem, true));
+    autoCommandChooser.addOption(
+        "6.5 - Sub2W3W2W1",
+        Sub2W3W2W1.get(driveSubsystem, manipulatorSubsystem, false));
+    autoCommandChooser.addOption(
+        "7 - Sub3ToC5",
+        Sub3ToC5.get(driveSubsystem, manipulatorSubsystem, objectDetectionSubsystem));
 
     RobotConstants.COMPETITION_TAB
         .add("Auto Command", autoCommandChooser)
