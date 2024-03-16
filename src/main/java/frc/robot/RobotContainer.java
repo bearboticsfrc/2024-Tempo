@@ -267,7 +267,7 @@ public class RobotContainer {
         .rightBumper()
         .whileTrue(
             manipulatorSubsystem
-                .getShooterPrepareCommad(
+                .getShooterAndArmPrepareCommand(
                     () ->
                         LocationHelper.getDistanceToPose(
                             driveSubsystem.getPose(),
