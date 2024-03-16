@@ -3,6 +3,7 @@ package frc.robot.commands;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.constants.commands.AutoNotePickupConstants;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.vision.ObjectDetectionSubsystem;
 import java.util.Optional;
@@ -15,8 +16,16 @@ public class AutoNotePickupCommand extends Command {
   private final DriveSubsystem driveSubsystem;
   private final ObjectDetectionSubsystem objectDetectionSubsystem;
 
-  private final PIDController yawPidController = new PIDController(0.009, 0.001, 0);
-  private final PIDController pitchPidController = new PIDController(0.05, 0, 0);
+  private final PIDController yawPidController =
+      new PIDController(
+          AutoNotePickupConstants.YawPid.P,
+          AutoNotePickupConstants.YawPid.I,
+          AutoNotePickupConstants.YawPid.D);
+  private final PIDController pitchPidController =
+      new PIDController(
+          AutoNotePickupConstants.PitchPid.P,
+          AutoNotePickupConstants.PitchPid.I,
+          AutoNotePickupConstants.PitchPid.D);
 
   private final BooleanSupplier hasNote;
 
@@ -35,8 +44,8 @@ public class AutoNotePickupCommand extends Command {
     this.objectDetectionSubsystem = objectDetectionSubsystem;
     this.hasNote = hasNote;
 
-    yawPidController.setTolerance(1);
-    pitchPidController.setTolerance(2);
+    yawPidController.setTolerance(AutoNotePickupConstants.YawPid.TOLERANCE);
+    pitchPidController.setTolerance(AutoNotePickupConstants.PitchPid.TOLERANCE);
 
     addRequirements(driveSubsystem, objectDetectionSubsystem);
   }

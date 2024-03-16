@@ -10,6 +10,7 @@ import edu.wpi.first.units.Measure;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.constants.RobotConstants;
+import frc.robot.constants.commands.AutoAimConstants;
 import frc.robot.location.LocationHelper;
 import frc.robot.subsystems.DriveSubsystem;
 import java.util.function.DoubleSupplier;
@@ -18,17 +19,21 @@ public class AutoAimCommand extends Command {
   private static boolean HAS_SETUP_SHUFFLEBOARD = false;
 
   private final DriveSubsystem driveSubsystem;
+  private final PIDController rotSpeedPidController =
+      new PIDController(
+          AutoAimConstants.RotationPid.P,
+          AutoAimConstants.RotationPid.I,
+          AutoAimConstants.RotationPid.D);
 
-  private PIDController rotSpeedPidController = new PIDController(0.01, 0.01, 0.0005);
-
-  private Translation2d targetPoint;
-
-  private boolean aimFront = true;
+  private final Translation2d targetPoint;
+  private boolean aimFront;
 
   private DoubleSupplier xSupplier = () -> 0.0;
   private DoubleSupplier ySupplier = () -> 0.0;
 
   private Rotation2d targetRotation = new Rotation2d();
+
+  private boolean rotationOverride;
 
   /*
    * Constructs the AutoAimCommand with the DriveSubsystem, target point, and optional
@@ -47,6 +52,25 @@ public class AutoAimCommand extends Command {
     this(driveSubsystem, targetPoint);
     this.xSupplier = xSupplier;
     this.ySupplier = ySupplier;
+  }
+
+  /*
+   * Constructs the AutoAimCommand with the DriveSubsystem, target point, and optional
+   * X and Y component suppliers for dynamic driving.
+   *
+   * @param driveSubsystem The DriveSubsystem instance for robot movement control.
+   * @param rotationOverride The rotation to rotate to.
+   */
+  public AutoAimCommand(
+      DriveSubsystem driveSubsystem,
+      DoubleSupplier xSupplier,
+      DoubleSupplier ySupplier,
+      Rotation2d rotationOverride) {
+    this(driveSubsystem, new Translation2d());
+    this.xSupplier = xSupplier;
+    this.ySupplier = ySupplier;
+    this.targetRotation = rotationOverride;
+    this.rotationOverride = true;
   }
 
   /*
@@ -72,9 +96,11 @@ public class AutoAimCommand extends Command {
     this.driveSubsystem = driveSubsystem;
     this.targetPoint = targetPoint;
 
-    rotSpeedPidController.setTolerance(2);
-    rotSpeedPidController.enableContinuousInput(-180, 180);
-    rotSpeedPidController.setIZone(5.0);
+    rotSpeedPidController.setTolerance(AutoAimConstants.RotationPid.TOLERANCE);
+    rotSpeedPidController.enableContinuousInput(
+        AutoAimConstants.RotationPid.ContinuousInput.MIN,
+        AutoAimConstants.RotationPid.ContinuousInput.MAX);
+    rotSpeedPidController.setIZone(AutoAimConstants.RotationPid.I_ZONE);
 
     if (!HAS_SETUP_SHUFFLEBOARD) {
       setupShuffleboardTab(RobotConstants.VISION_SYSTEM_TAB);
@@ -94,7 +120,11 @@ public class AutoAimCommand extends Command {
    */
   @Override
   public void execute() {
-    aimAtPoint(ySupplier, xSupplier, targetPoint);
+    if (rotationOverride) {
+      aimAtPoint(ySupplier, xSupplier, targetRotation);
+    } else {
+      aimAtPoint(ySupplier, xSupplier, targetPoint);
+    }
   }
 
   /**
@@ -110,8 +140,12 @@ public class AutoAimCommand extends Command {
   public void aimAtPoint(
       DoubleSupplier xRequest, DoubleSupplier yRequest, Translation2d targetPoint) {
     targetRotation = LocationHelper.getRotationToTranslation(driveSubsystem.getPose(), targetPoint);
+    aimAtPoint(xRequest, yRequest, targetRotation);
+  }
 
-    Measure<Angle> angularOffset = aimFront ? Degrees.of(180) : Degrees.of(0);
+  public void aimAtPoint(
+      DoubleSupplier xRequest, DoubleSupplier yRequest, Rotation2d targetRotation) {
+    Measure<Angle> angularOffset = aimFront ? Degrees.of(0) : Degrees.of(180);
 
     double rotateOutput =
         rotSpeedPidController.calculate(
