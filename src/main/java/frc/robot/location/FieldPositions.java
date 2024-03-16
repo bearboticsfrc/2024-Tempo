@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.bearbotics.fms.AllianceColor;
 import frc.bearbotics.fms.AllianceReadyListener;
+import frc.robot.constants.RobotConstants;
 import frc.robot.constants.VisionConstants;
 import java.io.IOException;
 
@@ -166,6 +167,11 @@ public class FieldPositions implements AllianceReadyListener {
       tagId = VisionConstants.TAG.RED_AMP.getValue();
     }
     return getTagPose(tagId);
+  }
+
+  public Pose2d getAmpScore() {
+    return new Pose2d(
+        getAmp().getX(), getAmp().getY() - RobotConstants.CENTER_TO_BUMPER, getAmp().getRotation());
   }
 
   public Pose2d getSourceLeft() {
