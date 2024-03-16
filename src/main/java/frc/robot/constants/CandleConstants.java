@@ -1,5 +1,5 @@
 package frc.robot.constants;
 
 public final class CandleConstants {
-  public static final int PORT = 1;
+  public static final int PORT = 59;
 }

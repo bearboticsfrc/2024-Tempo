@@ -13,7 +13,7 @@ public class CandleSubsystem extends SubsystemBase {
   private final CANdle CANDLE = new CANdle(CandleConstants.PORT);
 
   /** Represents the entire strip of LEDs as a single segment. */
-  private final CandleSegment entireSegment;
+  private final CandleSegment entireSegment = new CandleSegment(CANDLE, 0, 99, 0);
 
   /**
    * Initializes a new instance of the CandleSubsystem, configuring the CANdle device with default
@@ -22,10 +22,7 @@ public class CandleSubsystem extends SubsystemBase {
   public CandleSubsystem() {
     CANdleConfiguration candleConfiguration = new CANdleConfiguration();
     candleConfiguration.vBatOutputMode = VBatOutputMode.Modulated;
-
     CANDLE.configAllSettings(candleConfiguration, 100);
-
-    this.entireSegment = new CandleSegment(CANDLE, 0, 51, 0);
   }
 
   /**

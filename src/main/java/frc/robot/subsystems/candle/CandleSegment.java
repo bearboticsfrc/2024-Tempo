@@ -45,9 +45,9 @@ public class CandleSegment {
    */
   public void setColor(Color color) {
     candle.setLEDs(
-        (int) color.red * 255,
-        (int) color.green * 255,
-        (int) color.blue * 255,
+        (int) (color.red * 255),
+        (int) (color.green * 255),
+        (int) (color.blue * 255),
         0,
         startIndex,
         segmentSize);
@@ -62,9 +62,9 @@ public class CandleSegment {
   public void setLarsonAnimation(Color color, double speed) {
     LarsonAnimation animation =
         new LarsonAnimation(
-            (int) color.red * 255,
-            (int) color.green * 255,
-            (int) color.blue * 255,
+            (int) (color.red * 255),
+            (int) (color.green * 255),
+            (int) (color.blue * 255),
             0,
             speed,
             segmentSize,
