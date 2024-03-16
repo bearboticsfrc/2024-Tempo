@@ -42,7 +42,7 @@ public final class VisionConstants {
   public static final String BACK_RIGHT_CAMERA_NAME = "OV9281BackRight";
 
   public static final Vector<N3> STATE_STD_DEVS =
-      VecBuilder.fill(.2, .2, Units.degreesToRadians(10));
+      VecBuilder.fill(.8, .8, Units.degreesToRadians(30));
   public static final Vector<N3> VISION_STD_DEVS =
       VecBuilder.fill(0.1, 0.1, Units.degreesToRadians(20));
   public static final Matrix<N3, N1> VISION_MEASUREMENT_STD_DEVS =
