@@ -17,7 +17,7 @@ import java.util.function.DoubleSupplier;
 public class AutoAimCommand extends Command {
   private final DriveSubsystem driveSubsystem;
 
-  private PIDController rotSpeedPidController = new PIDController(0.01,0.01, 0.0005);
+  private PIDController rotSpeedPidController = new PIDController(0.01, 0.01, 0.0005);
 
   private Translation2d targetPoint;
 
@@ -73,7 +73,7 @@ public class AutoAimCommand extends Command {
     rotSpeedPidController.setTolerance(2);
     rotSpeedPidController.enableContinuousInput(-180, 180);
     rotSpeedPidController.setIZone(5.0);
-   
+
     targetRotationPublisher =
         NetworkTableInstance.getDefault().getDoubleTopic("/vision/targetRotation").publish();
 

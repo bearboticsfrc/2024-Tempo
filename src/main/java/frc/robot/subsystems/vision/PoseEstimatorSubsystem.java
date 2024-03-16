@@ -101,7 +101,8 @@ public class PoseEstimatorSubsystem extends SubsystemBase {
     }
 
     fusedPosePublisher.set(driveSubsystem.getPose());
-    headingPublisher.set(driveSubsystem.getPose().getRotation().plus(Rotation2d.fromDegrees(180)).getDegrees());
+    headingPublisher.set(
+        driveSubsystem.getPose().getRotation().plus(Rotation2d.fromDegrees(180)).getDegrees());
   }
 
   public String getPoseString(Pose2d pose) {
