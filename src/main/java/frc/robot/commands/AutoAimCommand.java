@@ -28,7 +28,7 @@ public class AutoAimCommand extends Command {
   private DoubleSupplier xSupplier = () -> 0.0;
   private DoubleSupplier ySupplier = () -> 0.0;
 
-  private Rotation2d targetRotation;
+  private Rotation2d targetRotation = new Rotation2d();
 
   /*
    * Constructs the AutoAimCommand with the DriveSubsystem, target point, and optional
