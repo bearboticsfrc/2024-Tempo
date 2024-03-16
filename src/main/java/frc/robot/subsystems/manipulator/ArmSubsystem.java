@@ -25,6 +25,9 @@ import frc.robot.util.RevUtil;
 import java.util.function.DoubleSupplier;
 
 public class ArmSubsystem extends SubsystemBase {
+  private final boolean SHUFFLEBOARD_ENABLED = false;
+  private final String LOG_ROOT = "Manipulator/Arm/";
+
   private CANSparkMax armMotor;
 
   private SparkAbsoluteEncoder armAbsoluteMotorEncoder;
@@ -49,7 +52,10 @@ public class ArmSubsystem extends SubsystemBase {
    */
   public ArmSubsystem() {
     setupMotors();
-    setupShuffleboardTab(RobotConstants.ARM_SYSTEM_TAB);
+
+    if (SHUFFLEBOARD_ENABLED) {
+      setupShuffleboardTab(RobotConstants.ARM_SYSTEM_TAB);
+    }
   }
 
   /** Initializes the arm motors. */

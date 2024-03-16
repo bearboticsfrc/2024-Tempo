@@ -25,13 +25,11 @@ public class Sub3ToC5 {
                     driveSubsystem, objectDetectionSubsystem, manipulatorSubsystem::isNoteInRoller)
                 .alongWith(manipulatorSubsystem.getIntakeCommand()))
         .andThen(Commands.waitUntil(manipulatorSubsystem::isNoteInFeeder))
-        .andThen(Commands.runOnce(() -> replanC5ToShootPath(driveSubsystem)))
-        .andThen(AutoBuilder.followPath(c5ToShootPath))
+        .andThen(AutoBuilder.followPath(getReplannedC5ToShootPath(driveSubsystem)))
         .andThen(new AutoShootCommand(driveSubsystem, manipulatorSubsystem));
   }
 
-  private static void replanC5ToShootPath(DriveSubsystem driveSubsystem) {
-    c5ToShootPath =
-        c5ToShootPath.replan(driveSubsystem.getPose(), driveSubsystem.getRobotRelativeSpeeds());
+  private static PathPlannerPath getReplannedC5ToShootPath(DriveSubsystem driveSubsystem) {
+    return c5ToShootPath.replan(driveSubsystem.getPose(), driveSubsystem.getRobotRelativeSpeeds());
   }
 }

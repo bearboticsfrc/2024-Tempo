@@ -25,13 +25,13 @@ import org.photonvision.PhotonCamera;
 public class PoseEstimatorSubsystem extends SubsystemBase {
   private final DriveSubsystem driveSubsystem;
 
-  private List<VisionCamera> cameras = new ArrayList<VisionCamera>();
+  private List<VisionCamera> cameras = new ArrayList<>();
+
+  private List<Notifier> notifiers = new ArrayList<>();
+  private List<EstimationRunnable> estimationRunnables = new ArrayList<>();
 
   private StructPublisher<Pose2d> fusedPosePublisher;
   private DoublePublisher headingPublisher;
-
-  private List<Notifier> notifiers = new ArrayList<Notifier>();
-  private List<EstimationRunnable> estimationRunnables = new ArrayList<EstimationRunnable>();
 
   public PoseEstimatorSubsystem(DriveSubsystem driveSubsystem, FieldPositions fieldPositions) {
     this.driveSubsystem = driveSubsystem;

@@ -15,6 +15,8 @@ import frc.robot.constants.manipulator.ShooterConstants;
 import java.util.function.DoubleSupplier;
 
 public class ShooterSubsystem extends SubsystemBase {
+  private final boolean SHUFFLEBOARD_ENABLED = false;
+
   private CANSparkFlex upperShooterMotor;
   private CANSparkFlex lowerShooterMotor;
 
@@ -25,7 +27,10 @@ public class ShooterSubsystem extends SubsystemBase {
 
   public ShooterSubsystem() {
     configureMotors();
-    setupShuffleboardTab(RobotConstants.SHOOTER_SYSTEM_TAB);
+
+    if (SHUFFLEBOARD_ENABLED) {
+      setupShuffleboardTab(RobotConstants.SHOOTER_SYSTEM_TAB);
+    }
   }
 
   private void configureMotors() {

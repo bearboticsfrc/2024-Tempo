@@ -13,6 +13,8 @@ import frc.robot.constants.RobotConstants;
 import frc.robot.constants.manipulator.IntakeConstants;
 
 public class IntakeSubsystem extends SubsystemBase {
+  private final boolean SHUFFLEBOARD_ENABLED = false;
+
   private CANSparkMax rollerMotor;
   private CANSparkMax feederMotor;
 
@@ -32,7 +34,10 @@ public class IntakeSubsystem extends SubsystemBase {
 
   public IntakeSubsystem() {
     configureMotors();
-    setupShuffleboardTab(RobotConstants.INTAKE_SYSTEM_TAB);
+
+    if (SHUFFLEBOARD_ENABLED) {
+      setupShuffleboardTab(RobotConstants.INTAKE_SYSTEM_TAB);
+    }
   }
 
   private void configureMotors() {
