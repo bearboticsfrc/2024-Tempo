@@ -264,15 +264,14 @@ public class RobotContainer {
         .whileTrue(
             new AutoShootCommand(driveSubsystem, manipulatorSubsystem)
 
-
-//            manipulatorSubsystem
-//                .getArmAndShooterPrepareCommand(
-//                    () ->
-//                        LocationHelper.getDistanceToPose(
-//                            driveSubsystem.getPose(),
-//                            FieldPositions.getInstance().getSpeakerCenter()))
-//                .andThen(manipulatorSubsystem.getShootCommand())
-);
+            //            manipulatorSubsystem
+            //                .getArmAndShooterPrepareCommand(
+            //                    () ->
+            //                        LocationHelper.getDistanceToPose(
+            //                            driveSubsystem.getPose(),
+            //                            FieldPositions.getInstance().getSpeakerCenter()))
+            //                .andThen(manipulatorSubsystem.getShootCommand())
+            );
 
     new Trigger(() -> manipulatorSubsystem.isNoteInFeeder())
         .onTrue(Commands.runOnce(() -> blinkinSubsystem.signalNoteInHolder()))

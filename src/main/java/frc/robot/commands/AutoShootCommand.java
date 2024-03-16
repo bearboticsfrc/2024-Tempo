@@ -7,7 +7,6 @@ import frc.robot.location.FieldPositions;
 import frc.robot.location.LocationHelper;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.manipulator.ManipulatorSubsystem;
-import java.util.Set;
 import java.util.function.DoubleSupplier;
 
 public class AutoShootCommand extends SequentialCommandGroup {
@@ -58,13 +57,13 @@ public class AutoShootCommand extends SequentialCommandGroup {
    */
   private Command getShooterPrepareCommand(
       ManipulatorSubsystem manipulatorSubsystem, DriveSubsystem driveSubsystem) {
- //   return Commands.defer(
- //       () ->
-   return         manipulatorSubsystem.getArmAndShooterPrepareCommand(
-                () ->
-                    LocationHelper.getDistanceToPose(
-                        driveSubsystem.getPose(), FieldPositions.getInstance().getSpeakerCenter()));
-                        //),
- //       Set.of());
+    //   return Commands.defer(
+    //       () ->
+    return manipulatorSubsystem.getArmAndShooterPrepareCommand(
+        () ->
+            LocationHelper.getDistanceToPose(
+                driveSubsystem.getPose(), FieldPositions.getInstance().getSpeakerCenter()));
+    // ),
+    //       Set.of());
   }
 }

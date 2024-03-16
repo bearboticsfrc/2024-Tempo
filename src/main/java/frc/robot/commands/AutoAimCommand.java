@@ -121,7 +121,7 @@ public class AutoAimCommand extends Command {
   /** Returns true if the PID controller indicates we are aimed. */
   @Override
   public boolean isFinished() {
-    if ( rotSpeedPidController.atSetpoint() ) System.out.println("autoaim finished");
+    if (rotSpeedPidController.atSetpoint()) System.out.println("autoaim finished");
     return rotSpeedPidController.atSetpoint();
   }
 }

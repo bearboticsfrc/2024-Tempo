@@ -1,18 +1,13 @@
 package frc.robot.commands.auto;
 
-import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.path.PathPlannerPath;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.ConditionalCommand;
-import edu.wpi.first.wpilibj2.command.DeferredCommand;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.commands.AutoShootCommand;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.manipulator.ManipulatorSubsystem;
 import frc.robot.subsystems.manipulator.ShooterSubsystem.ShooterVelocity;
-import java.util.Set;
 
 public class Sub2W3W2W1 {
 
@@ -27,10 +22,10 @@ public class Sub2W3W2W1 {
             .getSubwooferShootCommand()
             .andThen(manipulatorSubsystem.getShooterRunCommand(ShooterVelocity.PODIUM_SHOOT)),
         new PathPlannerAuto("Sub2W3NoteNoShoot"),
-                new AutoShootCommand(driveSubsystem, manipulatorSubsystem)
-                 .andThen(
-                     manipulatorSubsystem.getShooterRunCommand(ShooterVelocity.PODIUM_SHOOT))
-            /* ,
+        new InstantCommand( () -> DataLogManager.log("done with path")),
+        new AutoShootCommand(driveSubsystem, manipulatorSubsystem)
+            .andThen(manipulatorSubsystem.getShooterRunCommand(ShooterVelocity.PODIUM_SHOOT))
+        /* ,
         new DeferredCommand(
             () ->
                 new InstantCommand(
@@ -70,6 +65,6 @@ public class Sub2W3W2W1 {
                     Set.of())
                 .andThen(AutoBuilder.followPath(w1toc1Path)),
             new InstantCommand(),
-            () -> plusC1) */);
+            () -> plusC1) */ );
   }
 }

@@ -24,7 +24,7 @@ public class ShooterConstants {
 
     public static class MotorPid {
       public static final double P = 0.0001;
-      public static final double Ff = 0.000148; //0.00017;
+      public static final double Ff = 0.000148; // 0.00017;
     }
   }
 }
