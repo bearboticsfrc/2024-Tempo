@@ -33,6 +33,8 @@ public class AutoAimCommand extends Command {
 
   private Rotation2d targetRotation = new Rotation2d();
 
+  private boolean rotationOverride;
+
   /*
    * Constructs the AutoAimCommand with the DriveSubsystem, target point, and optional
    * X and Y component suppliers for dynamic driving.
@@ -50,6 +52,25 @@ public class AutoAimCommand extends Command {
     this(driveSubsystem, targetPoint);
     this.xSupplier = xSupplier;
     this.ySupplier = ySupplier;
+  }
+
+  /*
+   * Constructs the AutoAimCommand with the DriveSubsystem, target point, and optional
+   * X and Y component suppliers for dynamic driving.
+   *
+   * @param driveSubsystem The DriveSubsystem instance for robot movement control.
+   * @param rotationOverride The rotation to rotate to.
+   */
+  public AutoAimCommand(
+      DriveSubsystem driveSubsystem,
+      DoubleSupplier xSupplier,
+      DoubleSupplier ySupplier,
+      Rotation2d rotationOverride) {
+    this(driveSubsystem, new Translation2d());
+    this.xSupplier = xSupplier;
+    this.ySupplier = ySupplier;
+    this.targetRotation = rotationOverride;
+    this.rotationOverride = true;
   }
 
   /*
@@ -99,7 +120,11 @@ public class AutoAimCommand extends Command {
    */
   @Override
   public void execute() {
-    aimAtPoint(ySupplier, xSupplier, targetPoint);
+    if (rotationOverride) {
+      aimAtPoint(ySupplier, xSupplier, targetRotation);
+    } else {
+      aimAtPoint(ySupplier, xSupplier, targetPoint);
+    }
   }
 
   /**
@@ -115,7 +140,11 @@ public class AutoAimCommand extends Command {
   public void aimAtPoint(
       DoubleSupplier xRequest, DoubleSupplier yRequest, Translation2d targetPoint) {
     targetRotation = LocationHelper.getRotationToTranslation(driveSubsystem.getPose(), targetPoint);
+    aimAtPoint(xRequest, yRequest, targetRotation);
+  }
 
+  public void aimAtPoint(
+      DoubleSupplier xRequest, DoubleSupplier yRequest, Rotation2d targetRotation) {
     Measure<Angle> angularOffset = aimFront ? Degrees.of(0) : Degrees.of(180);
 
     double rotateOutput =
