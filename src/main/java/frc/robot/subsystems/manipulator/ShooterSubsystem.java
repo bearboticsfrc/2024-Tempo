@@ -107,6 +107,10 @@ public class ShooterSubsystem extends SubsystemBase {
         < ShooterConstants.VELOCITY_TOLERANCE;
   }
 
+  public void set(DoubleSupplier distanceSupplier) {
+    set(getVelocityFromDistance(distanceSupplier.getAsDouble()));
+  }
+
   private double getVelocityFromDistance(double distance) {
     if (distance <= 2) {
       return 2200;
@@ -115,10 +119,6 @@ public class ShooterSubsystem extends SubsystemBase {
     }
 
     return (17868.1 * Math.pow(distance, 0.070036)) - 16423.3;
-  }
-
-  public void set(DoubleSupplier distanceSupplier) {
-    set(getVelocityFromDistance(distanceSupplier.getAsDouble()));
   }
 
   /**

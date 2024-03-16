@@ -257,10 +257,10 @@ public class ManipulatorSubsystem extends SubsystemBase {
    * @param distanceSupplier The supplier for the shooting distance.
    * @return The command.
    */
-  public Command getShooterPrepareCommad(DoubleSupplier distanceSupplier) {
+  public Command getShooterAndArmPrepareCommand(DoubleSupplier distanceSupplier) {
     return Commands.either(
-        Commands.parallel(
-            getArmPrepareCommand(distanceSupplier), getShooterPrepareCommand(distanceSupplier)),
+        getArmPrepareCommand(distanceSupplier)
+            .alongWith(getShooterPrepareCommand(distanceSupplier)),
         Commands.none(),
         this::isNoteInFeeder);
   }
