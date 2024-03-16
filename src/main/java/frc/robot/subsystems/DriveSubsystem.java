@@ -127,7 +127,7 @@ public class DriveSubsystem extends SubsystemBase {
     maxSpeed = competitionTabMaxSpeedEntry.getDouble(DriveConstants.MAX_VELOCITY);
 
     posePublisher.set(getPose());
-    odometry.update(getHeading(), swerveModulePositions);
+    odometry.update(getHeading(), getModulePositions());
   }
 
   private void updateDataLogs() {
