@@ -15,6 +15,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -38,9 +39,10 @@ import frc.robot.constants.RobotConstants;
 import frc.robot.constants.VisionConstants;
 import frc.robot.location.FieldPositions;
 import frc.robot.location.LocationHelper;
-import frc.robot.subsystems.BlinkinSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.PowerDistributionSubsystem;
+import frc.robot.subsystems.candle.CandlePattern;
+import frc.robot.subsystems.candle.CandleSubsystem;
 import frc.robot.subsystems.manipulator.ArmSubsystem.ArmPosition;
 import frc.robot.subsystems.manipulator.IntakeSubsystem.IntakeSpeed;
 import frc.robot.subsystems.manipulator.ManipulatorSubsystem;
@@ -75,7 +77,7 @@ public class RobotContainer {
   private final PoseEstimatorSubsystem poseEstimatorSubsystem =
       new PoseEstimatorSubsystem(driveSubsystem, FieldPositions.getInstance());
 
-  private final BlinkinSubsystem blinkinSubsystem = new BlinkinSubsystem();
+  private final CandleSubsystem candleSubsystem = new CandleSubsystem();
 
   private boolean isTeleop;
   private boolean isAutoPathTargeting = false;
@@ -264,8 +266,9 @@ public class RobotContainer {
                 .andThen(manipulatorSubsystem.getShootCommand()));
 
     new Trigger(() -> manipulatorSubsystem.isNoteInFeeder())
-        .onTrue(Commands.runOnce(() -> blinkinSubsystem.signalNoteInHolder()))
-        .onFalse(Commands.runOnce(() -> blinkinSubsystem.reset()));
+        .onTrue(Commands.runOnce(() -> candleSubsystem.setColor(Color.kGreen)))
+        .onFalse(
+            Commands.runOnce(() -> candleSubsystem.setAllianceColor(AllianceColor::isRedAlliance)));
 
     new Trigger(() -> manipulatorSubsystem.isNoteInRoller() && isTeleop)
         .onTrue(
@@ -340,8 +343,10 @@ public class RobotContainer {
 
     operatorController
         .y()
-        .onTrue(Commands.runOnce(() -> blinkinSubsystem.signalSource()))
-        .onFalse(Commands.runOnce(() -> blinkinSubsystem.reset()));
+        .onTrue(
+            Commands.runOnce(() -> candleSubsystem.setPattern(CandlePattern.STROBE, Color.kGold)))
+        .onFalse(
+            Commands.runOnce(() -> candleSubsystem.setAllianceColor(AllianceColor::isRedAlliance)));
 
     operatorController
         .x()
@@ -367,8 +372,6 @@ public class RobotContainer {
    */
   public void setTeleop(boolean mode) {
     isTeleop = mode;
-
-    blinkinSubsystem.reset();
   }
 
   /**
