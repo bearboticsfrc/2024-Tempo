@@ -381,6 +381,12 @@ public class RobotContainer {
         .onTrue(manipulatorSubsystem.getAmpShootCommand())
         .onFalse(manipulatorSubsystem.getShootStopCommand());
 
+        
+    operatorController
+        .b()
+        .onTrue(manipulatorSubsystem.getBloopShootCommand())
+        .onFalse(manipulatorSubsystem.getShootStopCommand());
+
     operatorController
         .y()
         .onTrue(
