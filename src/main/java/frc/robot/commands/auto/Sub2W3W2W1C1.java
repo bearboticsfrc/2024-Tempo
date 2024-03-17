@@ -33,9 +33,8 @@ public class Sub2W3W2W1C1 {
       DriveSubsystem driveSubsystem,
       ObjectDetectionSubsystem objectDetectionSubsystem,
       ManipulatorSubsystem manipulatorSubsystem) {
-    return manipulatorSubsystem
-        .getSubwooferShootCommand()
-        .andThen(new PathPlannerAuto(AUTO_NAME))
+    return new PathPlannerAuto(AUTO_NAME)
+        .alongWith(manipulatorSubsystem.getLineShootCommand())
         .andThen(getNotePickupAndAutoShootCommand(driveSubsystem, manipulatorSubsystem))
         .andThen(
             getReplannedPathAndShooterPrepareCommand(
@@ -55,7 +54,11 @@ public class Sub2W3W2W1C1 {
             getReplannedPathAndShooterPrepareCommand(
                 driveSubsystem, manipulatorSubsystem, C1_TO_SHOOT_PATH))
         .andThen(getAutoShootCommand(driveSubsystem, manipulatorSubsystem))
-        .finallyDo(() -> manipulatorSubsystem.getShootStopCommand().schedule());
+        .finallyDo(
+            () -> {
+              System.out.println("Scheduling shoot stop command.");
+              manipulatorSubsystem.getShootStopCommand().schedule();
+            });
   }
 
   /**
