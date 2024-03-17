@@ -54,7 +54,8 @@ public class Sub2W3W2W1C1 {
         .andThen(
             getReplannedPathAndShooterPrepareCommand(
                 driveSubsystem, manipulatorSubsystem, C1_TO_SHOOT_PATH))
-        .andThen(getAutoShootCommand(driveSubsystem, manipulatorSubsystem));
+        .andThen(getAutoShootCommand(driveSubsystem, manipulatorSubsystem))
+        .finallyDo(() -> manipulatorSubsystem.getShootStopCommand().schedule());
   }
 
   /**
