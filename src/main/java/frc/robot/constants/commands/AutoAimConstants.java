@@ -7,7 +7,7 @@ public class AutoAimConstants {
     public static final double I_ZONE = 5;
     public static final double D = 0.0005;
 
-    public static final double TOLERANCE = 2;
+    public static final double TOLERANCE = 1.5;
 
     public static class ContinuousInput {
       public static final int MIN = -180;

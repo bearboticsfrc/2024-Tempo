@@ -25,8 +25,7 @@ import frc.robot.util.RevUtil;
 import java.util.function.DoubleSupplier;
 
 public class ArmSubsystem extends SubsystemBase {
-  private final boolean SHUFFLEBOARD_ENABLED = false;
-  private final String LOG_ROOT = "Manipulator/Arm/";
+  private final boolean SHUFFLEBOARD_ENABLED = true;
 
   private CANSparkMax armMotor;
 
