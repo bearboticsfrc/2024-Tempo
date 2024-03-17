@@ -3,41 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 6.501920222100072,
-        "y": 6.195032532718418
+        "x": 1.3842846515935527,
+        "y": 5.574358195791997
       },
       "prevControl": null,
       "nextControl": {
-        "x": 5.109271722516786,
-        "y": 6.25367036427616
-      },
-      "isLocked": false,
-      "linkedName": "ShootToC3End"
-    },
-    {
-      "anchor": {
-        "x": 5.074494720418012,
-        "y": 4.3245400776515845
-      },
-      "prevControl": {
-        "x": 5.408665395292333,
-        "y": 4.114975417137179
-      },
-      "nextControl": {
-        "x": 4.2095867048876965,
-        "y": 4.866940019594326
+        "x": 2.3842846515935534,
+        "y": 5.574358195791997
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 3.9992036740830232,
-        "y": 5.870386515547807
+        "x": 2.918404239090931,
+        "y": 5.574358195791997
       },
       "prevControl": {
-        "x": 4.498417645483939,
-        "y": 5.315704325102344
+        "x": 1.9184042390909308,
+        "y": 5.574358195791997
       },
       "nextControl": null,
       "isLocked": false,
@@ -46,7 +30,25 @@
   ],
   "rotationTargets": [],
   "constraintZones": [],
-  "eventMarkers": [],
+  "eventMarkers": [
+    {
+      "name": "intake",
+      "waypointRelativePos": 0.15,
+      "command": {
+        "type": "sequential",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "intake"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
   "globalConstraints": {
     "maxVelocity": 4.0,
     "maxAcceleration": 2.75,
@@ -55,7 +57,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 1.397181027641548,
+    "rotation": 0,
     "rotateFast": false
   },
   "reversed": false,
