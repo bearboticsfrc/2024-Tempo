@@ -4,7 +4,7 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.path.PathPlannerPath;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
+import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.commands.AutoNotePickupCommand;
 import frc.robot.commands.AutoShootCommand;
 import frc.robot.subsystems.DriveSubsystem;
@@ -14,68 +14,89 @@ import frc.robot.subsystems.vision.ObjectDetectionSubsystem;
 
 public class Sub2W3W2W1C1 {
   public static final String NAME = "Sub2W3W2W1C1";
+  private static final String AUTO_NAME = "Sub2W3NoteNoShoot";
 
-  static PathPlannerPath w3tow2Path = PathPlannerPath.fromPathFile("W3toW2Rotate");
-  static PathPlannerPath w2tow1Path = PathPlannerPath.fromPathFile("W2toW1Rotate");
-  static PathPlannerPath w1toc1Path = PathPlannerPath.fromPathFile("W1toC1");
-  static PathPlannerPath c1toShootPath = PathPlannerPath.fromPathFile("C1toShoot");
+  private static final PathPlannerPath W3_TO_W2_PATH = PathPlannerPath.fromPathFile("W3toW2Rotate");
+  private static final PathPlannerPath W2_TO_W1_PATH = PathPlannerPath.fromPathFile("W2toW1Rotate");
+  private static final PathPlannerPath W1_TO_C1_PATH = PathPlannerPath.fromPathFile("W1toC1");
+  private static final PathPlannerPath C1_TO_SHOOT_PATH = PathPlannerPath.fromPathFile("C1toShoot");
 
+  /**
+   * Retrieves a composite Command that represents the full autonomous routine.
+   *
+   * @param driveSubsystem The DriveSubsystem required for path following commands.
+   * @param objectDetectionSubsystem The ObjectDetectionSubsystem required for note detection.
+   * @param manipulatorSubsystem The ManipulatorSubsystem required for shooting and note handling.
+   * @return The entire autonomous routine command.
+   */
   public static Command get(
       DriveSubsystem driveSubsystem,
       ObjectDetectionSubsystem objectDetectionSubsystem,
       ManipulatorSubsystem manipulatorSubsystem) {
     return manipulatorSubsystem
         .getSubwooferShootCommand()
-        .andThen(new PathPlannerAuto("Sub2W3NoteNoShoot"))
-        .andThen(new WaitUntilCommand(manipulatorSubsystem::isNoteInFeeder))
-        .andThen(getAutoShootCommand(driveSubsystem, manipulatorSubsystem))
+        .andThen(new PathPlannerAuto(AUTO_NAME))
+        .andThen(getNotePickupAndAutoShootCommand(driveSubsystem, manipulatorSubsystem))
         .andThen(
-            AutoBuilder.followPath(getReplannedW3ToW2Path(driveSubsystem))
-                .alongWith(
-                    manipulatorSubsystem.getShooterPrepareCommand(ShooterVelocity.PODIUM_SHOOT)))
-        .andThen(new WaitUntilCommand(manipulatorSubsystem::isNoteInFeeder))
-        .andThen(getAutoShootCommand(driveSubsystem, manipulatorSubsystem))
+            getReplannedPathAndShooterPrepareCommand(
+                driveSubsystem, manipulatorSubsystem, W3_TO_W2_PATH))
+        .andThen(getNotePickupAndAutoShootCommand(driveSubsystem, manipulatorSubsystem))
         .andThen(
-            AutoBuilder.followPath(getReplannedW2ToW1Path(driveSubsystem))
-                .alongWith(
-                    manipulatorSubsystem.getShooterPrepareCommand(ShooterVelocity.PODIUM_SHOOT)))
-        .andThen(new WaitUntilCommand(manipulatorSubsystem::isNoteInFeeder))
-        .andThen(getAutoShootCommand(driveSubsystem, manipulatorSubsystem))
+            getReplannedPathAndShooterPrepareCommand(
+                driveSubsystem, manipulatorSubsystem, W2_TO_W1_PATH))
+        .andThen(getNotePickupAndAutoShootCommand(driveSubsystem, manipulatorSubsystem))
         .andThen(
-            AutoBuilder.followPath(getReplannedW1ToC1Path(driveSubsystem))
-                .alongWith(
-                    manipulatorSubsystem.getShooterPrepareCommand(ShooterVelocity.PODIUM_SHOOT)))
+            getReplannedPathAndShooterPrepareCommand(
+                driveSubsystem, manipulatorSubsystem, W1_TO_C1_PATH))
         .andThen(
             getAutoNotePickupCommand(
                 driveSubsystem, objectDetectionSubsystem, manipulatorSubsystem))
         .andThen(
-            AutoBuilder.followPath(getReplannedC1ToShootPath(driveSubsystem))
-                .alongWith(
-                    manipulatorSubsystem.getShooterPrepareCommand(ShooterVelocity.PODIUM_SHOOT)))
+            getReplannedPathAndShooterPrepareCommand(
+                driveSubsystem, manipulatorSubsystem, C1_TO_SHOOT_PATH))
         .andThen(getAutoShootCommand(driveSubsystem, manipulatorSubsystem));
   }
 
-  private static Command getAutoShootCommand(
+  /**
+   * Composes a Command that waits for a note to be in the feeder, and then auto shoots.
+   *
+   * @param driveSubsystem The DriveSubsystem used in the AutoShootCommand.
+   * @param manipulatorSubsystem The ManipulatorSubsystem that checks if note is in the feeder.
+   * @return A Command object that combines waiting for a note and shooting.
+   */
+  private static Command getNotePickupAndAutoShootCommand(
       DriveSubsystem driveSubsystem, ManipulatorSubsystem manipulatorSubsystem) {
-    return new AutoShootCommand(driveSubsystem, manipulatorSubsystem);
+    return Commands.waitUntil(manipulatorSubsystem::isNoteInFeeder)
+        .andThen(new AutoShootCommand(driveSubsystem, manipulatorSubsystem));
   }
 
-  private static PathPlannerPath getReplannedW3ToW2Path(DriveSubsystem driveSubsystem) {
-    return w3tow2Path.replan(driveSubsystem.getPose(), driveSubsystem.getRobotRelativeSpeeds());
+  /**
+   * Composes a Command that follows a replanned path and prepares the shooter.
+   *
+   * @param driveSubsystem The DriveSubsystem used for replanning the path.
+   * @param manipulatorSubsystem The ManipulatorSubsystem to prepare the shooter.
+   * @param path The PathPlannerPath that defines the initial path to follow.
+   * @return A Command object that executes the path following and shooter preparation.
+   */
+  private static Command getReplannedPathAndShooterPrepareCommand(
+      DriveSubsystem driveSubsystem,
+      ManipulatorSubsystem manipulatorSubsystem,
+      PathPlannerPath path) {
+    PathPlannerPath replannedPath =
+        path.replan(driveSubsystem.getPose(), driveSubsystem.getRobotRelativeSpeeds());
+
+    return AutoBuilder.followPath(replannedPath)
+        .alongWith(manipulatorSubsystem.getShooterPrepareCommand(ShooterVelocity.PODIUM_SHOOT));
   }
 
-  private static PathPlannerPath getReplannedW2ToW1Path(DriveSubsystem driveSubsystem) {
-    return w2tow1Path.replan(driveSubsystem.getPose(), driveSubsystem.getRobotRelativeSpeeds());
-  }
-
-  private static PathPlannerPath getReplannedW1ToC1Path(DriveSubsystem driveSubsystem) {
-    return w1toc1Path.replan(driveSubsystem.getPose(), driveSubsystem.getRobotRelativeSpeeds());
-  }
-
-  private static PathPlannerPath getReplannedC1ToShootPath(DriveSubsystem driveSubsystem) {
-    return c1toShootPath.replan(driveSubsystem.getPose(), driveSubsystem.getRobotRelativeSpeeds());
-  }
-
+  /**
+   * Composes the auto-note pickup command.
+   *
+   * @param driveSubsystem The DriveSubsystem required for the AutoNotePickupCommand.
+   * @param objectDetectionSubsystem The ObjectDetectionSubsystem used to detect notes on the field.
+   * @param manipulatorSubsystem The ManipulatorSubsystem used for intake operations.
+   * @return The auto-note pickup command.
+   */
   private static Command getAutoNotePickupCommand(
       DriveSubsystem driveSubsystem,
       ObjectDetectionSubsystem objectDetectionSubsystem,
@@ -85,5 +106,17 @@ public class Sub2W3W2W1C1 {
             objectDetectionSubsystem,
             () -> manipulatorSubsystem.isNoteInFeeder() || manipulatorSubsystem.isNoteInRoller())
         .alongWith(manipulatorSubsystem.getIntakeCommand());
+  }
+
+  /**
+   * Composes the auto shoot command.
+   *
+   * @param driveSubsystem The DriveSubsystem required for positioning during the shooting.
+   * @param manipulatorSubsystem The ManipulatorSubsystem that controls the shooting mechanism.
+   * @return A Command object that when executed will auto shoot.
+   */
+  private static Command getAutoShootCommand(
+      DriveSubsystem driveSubsystem, ManipulatorSubsystem manipulatorSubsystem) {
+    return new AutoShootCommand(driveSubsystem, manipulatorSubsystem);
   }
 }

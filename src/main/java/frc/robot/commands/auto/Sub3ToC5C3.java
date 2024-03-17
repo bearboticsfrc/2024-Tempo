@@ -14,10 +14,18 @@ import frc.robot.subsystems.vision.ObjectDetectionSubsystem;
 public class Sub3ToC5C3 {
   public static final String NAME = "Sub3ToC5C3";
 
-  private static final PathPlannerPath c5ToShootPath = PathPlannerPath.fromPathFile("C5ToShoot");
-  private static final PathPlannerPath shootToC3 = PathPlannerPath.fromPathFile("ShootToC3");
-  private static final PathPlannerPath c3ToShoot = PathPlannerPath.fromPathFile("C3ToShoot");
+  private static final PathPlannerPath C5_TO_SHOOT_PATH = PathPlannerPath.fromPathFile("C5ToShoot");
+  private static final PathPlannerPath SHOOT_TO_C3_PATH = PathPlannerPath.fromPathFile("ShootToC3");
+  private static final PathPlannerPath C3_TO_SHOOT_PATH = PathPlannerPath.fromPathFile("C3ToShoot");
 
+  /**
+   * Retrieves a composite Command that represents the full autonomous routine.
+   *
+   * @param driveSubsystem The DriveSubsystem required for path following commands.
+   * @param objectDetectionSubsystem The ObjectDetectionSubsystem required for note detection.
+   * @param manipulatorSubsystem The ManipulatorSubsystem required for shooting and note handling.
+   * @return The entire autonomous routine command.
+   */
   public static Command get(
       DriveSubsystem driveSubsystem,
       ManipulatorSubsystem manipulatorSubsystem,
@@ -28,26 +36,48 @@ public class Sub3ToC5C3 {
             getAutoNotePickupCommand(
                 driveSubsystem, objectDetectionSubsystem, manipulatorSubsystem))
         .andThen(
-            AutoBuilder.followPath(getReplannedC5ToShootPath(driveSubsystem))
-                .alongWith(
-                    manipulatorSubsystem.getShooterPrepareCommand(ShooterVelocity.PODIUM_SHOOT)))
+            getReplannedPathAndShooterPrepareCommand(
+                driveSubsystem, manipulatorSubsystem, C5_TO_SHOOT_PATH))
         .andThen(getAutoShootCommand(driveSubsystem, manipulatorSubsystem))
-        .andThen(AutoBuilder.followPath(getReplannedShootToC3Path(driveSubsystem)))
+        .andThen(
+            getReplannedPathAndShooterPrepareCommand(
+                driveSubsystem, manipulatorSubsystem, SHOOT_TO_C3_PATH))
         .andThen(
             getAutoNotePickupCommand(
                 driveSubsystem, objectDetectionSubsystem, manipulatorSubsystem))
         .andThen(
-            AutoBuilder.followPath(getReplannedC3ToShootPath(driveSubsystem))
-                .alongWith(
-                    manipulatorSubsystem.getShooterPrepareCommand(ShooterVelocity.PODIUM_SHOOT)))
+            getReplannedPathAndShooterPrepareCommand(
+                driveSubsystem, manipulatorSubsystem, C3_TO_SHOOT_PATH))
         .andThen(getAutoShootCommand(driveSubsystem, manipulatorSubsystem));
   }
 
-  private static Command getAutoShootCommand(
-      DriveSubsystem driveSubsystem, ManipulatorSubsystem manipulatorSubsystem) {
-    return new AutoShootCommand(driveSubsystem, manipulatorSubsystem);
+  /**
+   * Composes a Command that follows a replanned path and prepares the shooter.
+   *
+   * @param driveSubsystem The DriveSubsystem used for replanning the path.
+   * @param manipulatorSubsystem The ManipulatorSubsystem to prepare the shooter.
+   * @param path The PathPlannerPath that defines the initial path to follow.
+   * @return A Command object that executes the path following and shooter preparation.
+   */
+  private static Command getReplannedPathAndShooterPrepareCommand(
+      DriveSubsystem driveSubsystem,
+      ManipulatorSubsystem manipulatorSubsystem,
+      PathPlannerPath path) {
+    PathPlannerPath replannedPath =
+        path.replan(driveSubsystem.getPose(), driveSubsystem.getRobotRelativeSpeeds());
+
+    return AutoBuilder.followPath(replannedPath)
+        .alongWith(manipulatorSubsystem.getShooterPrepareCommand(ShooterVelocity.PODIUM_SHOOT));
   }
 
+  /**
+   * Composes the auto-note pickup command.
+   *
+   * @param driveSubsystem The DriveSubsystem required for the AutoNotePickupCommand.
+   * @param objectDetectionSubsystem The ObjectDetectionSubsystem used to detect notes on the field.
+   * @param manipulatorSubsystem The ManipulatorSubsystem used for intake operations.
+   * @return The auto-note pickup command.
+   */
   private static Command getAutoNotePickupCommand(
       DriveSubsystem driveSubsystem,
       ObjectDetectionSubsystem objectDetectionSubsystem,
@@ -59,15 +89,15 @@ public class Sub3ToC5C3 {
         .alongWith(manipulatorSubsystem.getIntakeCommand());
   }
 
-  private static PathPlannerPath getReplannedC5ToShootPath(DriveSubsystem driveSubsystem) {
-    return c5ToShootPath.replan(driveSubsystem.getPose(), driveSubsystem.getRobotRelativeSpeeds());
-  }
-
-  private static PathPlannerPath getReplannedShootToC3Path(DriveSubsystem driveSubsystem) {
-    return shootToC3.replan(driveSubsystem.getPose(), driveSubsystem.getRobotRelativeSpeeds());
-  }
-
-  private static PathPlannerPath getReplannedC3ToShootPath(DriveSubsystem driveSubsystem) {
-    return c3ToShoot.replan(driveSubsystem.getPose(), driveSubsystem.getRobotRelativeSpeeds());
+  /**
+   * Composes the auto shoot command.
+   *
+   * @param driveSubsystem The DriveSubsystem required for positioning during the shooting.
+   * @param manipulatorSubsystem The ManipulatorSubsystem that controls the shooting mechanism.
+   * @return A Command object that when executed will auto shoot.
+   */
+  private static Command getAutoShootCommand(
+      DriveSubsystem driveSubsystem, ManipulatorSubsystem manipulatorSubsystem) {
+    return new AutoShootCommand(driveSubsystem, manipulatorSubsystem);
   }
 }
