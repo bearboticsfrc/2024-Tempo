@@ -12,7 +12,8 @@ import frc.robot.subsystems.manipulator.ManipulatorSubsystem;
 import frc.robot.subsystems.manipulator.ShooterSubsystem.ShooterVelocity;
 import frc.robot.subsystems.vision.ObjectDetectionSubsystem;
 
-public class Sub2W3W2W1 {
+public class Sub2W3W2W1C1 {
+  public static final String NAME = "Sub2W3W2W1C1";
 
   static PathPlannerPath w3tow2Path = PathPlannerPath.fromPathFile("W3toW2Rotate");
   static PathPlannerPath w2tow1Path = PathPlannerPath.fromPathFile("W2toW1Rotate");
