@@ -11,6 +11,7 @@ import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PIDConstants;
 import com.pathplanner.lib.util.ReplanningConfig;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.filter.MedianFilter;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
@@ -19,6 +20,7 @@ import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.ScheduleCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -84,6 +86,8 @@ public class RobotContainer {
   private boolean isTeleop;
   private boolean isAutoPathTargeting = false;
 
+  private MedianFilter distanceFilter = new MedianFilter(6);
+
   private SendableChooser<Command> autoCommandChooser = new SendableChooser<>();
 
   private Map<String, Command> namedCommands =
@@ -123,11 +127,7 @@ public class RobotContainer {
    */
   private void setupShuffleboardTab(ShuffleboardTab tab) {
     tab.add("Home Climber", manipulatorSubsystem.getClimberHomeCommand());
-    tab.addDouble(
-        "Distance to Speaker",
-        () ->
-            LocationHelper.getDistanceToPose(
-                driveSubsystem.getPose(), FieldPositions.getInstance().getSpeakerCenter()));
+    tab.addDouble("Distance to Speaker", () -> getDistanceToSpeaker());
   }
 
   /**
@@ -246,12 +246,16 @@ public class RobotContainer {
     driverController
         .rightTrigger()
         .whileTrue(
-            new AutoAimCommand(
-                    driveSubsystem,
-                    FieldPositions.getInstance().getSpeakerTranslation(),
-                    () -> getJoystickInput(driverController, JoystickAxis.Ly),
-                    () -> getJoystickInput(driverController, JoystickAxis.Lx))
-                .repeatedly());
+            new ParallelCommandGroup(
+                new AutoAimCommand(
+                        driveSubsystem,
+                        FieldPositions.getInstance().getSpeakerTranslation(),
+                        () -> getJoystickInput(driverController, JoystickAxis.Ly),
+                        () -> getJoystickInput(driverController, JoystickAxis.Lx))
+                    .repeatedly(),
+                manipulatorSubsystem
+                    .getShooterAndArmPrepareCommand(() -> getDistanceToSpeaker())
+                    .repeatedly()));
 
     driverController.a().onTrue(Commands.runOnce(() -> driveSubsystem.resetImu()));
 
@@ -308,6 +312,11 @@ public class RobotContainer {
             Commands.runOnce(() -> driverController.getHID().setRumble(RumbleType.kBothRumble, 0)));
   }
 
+  public double getDistanceToSpeaker() {
+    return distanceFilter.calculate(
+        LocationHelper.getDistanceToPose(
+            driveSubsystem.getPose(), FieldPositions.getInstance().getSpeakerCenter()));
+  }
   /**
    * Configures the button bindings for the driver's Xbox controller. This method maps controller
    * inputs to robot commands for driving, manipulation, and other teleoperated actions.
