@@ -67,7 +67,7 @@ public class AutoNotePickupCommand extends Command {
             ? pitchPidController.calculate(adjustedPitch)
             : 0; // Rotate before driving if error is high.
 
-    driveSubsystem.drive(MathUtil.clamp(xSpeed, -1.0, 1.0), 0, rotSpeed, false);
+    driveSubsystem.drive(MathUtil.clamp(xSpeed, -0.5, 0.5), 0, rotSpeed, false);
   }
 
   @Override

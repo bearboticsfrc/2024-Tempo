@@ -14,6 +14,8 @@ import frc.robot.constants.RobotConstants;
 import frc.robot.constants.manipulator.ClimberConstants;
 
 public class ClimberSubsystem extends SubsystemBase {
+  private final boolean SHUFFLEBOARD_ENABLED = false;
+
   private CANSparkMax climberMotor;
   private CANSparkMax climberMotorFollower;
 
@@ -23,7 +25,10 @@ public class ClimberSubsystem extends SubsystemBase {
 
   public ClimberSubsystem() {
     setupMotors();
-    setupShuffleboardTab(RobotConstants.CLIMBER_SYSTEM_TAB);
+
+    if (SHUFFLEBOARD_ENABLED) {
+      setupShuffleboardTab(RobotConstants.CLIMBER_SYSTEM_TAB);
+    }
   }
 
   private void setupMotors() {

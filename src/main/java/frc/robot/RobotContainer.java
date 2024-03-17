@@ -31,6 +31,7 @@ import frc.robot.commands.auto.MiddleC1;
 import frc.robot.commands.auto.MiddleC1C2;
 import frc.robot.commands.auto.MiddleTwoNote;
 import frc.robot.commands.auto.Sub1TwoNote;
+import frc.robot.commands.auto.Sub3ToC5C3;
 import frc.robot.commands.auto.Sub3TwoNote;
 import frc.robot.commands.auto.Sub3W3W2W1;
 import frc.robot.constants.DriveConstants;
@@ -144,7 +145,7 @@ public class RobotContainer {
         new HolonomicPathFollowerConfig(
             new PIDConstants(5),
             new PIDConstants(5),
-            3,
+            DriveConstants.MAX_VELOCITY,
             RobotConstants.SWERVE_RADIUS,
             new ReplanningConfig()),
         AllianceColor::isRedAlliance,
@@ -181,7 +182,8 @@ public class RobotContainer {
     autoCommandChooser.addOption("1 - MiddleC1C2", MiddleC1C2.get(manipulatorSubsystem));
     autoCommandChooser.addOption(
         "1.5 - MiddleC1", MiddleC1.get(driveSubsystem, manipulatorSubsystem, true));
-    autoCommandChooser.addOption("2 - MidleTwoNote", MiddleTwoNote.get(manipulatorSubsystem));
+    autoCommandChooser.addOption(
+        "2 - " + MiddleTwoNote.NAME, MiddleTwoNote.get(manipulatorSubsystem));
     autoCommandChooser.addOption(
         "3 - Sub1TwoNote", Sub1TwoNote.get(driveSubsystem, manipulatorSubsystem));
     autoCommandChooser.addOption("4 - Sub3TwoNote", Sub3TwoNote.get(manipulatorSubsystem));
@@ -191,6 +193,9 @@ public class RobotContainer {
     autoCommandChooser.addOption(
         "6 - Sub3W3W2W1C1",
         Sub3W3W2W1.get(driveSubsystem, manipulatorSubsystem, poseEstimatorSubsystem, true));
+    autoCommandChooser.addOption(
+        "7 - " + Sub3ToC5C3.NAME,
+        Sub3ToC5C3.get(driveSubsystem, manipulatorSubsystem, objectDetectionSubsystem));
 
     RobotConstants.COMPETITION_TAB
         .add("Auto Command", autoCommandChooser)
@@ -423,7 +428,11 @@ public class RobotContainer {
    * subsystem states and configuring global settings.
    */
   public void robotInit() {
-    candleSubsystem.setAllianceColor(AllianceColor::isRedAlliance);
+    if (manipulatorSubsystem.isNoteInFeeder()) {
+      candleSubsystem.setColor(Color.kGreen);
+    } else {
+      candleSubsystem.setAllianceColor(AllianceColor::isRedAlliance);
+    }
   }
 
   /** Prepares the robot for being disabled, including stopping any rumble on the controllers. */

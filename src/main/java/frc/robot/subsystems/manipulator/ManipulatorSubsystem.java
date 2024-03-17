@@ -272,7 +272,7 @@ public class ManipulatorSubsystem extends SubsystemBase {
    * @param velocity The desired shooter velocity.
    * @return The command.
    */
-  private Command getShooterPrepareCommand(ShooterVelocity velocity) {
+  public Command getShooterPrepareCommand(ShooterVelocity velocity) {
     return Commands.sequence(
         getShooterRunCommand(velocity), Commands.waitUntil(shooterSubsystem::atTargetVelocity));
   }

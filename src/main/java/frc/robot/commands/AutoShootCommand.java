@@ -1,6 +1,5 @@
 package frc.robot.commands;
 
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.location.FieldPositions;
 import frc.robot.location.LocationHelper;
@@ -10,7 +9,6 @@ import java.util.function.DoubleSupplier;
 
 public class AutoShootCommand extends SequentialCommandGroup {
   private final DriveSubsystem driveSubsystem;
-  private final ManipulatorSubsystem manipulatorSubsystem;
 
   /**
    * Constructs the AutoShootCommand with the DriveSubsystem and ManipulatorSubsystem.
@@ -38,28 +36,16 @@ public class AutoShootCommand extends SequentialCommandGroup {
       DoubleSupplier xSupplier,
       DoubleSupplier ySupplier) {
     this.driveSubsystem = driveSubsystem;
-    this.manipulatorSubsystem = manipulatorSubsystem;
 
     addCommands(
         driveSubsystem.getDriveStopCommand(),
         new AutoAimCommand(driveSubsystem, FieldPositions.getInstance().getSpeakerTranslation())
-            .alongWith(getShooterPrepareCommand()),
+            .alongWith(
+                manipulatorSubsystem.getShooterAndArmPrepareCommand(
+                    this::getDistanceToSpeakerCenter)),
         manipulatorSubsystem.getShootCommand());
 
     addRequirements(driveSubsystem, manipulatorSubsystem);
-  }
-
-  /**
-   * Retrieves the shooter preparation command based on the current robot pose and speaker center
-   * position.
-   *
-   * @param manipulatorSubsystem The ManipulatorSubsystem instance for shooter and manipulator
-   *     control.
-   * @param driveSubsystem The DriveSubsystem instance for robot movement control.
-   * @return The shooter preparation command.
-   */
-  private Command getShooterPrepareCommand() {
-    return manipulatorSubsystem.getShooterPrepareCommand(this::getDistanceToSpeakerCenter);
   }
 
   /**

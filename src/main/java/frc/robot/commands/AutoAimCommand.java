@@ -145,6 +145,7 @@ public class AutoAimCommand extends Command {
 
   public void aimAtPoint(
       DoubleSupplier xRequest, DoubleSupplier yRequest, Rotation2d targetRotation) {
+    this.targetRotation = targetRotation;
     Measure<Angle> angularOffset = aimFront ? Degrees.of(0) : Degrees.of(180);
 
     double rotateOutput =
