@@ -204,6 +204,10 @@ public class ManipulatorSubsystem extends SubsystemBase {
     return getShootCommand(ArmPosition.PODIUM_SHOOT, ShooterVelocity.PODIUM_SHOOT);
   }
 
+  public Command getFarLineShootCommand() {
+    return getShootCommand(ArmPosition.FAR_LINE_SHOOT, ShooterVelocity.SUBWOOFER_SHOOT);
+  }
+
   public Command getLineShootCommand() {
     return getShootCommand(ArmPosition.LINE_SHOOT, ShooterVelocity.SUBWOOFER_SHOOT);
   }

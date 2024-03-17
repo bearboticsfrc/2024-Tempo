@@ -12,7 +12,9 @@ import frc.robot.subsystems.manipulator.ManipulatorSubsystem;
 import frc.robot.subsystems.manipulator.ShooterSubsystem.ShooterVelocity;
 import frc.robot.subsystems.vision.ObjectDetectionSubsystem;
 
-public class Sub2W2C3C4 {
+public class Sub2W2C3C2 {
+  private static final String AUTO_NAME = "Sub2W2";
+
   public static final String NAME = "Sub2W2C3C4";
 
   static PathPlannerPath w2toc3Path = PathPlannerPath.fromPathFile("W2toC3");
@@ -26,16 +28,11 @@ public class Sub2W2C3C4 {
       DriveSubsystem driveSubsystem,
       ObjectDetectionSubsystem objectDetectionSubsystem,
       ManipulatorSubsystem manipulatorSubsystem) {
-    return manipulatorSubsystem
-        .getSubwooferShootCommand()
-        .andThen(
-            new PathPlannerAuto("Sub2W2")
-                .alongWith(
-                    manipulatorSubsystem.getShooterPrepareCommand(ShooterVelocity.PODIUM_SHOOT)))
+    return new PathPlannerAuto(AUTO_NAME)
+        .alongWith(manipulatorSubsystem.getFarLineShootCommand())
         .andThen(new WaitUntilCommand(manipulatorSubsystem::isNoteInFeeder))
         .andThen(getAutoShootCommand(driveSubsystem, manipulatorSubsystem))
-        .andThen(
-            AutoBuilder.followPath(getReplannedW2ToC3Path(driveSubsystem)))
+        .andThen(AutoBuilder.followPath(getReplannedW2ToC3Path(driveSubsystem)))
         .andThen(
             getAutoNotePickupCommand(
                 driveSubsystem, objectDetectionSubsystem, manipulatorSubsystem))
@@ -44,10 +41,7 @@ public class Sub2W2C3C4 {
                 .alongWith(
                     manipulatorSubsystem.getShooterPrepareCommand(ShooterVelocity.PODIUM_SHOOT)))
         .andThen(getAutoShootCommand(driveSubsystem, manipulatorSubsystem))
-        
-
-        .andThen(
-            AutoBuilder.followPath(getReplannedShootToC2Path(driveSubsystem)))
+        .andThen(AutoBuilder.followPath(getReplannedShootToC2Path(driveSubsystem)))
         .andThen(
             getAutoNotePickupCommand(
                 driveSubsystem, objectDetectionSubsystem, manipulatorSubsystem))
@@ -55,8 +49,7 @@ public class Sub2W2C3C4 {
             AutoBuilder.followPath(getReplannedC2ToShootPath(driveSubsystem))
                 .alongWith(
                     manipulatorSubsystem.getShooterPrepareCommand(ShooterVelocity.PODIUM_SHOOT)))
-        .andThen(getAutoShootCommand(driveSubsystem, manipulatorSubsystem))
-        ;
+        .andThen(getAutoShootCommand(driveSubsystem, manipulatorSubsystem));
   }
 
   private static Command getAutoShootCommand(
