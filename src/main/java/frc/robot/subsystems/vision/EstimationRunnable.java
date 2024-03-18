@@ -45,8 +45,6 @@ public class EstimationRunnable implements Runnable {
   public void run() {
     PhotonPipelineResult photonResults = photonCamera.getLatestResult();
 
-    if (!photonResults.hasTargets()) return;
-
     photonResults.targets.removeIf(t -> t.getPoseAmbiguity() > APRILTAG_AMBIGUITY_THRESHOLD);
     photonResults.targets.removeIf(t -> isTargetTooFarAway(t));
 
