@@ -51,10 +51,11 @@ public final class VisionConstants {
   public static final double POSE_AMBIGUITY_SHIFTER = 0.2;
   public static final double POSE_AMBIGUITY_MULTIPLIER = 4;
   public static final double TAG_PRESENCE_WEIGHT = 10;
-  public static final double NOISY_DISTANCE_METERS = 3.5;
-  public static final double DISTANCE_WEIGHT = 7;
+  public static final double NOISY_DISTANCE_METERS = 3.2;
+  public static final double DISTANCE_WEIGHT = 20;
 
-  public static final double APRILTAG_AMBIGUITY_THRESHOLD = 0.08;
+  public static final double APRILTAG_AMBIGUITY_THRESHOLD = 0.09;
+  public static final double APRILTAG_CULL_DISTANCE = 4.0;
 
   public static final String OBJECT_DETECTION_CAMERA = "OV9782NoteCamera";
   public static final String CAMERA2_NAME = "OV9281_2";
