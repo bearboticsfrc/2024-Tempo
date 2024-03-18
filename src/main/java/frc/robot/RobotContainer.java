@@ -380,6 +380,11 @@ public class RobotContainer {
         .onFalse(manipulatorSubsystem.getShootStopCommand());
 
     operatorController
+        .b()
+        .onTrue(manipulatorSubsystem.getBloopShootCommand())
+        .onFalse(manipulatorSubsystem.getShootStopCommand());
+
+    operatorController
         .y()
         .onTrue(
             Commands.runOnce(() -> candleSubsystem.setPattern(CandlePattern.STROBE, Color.kGold)))
