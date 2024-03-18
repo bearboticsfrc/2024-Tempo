@@ -31,6 +31,7 @@ public class Sub2W2C3C2 {
     return new PathPlannerAuto(AUTO_NAME)
         .alongWith(manipulatorSubsystem.getFarLineShootCommand())
         .andThen(new WaitUntilCommand(manipulatorSubsystem::isNoteInFeeder))
+        .andThen(manipulatorSubsystem.getFarPodiumShootCommand())
         .andThen(getAutoShootCommand(driveSubsystem, manipulatorSubsystem))
         .andThen(AutoBuilder.followPath(getReplannedW2ToC3Path(driveSubsystem)))
         .andThen(
@@ -49,7 +50,8 @@ public class Sub2W2C3C2 {
             AutoBuilder.followPath(getReplannedC2ToShootPath(driveSubsystem))
                 .alongWith(
                     manipulatorSubsystem.getShooterPrepareCommand(ShooterVelocity.PODIUM_SHOOT)))
-        .andThen(getAutoShootCommand(driveSubsystem, manipulatorSubsystem));
+        .andThen(getAutoShootCommand(driveSubsystem, manipulatorSubsystem))
+        .finallyDo(() -> manipulatorSubsystem.getShootStopCommand().schedule());
   }
 
   private static Command getAutoShootCommand(
