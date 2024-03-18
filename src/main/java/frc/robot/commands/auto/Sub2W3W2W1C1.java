@@ -4,6 +4,7 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.path.PathPlannerPath;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.commands.AutoNotePickupCommand;
 import frc.robot.commands.AutoShootCommand;
 import frc.robot.subsystems.DriveSubsystem;
@@ -11,12 +12,14 @@ import frc.robot.subsystems.manipulator.ManipulatorSubsystem;
 import frc.robot.subsystems.manipulator.ShooterSubsystem.ShooterVelocity;
 import frc.robot.subsystems.vision.ObjectDetectionSubsystem;
 
-public class Sub3ToC5C3 {
-  public static final String NAME = "Sub3ToC5C3";
+public class Sub2W3W2W1C1 {
+  public static final String NAME = "Sub2W3W2W1C1";
+  private static final String AUTO_NAME = "Sub2W3NoteNoShoot";
 
-  private static final PathPlannerPath C5_TO_SHOOT_PATH = PathPlannerPath.fromPathFile("C5ToShoot");
-  private static final PathPlannerPath SHOOT_TO_C3_PATH = PathPlannerPath.fromPathFile("ShootToC3");
-  private static final PathPlannerPath C3_TO_SHOOT_PATH = PathPlannerPath.fromPathFile("C3ToShoot");
+  private static final PathPlannerPath W3_TO_W2_PATH = PathPlannerPath.fromPathFile("W3toW2Rotate");
+  private static final PathPlannerPath W2_TO_W1_PATH = PathPlannerPath.fromPathFile("W2toW1Rotate");
+  private static final PathPlannerPath W1_TO_C1_PATH = PathPlannerPath.fromPathFile("W1toC1");
+  private static final PathPlannerPath C1_TO_SHOOT_PATH = PathPlannerPath.fromPathFile("C1toShoot");
 
   /**
    * Retrieves a composite Command that represents the full autonomous routine.
@@ -28,28 +31,47 @@ public class Sub3ToC5C3 {
    */
   public static Command get(
       DriveSubsystem driveSubsystem,
-      ManipulatorSubsystem manipulatorSubsystem,
-      ObjectDetectionSubsystem objectDetectionSubsystem) {
-    return getAutoShootCommand(driveSubsystem, manipulatorSubsystem)
-        .andThen(new PathPlannerAuto(NAME))
+      ObjectDetectionSubsystem objectDetectionSubsystem,
+      ManipulatorSubsystem manipulatorSubsystem) {
+    return new PathPlannerAuto(AUTO_NAME)
+        .alongWith(manipulatorSubsystem.getLineShootCommand())
+        .andThen(getNotePickupAndAutoShootCommand(driveSubsystem, manipulatorSubsystem))
+        .andThen(
+            getReplannedPathAndShooterPrepareCommand(
+                driveSubsystem, manipulatorSubsystem, W3_TO_W2_PATH))
+        .andThen(getNotePickupAndAutoShootCommand(driveSubsystem, manipulatorSubsystem))
+        .andThen(
+            getReplannedPathAndShooterPrepareCommand(
+                driveSubsystem, manipulatorSubsystem, W2_TO_W1_PATH))
+        .andThen(getNotePickupAndAutoShootCommand(driveSubsystem, manipulatorSubsystem))
+        .andThen(
+            getReplannedPathAndShooterPrepareCommand(
+                driveSubsystem, manipulatorSubsystem, W1_TO_C1_PATH))
         .andThen(
             getAutoNotePickupCommand(
                 driveSubsystem, objectDetectionSubsystem, manipulatorSubsystem))
         .andThen(
             getReplannedPathAndShooterPrepareCommand(
-                driveSubsystem, manipulatorSubsystem, C5_TO_SHOOT_PATH))
+                driveSubsystem, manipulatorSubsystem, C1_TO_SHOOT_PATH))
         .andThen(getAutoShootCommand(driveSubsystem, manipulatorSubsystem))
-        .andThen(
-            getReplannedPathAndShooterPrepareCommand(
-                driveSubsystem, manipulatorSubsystem, SHOOT_TO_C3_PATH))
-        .andThen(
-            getAutoNotePickupCommand(
-                driveSubsystem, objectDetectionSubsystem, manipulatorSubsystem))
-        .andThen(
-            getReplannedPathAndShooterPrepareCommand(
-                driveSubsystem, manipulatorSubsystem, C3_TO_SHOOT_PATH))
-        .andThen(getAutoShootCommand(driveSubsystem, manipulatorSubsystem))
-        .finallyDo(() -> manipulatorSubsystem.getShootStopCommand().schedule());
+        .finallyDo(
+            () -> {
+              System.out.println("Scheduling shoot stop command.");
+              manipulatorSubsystem.getShootStopCommand().schedule();
+            });
+  }
+
+  /**
+   * Composes a Command that waits for a note to be in the feeder, and then auto shoots.
+   *
+   * @param driveSubsystem The DriveSubsystem used in the AutoShootCommand.
+   * @param manipulatorSubsystem The ManipulatorSubsystem that checks if note is in the feeder.
+   * @return A Command object that combines waiting for a note and shooting.
+   */
+  private static Command getNotePickupAndAutoShootCommand(
+      DriveSubsystem driveSubsystem, ManipulatorSubsystem manipulatorSubsystem) {
+    return Commands.waitUntil(manipulatorSubsystem::isNoteInFeeder)
+        .andThen(new AutoShootCommand(driveSubsystem, manipulatorSubsystem));
   }
 
   /**

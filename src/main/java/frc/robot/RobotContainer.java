@@ -31,9 +31,9 @@ import frc.robot.commands.auto.MiddleC1;
 import frc.robot.commands.auto.MiddleC1C2;
 import frc.robot.commands.auto.MiddleTwoNote;
 import frc.robot.commands.auto.Sub1TwoNote;
+import frc.robot.commands.auto.Sub2W3W2W1C1;
 import frc.robot.commands.auto.Sub3ToC5C3;
 import frc.robot.commands.auto.Sub3TwoNote;
-import frc.robot.commands.auto.Sub3W3W2W1;
 import frc.robot.constants.DriveConstants;
 import frc.robot.constants.DriveConstants.SpeedMode;
 import frc.robot.constants.RobotConstants;
@@ -187,12 +187,10 @@ public class RobotContainer {
     autoCommandChooser.addOption(
         "3 - Sub1TwoNote", Sub1TwoNote.get(driveSubsystem, manipulatorSubsystem));
     autoCommandChooser.addOption("4 - Sub3TwoNote", Sub3TwoNote.get(manipulatorSubsystem));
+
     autoCommandChooser.addOption(
-        "5 - Sub3W3W2W1",
-        Sub3W3W2W1.get(driveSubsystem, manipulatorSubsystem, poseEstimatorSubsystem, false));
-    autoCommandChooser.addOption(
-        "6 - Sub3W3W2W1C1",
-        Sub3W3W2W1.get(driveSubsystem, manipulatorSubsystem, poseEstimatorSubsystem, true));
+        "5 - " + Sub2W3W2W1C1.NAME,
+        Sub2W3W2W1C1.get(driveSubsystem, objectDetectionSubsystem, manipulatorSubsystem));
     autoCommandChooser.addOption(
         "7 - " + Sub3ToC5C3.NAME,
         Sub3ToC5C3.get(driveSubsystem, manipulatorSubsystem, objectDetectionSubsystem));

@@ -204,6 +204,10 @@ public class ManipulatorSubsystem extends SubsystemBase {
     return getShootCommand(ArmPosition.PODIUM_SHOOT, ShooterVelocity.PODIUM_SHOOT);
   }
 
+  public Command getLineShootCommand() {
+    return getShootCommand(ArmPosition.LINE_SHOOT, ShooterVelocity.SUBWOOFER_SHOOT);
+  }
+
   /**
    * Get a command to execute the entire shooting sequence for the stage.
    *
