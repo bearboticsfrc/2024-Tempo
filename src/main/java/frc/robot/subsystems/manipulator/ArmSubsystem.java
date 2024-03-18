@@ -257,6 +257,7 @@ public class ArmSubsystem extends SubsystemBase {
   /** Enum representing different positions of the arm. */
   public enum ArmPosition {
     HOME(Rotation2d.fromDegrees(0)),
+    LINE_SHOOT(Rotation2d.fromDegrees(18)),
     PODIUM_SHOOT(Rotation2d.fromDegrees(28)),
     AMP_SHOOT(Rotation2d.fromDegrees(80)),
     STAGE_SHOOT(Rotation2d.fromDegrees(36)),
