@@ -3,29 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 8.343553829964803,
-        "y": 0.7916107260785962
+        "x": 6.467143220000726,
+        "y": 1.0994593417758272
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.1153162306324615,
-        "y": 1.1141187996661719
+        "x": 7.0535215356145,
+        "y": 1.4806052469247806
       },
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "W3ToC5End"
     },
     {
       "anchor": {
-        "x": 3.4907449995080166,
-        "y": 2.4683357474823056
+        "x": 7.376029609202075,
+        "y": 1.7298160310606336
       },
       "prevControl": {
-        "x": 4.036128835022533,
-        "y": 1.8398365343902694
+        "x": 6.9069269567110565,
+        "y": 1.4366268732537475
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "C5ToShootEnd"
+      "linkedName": null
     }
   ],
   "rotationTargets": [],
@@ -38,14 +38,14 @@
     "maxAngularAcceleration": 720.0
   },
   "goalEndState": {
-    "velocity": 0,
-    "rotation": -39.667841118340455,
-    "rotateFast": false
+    "velocity": 2.0,
+    "rotation": 38.93,
+    "rotateFast": true
   },
   "reversed": false,
   "folder": null,
   "previewStartingState": {
-    "rotation": 1.1934894239819658,
+    "rotation": 0,
     "velocity": 0
   },
   "useDefaultConstraints": true

@@ -30,6 +30,7 @@ import frc.robot.commands.AutoShootCommand;
 import frc.robot.commands.auto.MiddleC1;
 import frc.robot.commands.auto.MiddleC1C2;
 import frc.robot.commands.auto.MiddleTwoNote;
+import frc.robot.commands.auto.SmartSub3ToC5C3;
 import frc.robot.commands.auto.Sub1TwoNote;
 import frc.robot.commands.auto.Sub2W3W2W1C1;
 import frc.robot.commands.auto.Sub3ToC5C3;
@@ -76,6 +77,7 @@ public class RobotContainer {
   private final ObjectDetectionSubsystem objectDetectionSubsystem =
       new ObjectDetectionSubsystem(VisionConstants.OBJECT_DETECTION_CAMERA);
 
+  @SuppressWarnings("unused")
   private final PoseEstimatorSubsystem poseEstimatorSubsystem =
       new PoseEstimatorSubsystem(driveSubsystem, FieldPositions.getInstance());
 
@@ -187,13 +189,15 @@ public class RobotContainer {
     autoCommandChooser.addOption(
         "3 - Sub1TwoNote", Sub1TwoNote.get(driveSubsystem, manipulatorSubsystem));
     autoCommandChooser.addOption("4 - Sub3TwoNote", Sub3TwoNote.get(manipulatorSubsystem));
-
     autoCommandChooser.addOption(
         "5 - " + Sub2W3W2W1C1.NAME,
         Sub2W3W2W1C1.get(driveSubsystem, objectDetectionSubsystem, manipulatorSubsystem));
     autoCommandChooser.addOption(
         "7 - " + Sub3ToC5C3.NAME,
         Sub3ToC5C3.get(driveSubsystem, manipulatorSubsystem, objectDetectionSubsystem));
+    autoCommandChooser.addOption(
+        "7.5 - " + SmartSub3ToC5C3.NAME,
+        SmartSub3ToC5C3.get(driveSubsystem, manipulatorSubsystem, objectDetectionSubsystem));
 
     RobotConstants.COMPETITION_TAB
         .add("Auto Command", autoCommandChooser)

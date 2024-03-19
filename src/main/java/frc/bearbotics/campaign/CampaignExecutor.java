@@ -4,7 +4,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 
 public class CampaignExecutor extends Command {
   private Campaign campaign;
-  private MissionTree nextMission = null;
+  private MissionTree nextMissionTree = null;
   private AbstractMission currentMission = null;
 
   public CampaignExecutor(Campaign campaign) {
@@ -13,31 +13,38 @@ public class CampaignExecutor extends Command {
 
   @Override
   public void initialize() {
-    nextMission = campaign.getMissions();
-    currentMission = nextMission.getNode();
+    nextMissionTree = campaign.getMissions();
+    currentMission = nextMissionTree.getNode();
     currentMission.initialize();
   }
 
   @Override
   public void execute() {
+    if (!currentMission.isValid()) {
+      nextMissionTree = getNextMissionTree(false);
+      return;
+    }
+
     currentMission.execute();
 
-    if (!currentMission.isFinished() || nextMission == null) {
+    if (!currentMission.isFinished() || nextMissionTree == null) {
       return;
     }
 
     currentMission.end(false);
+    nextMissionTree = getNextMissionTree(currentMission.isSuccess());
 
-    nextMission =
-        currentMission.isSuccess() ? nextMission.getSuccessNode() : nextMission.getFailureNode();
-
-    if (nextMission == null) {
+    if (nextMissionTree == null) {
       currentMission = null; // maybe use this.end()?
       return; // TODO: Logic needs reworking here, maybe
     }
 
-    currentMission = nextMission.getNode();
+    currentMission = nextMissionTree.getNode();
     currentMission.initialize();
+  }
+
+  private MissionTree getNextMissionTree(boolean previousSuccess) {
+    return previousSuccess ? nextMissionTree.getSuccessNode() : nextMissionTree.getFailureNode();
   }
 
   @Override
