@@ -432,10 +432,6 @@ public class RobotContainer {
    * subsystem states and configuring global settings.
    */
   public void robotInit() {
-    if (driveSubsystem.getPose().getX() != 0.0) {
-        System.out.println("Has good pose!");
-        //if (driveSubsystem.getPose().getY() 
-    }
     if (manipulatorSubsystem.isNoteInFeeder()) {
       candleSubsystem.setColor(Color.kGreen);
     } else {
