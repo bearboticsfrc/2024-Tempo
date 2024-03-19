@@ -20,9 +20,9 @@ public class Sub2W2C3C2 {
   static PathPlannerPath w2toc3Path = PathPlannerPath.fromPathFile("W2toC3");
   static PathPlannerPath c3toShootPath = PathPlannerPath.fromPathFile("C3ToShoot");
 
-  static PathPlannerPath shootToc2Path = PathPlannerPath.fromPathFile("ShootToC2");
+  static PathPlannerPath shootToc2Path = PathPlannerPath.fromPathFile("ShootToC2AfterC3");
 
-  static PathPlannerPath c2toShootPath = PathPlannerPath.fromPathFile("C2ToShoot");
+  static PathPlannerPath c2toShootPath = PathPlannerPath.fromPathFile("C2ToShootAfterC3");
 
   public static Command get(
       DriveSubsystem driveSubsystem,
