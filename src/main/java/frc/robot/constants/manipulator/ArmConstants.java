@@ -12,34 +12,77 @@ public class ArmConstants {
 
   public static final double MAX_DISTANCE = 5.26;
 
-  public static final SortedMap<Double, Double> SHOOT_ANGLE_MAP =
+  public static final SortedMap<Double, Double> OLD_SHOOT_ANGLE_MAP =
       new TreeMap<>(
           Map.ofEntries(
               Map.entry(0.0, 0.0),
               Map.entry(1.787, 13.5),
               Map.entry(1.95, 17.2),
               Map.entry(2.13, 19.8),
-              Map.entry(2.29, 21.27),
-              Map.entry(2.46, 21.5),
-              Map.entry(2.55, 24.1),
-              Map.entry(2.63, 23.8),
-              Map.entry(2.81, 27.5),
-              Map.entry(2.97, 28.9),
-              Map.entry(3.14, 30.0),
-              Map.entry(3.25, 30.5),
-              Map.entry(3.45, 31.5),
-              Map.entry(3.63, 31.33),
+              Map.entry(2.29, 21.3),
+              Map.entry(2.46, 23.7),
+              Map.entry(2.55, 25.1),
+              Map.entry(2.63, 26.4),
+              Map.entry(2.81, 28.4),
+              Map.entry(2.97, 29.8),
+              Map.entry(3.14, 30.5),
+              Map.entry(3.25, 31.4),
+              Map.entry(3.45, 32.2),
+              Map.entry(3.63, 33.5),
               Map.entry(3.77, 34.0),
-              Map.entry(3.88, 33.8),
-              Map.entry(4.0, 34.2),
-              Map.entry(4.16, 34.9),
+              Map.entry(3.88, 34.8),
+              Map.entry(4.0, 35.2),
+              Map.entry(4.16, 35.4),
               Map.entry(4.3, 35.8),
-              Map.entry(4.46, 36.5),
+              Map.entry(4.46, 36.4),
               Map.entry(4.71, 37.5),
               Map.entry(4.96, 37.9),
               Map.entry(5.25, 38.1),
               Map.entry(5.26, 38.22),
               Map.entry(5.27, 38.24)));
+
+
+
+public static final SortedMap<Double, Double> SHOOT_ANGLE_MAP_everyquarter =
+      new TreeMap<>(
+          Map.ofEntries(
+              Map.entry(0.0, 0.0),
+              Map.entry(1.79,	13.5),
+              Map.entry(2.00,	17.8),
+              Map.entry(2.25,	21.4),
+              Map.entry(2.50,	25.0),
+              Map.entry(2.75,	27.8),
+              Map.entry(3.00,	29.8),
+              Map.entry(3.25,	31.4),
+              Map.entry(3.50,	32.6),
+              Map.entry(3.75,	34.0),
+              Map.entry(4.00,	35.2),
+              Map.entry(4.25,	35.9),
+              Map.entry(4.50,	36.5),
+              Map.entry(4.75,	37.5),
+              Map.entry(5.00,	37.9),
+              Map.entry(5.25,	38.1),
+              Map.entry(5.26,	38.22),
+              Map.entry(5.27,	38.24)));          
+
+
+public static final SortedMap<Double, Double> SHOOT_ANGLE_MAP =
+      new TreeMap<>(
+          Map.ofEntries(
+              Map.entry(0.0, 0.0),
+              Map.entry(1.79,	13.5),
+              Map.entry(2.00,	17.8),
+              Map.entry(2.50,	25.0),
+              Map.entry(3.00,	29.8),
+              Map.entry(3.50,	32.9),
+              Map.entry(4.00,	35.2),
+              Map.entry(4.50,	36.5),
+              Map.entry(5.00,	37.9),
+              Map.entry(5.25,	38.1),
+              Map.entry(5.26,	38.22),
+              Map.entry(5.27,	38.24)));      
+
+
 
   public class Motor {
     public static final String NAME = "Arm Motor";
