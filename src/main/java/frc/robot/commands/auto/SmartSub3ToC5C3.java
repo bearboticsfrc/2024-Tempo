@@ -17,11 +17,13 @@ import frc.robot.subsystems.vision.ObjectDetectionSubsystem;
 
 public class SmartSub3ToC5C3 {
   public static final String NAME = "SmartSub3ToC5C3";
+  public static final String AUTO_NAME = "Sub3ToC5C3";
+
 
   private static final PathPlannerPath C5_TO_SHOOT_PATH = PathPlannerPath.fromPathFile("C5ToShoot");
 
   private static final PathPlannerPath C5_TO_C4_PATH = PathPlannerPath.fromPathFile("C5ToC4");
-  private static final PathPlannerPath C4_TO_SHOOT_PATH = PathPlannerPath.fromPathFile("C4ToShoot");
+  private static final PathPlannerPath C4_TO_SHOOT_PATH = PathPlannerPath.fromPathFile("C4toShoot");
 
   private static final PathPlannerPath SHOOT_TO_C3_PATH = PathPlannerPath.fromPathFile("ShootToC3");
   private static final PathPlannerPath C3_TO_SHOOT_PATH = PathPlannerPath.fromPathFile("C3ToShoot");
@@ -39,7 +41,7 @@ public class SmartSub3ToC5C3 {
       ManipulatorSubsystem manipulatorSubsystem,
       ObjectDetectionSubsystem objectDetectionSubsystem) {
     return getAutoShootCommand(driveSubsystem, manipulatorSubsystem)
-        .andThen(new PathPlannerAuto(NAME))
+        .andThen(new PathPlannerAuto(AUTO_NAME))
         .andThen(
             getAutoNotePickupCommand(
                 driveSubsystem, objectDetectionSubsystem, manipulatorSubsystem))
