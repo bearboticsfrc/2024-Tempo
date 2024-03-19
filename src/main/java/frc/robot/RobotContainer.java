@@ -122,6 +122,7 @@ public class RobotContainer {
    * command bindings, and prepares autonomous selections and Shuffleboard tabs.
    */
   private void setupShuffleboardTab(ShuffleboardTab tab) {
+    tab.addBoolean("isRedAlliance", () -> AllianceColor.isRedAlliance());
     tab.add("Home Climber", manipulatorSubsystem.getClimberHomeCommand());
     tab.addDouble(
         "Distance to Speaker",
