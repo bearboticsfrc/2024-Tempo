@@ -35,28 +35,20 @@ public class EstimationRunnable implements Runnable {
     this.photonPoseEstimator =
         new PhotonPoseEstimator(
             layout,
-            PoseStrategy.LOWEST_AMBIGUITY,
+            PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
             photonCamera,
             camera.getRobotToCameraTransform());
+    photonPoseEstimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
   }
 
   @Override
   public void run() {
     PhotonPipelineResult photonResults = photonCamera.getLatestResult();
 
-    if (!photonResults.hasTargets()
-        || (photonResults.targets.size() >= 1
-            && photonResults.targets.get(0).getPoseAmbiguity() > APRILTAG_AMBIGUITY_THRESHOLD)) {
-      return;
-    }
+    photonResults.targets.removeIf(t -> t.getPoseAmbiguity() > APRILTAG_AMBIGUITY_THRESHOLD);
+    photonResults.targets.removeIf(t -> isTargetTooFarAway(t));
 
-    if (photonResults.targets.size() >= 1) {
-      PhotonTrackedTarget target = photonResults.getTargets().get(0);
-      Transform3d t3d = target.getBestCameraToTarget();
-      double distance = Math.hypot(t3d.getX(), t3d.getY());
-
-      if (distance > 3.3) return;
-    }
+    if (!photonResults.hasTargets()) return;
 
     photonPoseEstimator
         .update(photonResults)
@@ -64,14 +56,18 @@ public class EstimationRunnable implements Runnable {
             estimatedRobotPose -> {
               Pose3d estimatedPose = estimatedRobotPose.estimatedPose;
               // Make sure the measurement is on the field
-              if (estimatedPose.getX() > -FieldPositions.TAG_OUTSIDE_FIELD
-                  && estimatedPose.getX()
-                      <= (FieldPositions.FIELD_LENGTH + FieldPositions.TAG_OUTSIDE_FIELD)
+              if (estimatedPose.getX() > 0.0
+                  && estimatedPose.getX() <= FieldPositions.FIELD_LENGTH
                   && estimatedPose.getY() > 0.0
                   && estimatedPose.getY() <= FieldPositions.FIELD_WIDTH) {
                 atomicEstimatedRobotPose.set(estimatedRobotPose);
               }
             });
+  }
+
+  private boolean isTargetTooFarAway(PhotonTrackedTarget target) {
+    Transform3d t3d = target.getBestCameraToTarget();
+    return (Math.hypot(t3d.getX(), t3d.getY())) > APRILTAG_CULL_DISTANCE;
   }
 
   /**
