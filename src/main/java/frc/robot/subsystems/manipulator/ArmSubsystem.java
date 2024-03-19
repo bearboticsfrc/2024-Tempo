@@ -153,6 +153,7 @@ public class ArmSubsystem extends SubsystemBase {
 
     if (isArmHome() && targetState.position == 0) {
       armMotor.stopMotor(); // Prevent arm from pulling current when resting.
+      armRelativeEncoder.setPosition(0.0);
     }
   }
 

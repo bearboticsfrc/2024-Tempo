@@ -31,6 +31,8 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousInit() {
+    updateAllianceColor();
+
     robotContainer.setTeleop(false);
     autonomousCommand = robotContainer.getAutonomousCommand();
 
@@ -38,8 +40,6 @@ public class Robot extends TimedRobot {
     if (autonomousCommand != null) {
       autonomousCommand.schedule();
     }
-
-    updateAllianceColor();
   }
 
   @Override
