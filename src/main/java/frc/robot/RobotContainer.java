@@ -28,12 +28,12 @@ import frc.robot.commands.AutoAimCommand;
 import frc.robot.commands.AutoNotePickupCommand;
 import frc.robot.commands.AutoShootCommand;
 import frc.robot.commands.auto.MiddleC1;
-import frc.robot.commands.auto.MiddleC1C2;
 import frc.robot.commands.auto.MiddleTwoNote;
 import frc.robot.commands.auto.SmartSub3ToC5C3;
 import frc.robot.commands.auto.Sub1C1C2;
 import frc.robot.commands.auto.Sub1TwoNote;
 import frc.robot.commands.auto.Sub1W1W2C1;
+import frc.robot.commands.auto.Sub2W2C3C2;
 import frc.robot.commands.auto.Sub2W3W2W1C1;
 import frc.robot.commands.auto.Sub3ToC5C3;
 import frc.robot.commands.auto.Sub3TwoNote;
@@ -184,7 +184,6 @@ public class RobotContainer {
    */
   private void buildAutoList() {
     autoCommandChooser.addOption("0 - NoOp", new InstantCommand());
-    autoCommandChooser.addOption("1 - MiddleC1C2", MiddleC1C2.get(manipulatorSubsystem));
     autoCommandChooser.addOption(
         "1.5 - MiddleC1", MiddleC1.get(driveSubsystem, manipulatorSubsystem, true));
     autoCommandChooser.addOption(
@@ -193,7 +192,7 @@ public class RobotContainer {
         "3 - Sub1TwoNote", Sub1TwoNote.get(driveSubsystem, manipulatorSubsystem));
     autoCommandChooser.addOption("4 - Sub3TwoNote", Sub3TwoNote.get(manipulatorSubsystem));
     autoCommandChooser.addOption(
-        "5 - " + Sub2W3W2W1C1.NAME,
+        "6 - " + Sub2W3W2W1C1.NAME,
         Sub2W3W2W1C1.get(driveSubsystem, objectDetectionSubsystem, manipulatorSubsystem));
     autoCommandChooser.addOption(
         "7 - " + Sub3ToC5C3.NAME,
@@ -201,7 +200,9 @@ public class RobotContainer {
     autoCommandChooser.addOption(
         "7.5 - " + SmartSub3ToC5C3.NAME,
         SmartSub3ToC5C3.get(driveSubsystem, manipulatorSubsystem, objectDetectionSubsystem));
-
+    autoCommandChooser.addOption(
+        "8 - " + Sub2W2C3C2.NAME,
+        Sub2W2C3C2.get(driveSubsystem, objectDetectionSubsystem, manipulatorSubsystem));
     autoCommandChooser.addOption(
         "9 - " + Sub1C1C2.NAME,
         Sub1C1C2.get(driveSubsystem, objectDetectionSubsystem, manipulatorSubsystem));
