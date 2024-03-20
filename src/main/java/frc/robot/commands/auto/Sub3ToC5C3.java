@@ -48,8 +48,7 @@ public class Sub3ToC5C3 {
         .andThen(
             getReplannedPathAndShooterPrepareCommand(
                 driveSubsystem, manipulatorSubsystem, C3_TO_SHOOT_PATH))
-        .andThen(getAutoShootCommand(driveSubsystem, manipulatorSubsystem))
-        .finallyDo(() -> manipulatorSubsystem.getShootStopCommand().schedule());
+        .andThen(getAutoShootCommand(driveSubsystem, manipulatorSubsystem));
   }
 
   /**
@@ -83,10 +82,11 @@ public class Sub3ToC5C3 {
       DriveSubsystem driveSubsystem,
       ObjectDetectionSubsystem objectDetectionSubsystem,
       ManipulatorSubsystem manipulatorSubsystem) {
-    return new AutoNotePickupCommand(
-            driveSubsystem,
-            objectDetectionSubsystem,
-            () -> manipulatorSubsystem.isNoteInFeeder() || manipulatorSubsystem.isNoteInRoller())
+    return driveSubsystem
+        .getDriveStopCommand()
+        .andThen(
+            new AutoNotePickupCommand(
+                driveSubsystem, objectDetectionSubsystem, manipulatorSubsystem::isNoteInIntake))
         .alongWith(manipulatorSubsystem.getIntakeCommand());
   }
 

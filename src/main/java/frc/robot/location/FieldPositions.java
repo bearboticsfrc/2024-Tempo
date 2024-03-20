@@ -7,13 +7,11 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.bearbotics.fms.AllianceColor;
-import frc.bearbotics.fms.AllianceReadyListener;
 import frc.robot.constants.VisionConstants;
 import java.io.IOException;
 
-public class FieldPositions implements AllianceReadyListener {
+public class FieldPositions {
 
   public static double FIELD_LENGTH = 16.541; // meters
   public static double FIELD_WIDTH = 8.211; // meters
@@ -24,12 +22,7 @@ public class FieldPositions implements AllianceReadyListener {
   private static FieldPositions instance = null;
 
   public FieldPositions() {
-    this(AllianceColor.isRedAlliance());
-  }
-
-  public FieldPositions(boolean redOrigin) {
-    initializeLayout(redOrigin);
-    AllianceColor.addListener(this);
+    initializeLayout();
   }
 
   public static FieldPositions getInstance() {
@@ -39,7 +32,7 @@ public class FieldPositions implements AllianceReadyListener {
     return instance;
   }
 
-  private void initializeLayout(boolean redOrigin) {
+  private void initializeLayout() {
     try {
       layout = AprilTagFieldLayout.loadFromResource(AprilTagFields.k2024Crescendo.m_resourceFile);
       layout.setOrigin(OriginPosition.kBlueAllianceWallRightSide);
@@ -50,10 +43,6 @@ public class FieldPositions implements AllianceReadyListener {
 
   public AprilTagFieldLayout getLayout() {
     return layout;
-  }
-
-  public void updateAllianceColor(Alliance alliance) {
-    initializeLayout(AllianceColor.isRedAlliance());
   }
 
   public double getWingY() {

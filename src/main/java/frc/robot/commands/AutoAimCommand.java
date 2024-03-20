@@ -14,6 +14,7 @@ import frc.robot.constants.commands.AutoAimConstants;
 import frc.robot.location.LocationHelper;
 import frc.robot.subsystems.DriveSubsystem;
 import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
 
 public class AutoAimCommand extends Command {
   private static boolean HAS_SETUP_SHUFFLEBOARD = false;
@@ -25,7 +26,7 @@ public class AutoAimCommand extends Command {
           AutoAimConstants.RotationPid.I,
           AutoAimConstants.RotationPid.D);
 
-  private final Translation2d targetPoint;
+  private final Supplier<Translation2d> targetPoint;
   private boolean aimFront;
 
   private DoubleSupplier xSupplier = () -> 0.0;
@@ -46,7 +47,7 @@ public class AutoAimCommand extends Command {
    */
   public AutoAimCommand(
       DriveSubsystem driveSubsystem,
-      Translation2d targetPoint,
+      Supplier<Translation2d> targetPoint,
       DoubleSupplier xSupplier,
       DoubleSupplier ySupplier) {
     this(driveSubsystem, targetPoint);
@@ -66,7 +67,7 @@ public class AutoAimCommand extends Command {
       DoubleSupplier xSupplier,
       DoubleSupplier ySupplier,
       Rotation2d rotationOverride) {
-    this(driveSubsystem, new Translation2d());
+    this(driveSubsystem, Translation2d::new);
     this.xSupplier = xSupplier;
     this.ySupplier = ySupplier;
     this.targetRotation = rotationOverride;
@@ -81,7 +82,7 @@ public class AutoAimCommand extends Command {
    * @param aimFront Whether the command should aim the front or back of the robot.
    */
   public AutoAimCommand(
-      DriveSubsystem driveSubsystem, Translation2d targetPoint, boolean aimFront) {
+      DriveSubsystem driveSubsystem, Supplier<Translation2d> targetPoint, boolean aimFront) {
     this(driveSubsystem, targetPoint);
     this.aimFront = aimFront;
   }
@@ -92,7 +93,7 @@ public class AutoAimCommand extends Command {
    * @param driveSubsystem The DriveSubsystem instance for robot movement control.
    * @param targetPoint The target point for auto-aiming.
    */
-  public AutoAimCommand(DriveSubsystem driveSubsystem, Translation2d targetPoint) {
+  public AutoAimCommand(DriveSubsystem driveSubsystem, Supplier<Translation2d> targetPoint) {
     this.driveSubsystem = driveSubsystem;
     this.targetPoint = targetPoint;
 
@@ -123,7 +124,7 @@ public class AutoAimCommand extends Command {
     if (rotationOverride) {
       aimAtPoint(ySupplier, xSupplier, targetRotation);
     } else {
-      aimAtPoint(ySupplier, xSupplier, targetPoint);
+      aimAtPoint(ySupplier, xSupplier, targetPoint.get());
     }
   }
 
@@ -164,5 +165,10 @@ public class AutoAimCommand extends Command {
   @Override
   public boolean isFinished() {
     return rotSpeedPidController.atSetpoint();
+  }
+
+  @Override
+  public void end(boolean interrupted) {
+    driveSubsystem.drive(0, 0, 0);
   }
 }

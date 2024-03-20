@@ -251,7 +251,7 @@ public class RobotContainer {
         .whileTrue(
             new AutoAimCommand(
                     driveSubsystem,
-                    FieldPositions.getInstance().getSpeakerTranslation(),
+                    () -> FieldPositions.getInstance().getSpeakerTranslation(),
                     () -> getJoystickInput(driverController, JoystickAxis.Ly),
                     () -> getJoystickInput(driverController, JoystickAxis.Lx))
                 .repeatedly());
@@ -301,8 +301,7 @@ public class RobotContainer {
 
     new Trigger(() -> manipulatorSubsystem.isNoteInFeeder())
         .onTrue(Commands.runOnce(() -> candleSubsystem.setColor(Color.kGreen)))
-        .onFalse(
-            Commands.runOnce(() -> candleSubsystem.setAllianceColor(AllianceColor::isRedAlliance)));
+        .onFalse(Commands.runOnce(() -> candleSubsystem.setAllianceColor()));
 
     new Trigger(() -> manipulatorSubsystem.isNoteInRoller() && isTeleop)
         .onTrue(
@@ -393,8 +392,7 @@ public class RobotContainer {
         .y()
         .onTrue(
             Commands.runOnce(() -> candleSubsystem.setPattern(CandlePattern.STROBE, Color.kGold)))
-        .onFalse(
-            Commands.runOnce(() -> candleSubsystem.setAllianceColor(AllianceColor::isRedAlliance)));
+        .onFalse(Commands.runOnce(() -> candleSubsystem.setAllianceColor()));
 
     operatorController
         .x()
@@ -438,9 +436,14 @@ public class RobotContainer {
   public void robotInit() {
     if (manipulatorSubsystem.isNoteInFeeder()) {
       candleSubsystem.setColor(Color.kGreen);
-    } else {
-      candleSubsystem.setAllianceColor(AllianceColor::isRedAlliance);
     }
+  }
+
+  public void teleopInit() {
+    manipulatorSubsystem
+        .getShootStopCommand()
+        .alongWith(manipulatorSubsystem.getIntakeStopCommand())
+        .schedule();
   }
 
   /** Prepares the robot for being disabled, including stopping any rumble on the controllers. */

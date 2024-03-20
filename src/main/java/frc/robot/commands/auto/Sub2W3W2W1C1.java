@@ -33,8 +33,9 @@ public class Sub2W3W2W1C1 {
       DriveSubsystem driveSubsystem,
       ObjectDetectionSubsystem objectDetectionSubsystem,
       ManipulatorSubsystem manipulatorSubsystem) {
-    return new PathPlannerAuto(AUTO_NAME)
-        .alongWith(manipulatorSubsystem.getLineShootCommand())
+    return manipulatorSubsystem
+        .getSubwooferShootCommand()
+        .andThen(new PathPlannerAuto(AUTO_NAME))
         .andThen(getNotePickupAndAutoShootCommand(driveSubsystem, manipulatorSubsystem))
         .andThen(
             getReplannedPathAndShooterPrepareCommand(
@@ -53,12 +54,7 @@ public class Sub2W3W2W1C1 {
         .andThen(
             getReplannedPathAndShooterPrepareCommand(
                 driveSubsystem, manipulatorSubsystem, C1_TO_SHOOT_PATH))
-        .andThen(getAutoShootCommand(driveSubsystem, manipulatorSubsystem))
-        .finallyDo(
-            () -> {
-              System.out.println("Scheduling shoot stop command.");
-              manipulatorSubsystem.getShootStopCommand().schedule();
-            });
+        .andThen(getAutoShootCommand(driveSubsystem, manipulatorSubsystem));
   }
 
   /**
@@ -105,11 +101,14 @@ public class Sub2W3W2W1C1 {
       DriveSubsystem driveSubsystem,
       ObjectDetectionSubsystem objectDetectionSubsystem,
       ManipulatorSubsystem manipulatorSubsystem) {
-    return new AutoNotePickupCommand(
-            driveSubsystem,
-            objectDetectionSubsystem,
-            () -> manipulatorSubsystem.isNoteInFeeder() || manipulatorSubsystem.isNoteInRoller())
-        .alongWith(manipulatorSubsystem.getIntakeCommand());
+    return driveSubsystem
+        .getDriveStopCommand()
+        .andThen(
+            new AutoNotePickupCommand(
+                    driveSubsystem,
+                    objectDetectionSubsystem,
+                    () -> manipulatorSubsystem.isNoteInIntake())
+                .alongWith(manipulatorSubsystem.getIntakeCommand()));
   }
 
   /**

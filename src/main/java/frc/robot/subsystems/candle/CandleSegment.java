@@ -17,6 +17,8 @@ public class CandleSegment {
   private final int segmentSize;
   private final int animationSlot;
 
+  private Color currentColor;
+
   /**
    * Constructs a new CandleSegment object to control a segment of LEDs on a CANdle device.
    *
@@ -32,6 +34,10 @@ public class CandleSegment {
     this.animationSlot = animationSlot;
   }
 
+  public Color getColor() {
+    return currentColor;
+  }
+
   /** Clears any ongoing animation on this LED segment. */
   public void clearAnimation() {
     candle.clearAnimation(animationSlot);
@@ -44,6 +50,8 @@ public class CandleSegment {
    * @param color The color to set the LEDs to. Uses the WPILib Color class.
    */
   public void setColor(Color color) {
+    currentColor = color;
+
     candle.setLEDs(
         (int) (color.red * 255),
         (int) (color.green * 255),
@@ -60,6 +68,8 @@ public class CandleSegment {
    * @param speed The speed of the Larson scanner effect.
    */
   public void setLarsonAnimation(Color color, double speed) {
+    currentColor = color;
+
     LarsonAnimation animation =
         new LarsonAnimation(
             (int) (color.red * 255),
@@ -81,6 +91,8 @@ public class CandleSegment {
    * @param speed The speed of the strobe effect.
    */
   public void setStrobeAnimation(Color color, double speed) {
+    currentColor = color;
+
     StrobeAnimation animation =
         new StrobeAnimation(
             (int) (color.red * 255),

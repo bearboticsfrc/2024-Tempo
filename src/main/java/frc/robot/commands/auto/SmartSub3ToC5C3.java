@@ -1,7 +1,6 @@
 package frc.robot.commands.auto;
 
 import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.path.PathPlannerPath;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.bearbotics.campaign.Campaign;
@@ -17,10 +16,10 @@ import frc.robot.subsystems.vision.ObjectDetectionSubsystem;
 
 public class SmartSub3ToC5C3 {
   public static final String NAME = "SmartSub3ToC5C3";
-  public static final String AUTO_NAME = "Sub3ToC5C3";
-
 
   private static final PathPlannerPath C5_TO_SHOOT_PATH = PathPlannerPath.fromPathFile("C5ToShoot");
+
+  private static final PathPlannerPath SUB3_TO_C5 = PathPlannerPath.fromPathFile("Sub3ToC5");
 
   private static final PathPlannerPath C5_TO_C4_PATH = PathPlannerPath.fromPathFile("C5ToC4");
   private static final PathPlannerPath C4_TO_SHOOT_PATH = PathPlannerPath.fromPathFile("C4toShoot");
@@ -41,10 +40,7 @@ public class SmartSub3ToC5C3 {
       ManipulatorSubsystem manipulatorSubsystem,
       ObjectDetectionSubsystem objectDetectionSubsystem) {
     return getAutoShootCommand(driveSubsystem, manipulatorSubsystem)
-        .andThen(new PathPlannerAuto(AUTO_NAME))
-        .andThen(
-            getAutoNotePickupCommand(
-                driveSubsystem, objectDetectionSubsystem, manipulatorSubsystem))
+        .andThen(AutoBuilder.followPath(SUB3_TO_C5))
         .andThen(getC5C4Campaign(driveSubsystem, objectDetectionSubsystem, manipulatorSubsystem))
         .andThen(getAutoShootCommand(driveSubsystem, manipulatorSubsystem))
         .andThen(
@@ -56,8 +52,7 @@ public class SmartSub3ToC5C3 {
         .andThen(
             getReplannedPathAndShooterPrepareCommand(
                 driveSubsystem, manipulatorSubsystem, C3_TO_SHOOT_PATH))
-        .andThen(getAutoShootCommand(driveSubsystem, manipulatorSubsystem))
-        .finallyDo(() -> manipulatorSubsystem.getShootStopCommand().schedule());
+        .andThen(getAutoShootCommand(driveSubsystem, manipulatorSubsystem));
   }
 
   /**
@@ -92,17 +87,20 @@ public class SmartSub3ToC5C3 {
       ManipulatorSubsystem manipulatorSubsystem) {
     CommandMission c5PickupMission =
         new CommandMission(
-                getAutoNotePickupCommand(
-                    driveSubsystem, objectDetectionSubsystem, manipulatorSubsystem))
-            .withPrecondition(() -> objectDetectionSubsystem.hasTargetInView())
-            .withSuccessCallback(
-                () ->
-                    manipulatorSubsystem.isNoteInRoller() || manipulatorSubsystem.isNoteInFeeder());
+                driveSubsystem
+                    .getDriveStopCommand()
+                    .andThen(
+                        getAutoNotePickupCommand(
+                            driveSubsystem, objectDetectionSubsystem, manipulatorSubsystem))
+                    .withTimeout(1)
+                    .withName("C5 Pickup"))
+            .withSuccessCallback(manipulatorSubsystem::isNoteInIntake);
 
     CommandMission c5ToShootMission =
         new CommandMission(
             getReplannedPathAndShooterPrepareCommand(
-                driveSubsystem, manipulatorSubsystem, C5_TO_SHOOT_PATH));
+                    driveSubsystem, manipulatorSubsystem, C5_TO_SHOOT_PATH)
+                .withName("C5 To Shoot"));
 
     // TODO: Maybe add precondition here?
     CommandMission c5ToC4PickupMission =
@@ -111,15 +109,16 @@ public class SmartSub3ToC5C3 {
                         driveSubsystem, manipulatorSubsystem, C5_TO_C4_PATH)
                     .andThen(
                         getAutoNotePickupCommand(
-                            driveSubsystem, objectDetectionSubsystem, manipulatorSubsystem)))
-            .withSuccessCallback(
-                () ->
-                    manipulatorSubsystem.isNoteInRoller() || manipulatorSubsystem.isNoteInFeeder());
+                            driveSubsystem, objectDetectionSubsystem, manipulatorSubsystem))
+                    .withName("C5 To C4 Pickup"))
+            .withSuccessCallback(manipulatorSubsystem::isNoteInIntake);
 
     CommandMission c4ToShootMission =
         new CommandMission(
-            getReplannedPathAndShooterPrepareCommand(
-                driveSubsystem, manipulatorSubsystem, C4_TO_SHOOT_PATH));
+            AutoBuilder.followPath(C4_TO_SHOOT_PATH)
+                .alongWith(
+                    manipulatorSubsystem.getShooterPrepareCommand(ShooterVelocity.PODIUM_SHOOT))
+                .withName("C4 To Shoot"));
 
     MissionTree c5ToC4Mission =
         new MissionTree(c5ToC4PickupMission).withSuccessNode(c4ToShootMission);
@@ -164,10 +163,11 @@ public class SmartSub3ToC5C3 {
       DriveSubsystem driveSubsystem,
       ObjectDetectionSubsystem objectDetectionSubsystem,
       ManipulatorSubsystem manipulatorSubsystem) {
-    return new AutoNotePickupCommand(
-            driveSubsystem,
-            objectDetectionSubsystem,
-            () -> manipulatorSubsystem.isNoteInFeeder() || manipulatorSubsystem.isNoteInRoller())
+    return driveSubsystem
+        .getDriveStopCommand()
+        .andThen(
+            new AutoNotePickupCommand(
+                driveSubsystem, objectDetectionSubsystem, manipulatorSubsystem::isNoteInIntake))
         .alongWith(manipulatorSubsystem.getIntakeCommand());
   }
 

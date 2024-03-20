@@ -125,4 +125,9 @@ public class CommandMission extends AbstractMission {
   public boolean isValid() {
     return preconditionSupplier.getAsBoolean();
   }
+
+  public CommandMission withNameTest(String name) {
+    setName(name);
+    return this;
+  }
 }
