@@ -243,6 +243,10 @@ public class ManipulatorSubsystem extends SubsystemBase {
     return getShootCommand(ArmPosition.HOME, ShooterVelocity.SUBWOOFER_SHOOT);
   }
 
+  public Command getBloopShootCommand() {
+    return getShootCommand(ArmPosition.HOME, ShooterVelocity.BLOOP_SHOOT);
+  }
+
   private Command getShootCommand(ArmPosition armPosition, ShooterVelocity shooterVelocity) {
     return Commands.sequence(
         Commands.parallel(

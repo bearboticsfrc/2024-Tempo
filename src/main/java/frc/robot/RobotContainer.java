@@ -30,6 +30,7 @@ import frc.robot.commands.AutoShootCommand;
 import frc.robot.commands.auto.MiddleC1;
 import frc.robot.commands.auto.MiddleC1C2;
 import frc.robot.commands.auto.MiddleTwoNote;
+import frc.robot.commands.auto.Sub1C1C2;
 import frc.robot.commands.auto.Sub1TwoNote;
 import frc.robot.commands.auto.Sub2W2C3C2;
 import frc.robot.commands.auto.Sub2W3W2W1C1;
@@ -123,6 +124,7 @@ public class RobotContainer {
    * command bindings, and prepares autonomous selections and Shuffleboard tabs.
    */
   private void setupShuffleboardTab(ShuffleboardTab tab) {
+    tab.addBoolean("isRedAlliance", () -> AllianceColor.isRedAlliance());
     tab.add("Home Climber", manipulatorSubsystem.getClimberHomeCommand());
     tab.addDouble(
         "Distance to Speaker",
@@ -199,6 +201,10 @@ public class RobotContainer {
     autoCommandChooser.addOption(
         "8 - " + Sub2W2C3C2.NAME,
         Sub2W2C3C2.get(driveSubsystem, objectDetectionSubsystem, manipulatorSubsystem));
+
+    autoCommandChooser.addOption(
+        "9 - " + Sub1C1C2.NAME,
+        Sub1C1C2.get(driveSubsystem, objectDetectionSubsystem, manipulatorSubsystem));
 
     RobotConstants.COMPETITION_TAB
         .add("Auto Command", autoCommandChooser)
@@ -382,6 +388,11 @@ public class RobotContainer {
     operatorController
         .a()
         .onTrue(manipulatorSubsystem.getAmpShootCommand())
+        .onFalse(manipulatorSubsystem.getShootStopCommand());
+
+    operatorController
+        .b()
+        .onTrue(manipulatorSubsystem.getBloopShootCommand())
         .onFalse(manipulatorSubsystem.getShootStopCommand());
 
     operatorController
