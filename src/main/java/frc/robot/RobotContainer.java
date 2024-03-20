@@ -270,6 +270,11 @@ public class RobotContainer {
     driverController.a().onTrue(Commands.runOnce(() -> driveSubsystem.resetImu()));
 
     driverController
+        .b()
+        .onTrue(manipulatorSubsystem.getAmpShootCommand())
+        .onFalse(manipulatorSubsystem.getShootStopCommand());
+
+    driverController
         .x()
         .whileTrue(
             new AutoAimCommand(
@@ -419,7 +424,7 @@ public class RobotContainer {
 
     operatorController.povUp().onTrue(manipulatorSubsystem.getArmRunCommand(ArmPosition.AMP_SHOOT));
 
-    operatorController.povDown().onTrue(manipulatorSubsystem.getArmRunCommand(ArmPosition.HOME));
+    operatorController.povDown().onTrue(manipulatorSubsystem.getShootStopCommand());
   }
 
   /**
