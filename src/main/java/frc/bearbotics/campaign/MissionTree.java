@@ -1,5 +1,7 @@
 package frc.bearbotics.campaign;
 
+import edu.wpi.first.wpilibj2.command.Command;
+
 /* A binary tree containing a success node and a failure node. */
 public class MissionTree {
   private AbstractMission node;
@@ -8,6 +10,10 @@ public class MissionTree {
 
   public MissionTree(AbstractMission node) {
     this.node = node;
+  }
+
+  public MissionTree(Command node) {
+    this.node = new CommandMission(node);
   }
 
   /**
@@ -20,8 +26,16 @@ public class MissionTree {
   /**
    * @param successNode the successNode to set
    */
-  public MissionTree setSuccessNode(MissionTree successNode) {
+  public MissionTree withSuccessNode(MissionTree successNode) {
     this.successNode = successNode;
+    return this;
+  }
+
+  /**
+   * @param successNode the successNode to set
+   */
+  public MissionTree withSuccessNode(CommandMission successNode) {
+    this.successNode = new MissionTree(successNode);
     return this;
   }
 
@@ -35,8 +49,16 @@ public class MissionTree {
   /**
    * @param failureNode the failureNode to set
    */
-  public MissionTree setFailureNode(MissionTree failureNode) {
+  public MissionTree withFailureNode(MissionTree failureNode) {
     this.failureNode = failureNode;
+    return this;
+  }
+
+  /**
+   * @param failureNode the failureNode to set
+   */
+  public MissionTree withFailureNode(CommandMission failureNode) {
+    this.failureNode = new MissionTree(failureNode);
     return this;
   }
 

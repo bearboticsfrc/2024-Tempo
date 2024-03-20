@@ -3,6 +3,7 @@ package frc.bearbotics.fms;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class AllianceColor {
   public static Alliance alliance = null;
@@ -17,6 +18,10 @@ public class AllianceColor {
       alliance = newAlliance;
       notifyListeners();
     }
+  }
+
+  public static Optional<Alliance> getAlliance() {
+    return Optional.ofNullable(alliance);
   }
 
   public static void notifyListeners() {

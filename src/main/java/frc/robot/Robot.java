@@ -18,7 +18,6 @@ public class Robot extends TimedRobot {
   @Override
   public void robotInit() {
     DriverStation.silenceJoystickConnectionWarning(true);
-    updateAllianceColor();
 
     robotContainer = new RobotContainer();
     robotContainer.robotInit();
@@ -26,13 +25,12 @@ public class Robot extends TimedRobot {
 
   @Override
   public void robotPeriodic() {
+    DriverStation.getAlliance().ifPresent(AllianceColor::setAllianceColor);
     CommandScheduler.getInstance().run();
   }
 
   @Override
   public void autonomousInit() {
-    updateAllianceColor();
-
     robotContainer.setTeleop(false);
     autonomousCommand = robotContainer.getAutonomousCommand();
 
@@ -45,24 +43,16 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopInit() {
     robotContainer.setTeleop(true);
+    robotContainer.teleopInit();
 
     if (autonomousCommand != null) {
       autonomousCommand.cancel();
     }
-
-    updateAllianceColor();
   }
 
   @Override
   public void disabledInit() {
     robotContainer.disabledInit();
     robotContainer.setTeleop(false);
-    updateAllianceColor();
-  }
-
-  private void updateAllianceColor() {
-    if (DriverStation.isDSAttached() && DriverStation.getAlliance().isPresent()) {
-      AllianceColor.setAllianceColor(DriverStation.getAlliance().get());
-    }
   }
 }

@@ -30,6 +30,7 @@ import frc.robot.commands.AutoShootCommand;
 import frc.robot.commands.auto.MiddleC1;
 import frc.robot.commands.auto.MiddleC1C2;
 import frc.robot.commands.auto.MiddleTwoNote;
+import frc.robot.commands.auto.SmartSub3ToC5C3;
 import frc.robot.commands.auto.Sub1C1C2;
 import frc.robot.commands.auto.Sub1TwoNote;
 import frc.robot.commands.auto.Sub2W3W2W1C1;
@@ -77,6 +78,7 @@ public class RobotContainer {
   private final ObjectDetectionSubsystem objectDetectionSubsystem =
       new ObjectDetectionSubsystem(VisionConstants.OBJECT_DETECTION_CAMERA);
 
+  @SuppressWarnings("unused")
   private final PoseEstimatorSubsystem poseEstimatorSubsystem =
       new PoseEstimatorSubsystem(driveSubsystem, FieldPositions.getInstance());
 
@@ -189,13 +191,15 @@ public class RobotContainer {
     autoCommandChooser.addOption(
         "3 - Sub1TwoNote", Sub1TwoNote.get(driveSubsystem, manipulatorSubsystem));
     autoCommandChooser.addOption("4 - Sub3TwoNote", Sub3TwoNote.get(manipulatorSubsystem));
-
     autoCommandChooser.addOption(
         "5 - " + Sub2W3W2W1C1.NAME,
         Sub2W3W2W1C1.get(driveSubsystem, objectDetectionSubsystem, manipulatorSubsystem));
     autoCommandChooser.addOption(
         "7 - " + Sub3ToC5C3.NAME,
         Sub3ToC5C3.get(driveSubsystem, manipulatorSubsystem, objectDetectionSubsystem));
+    autoCommandChooser.addOption(
+        "7.5 - " + SmartSub3ToC5C3.NAME,
+        SmartSub3ToC5C3.get(driveSubsystem, manipulatorSubsystem, objectDetectionSubsystem));
 
     autoCommandChooser.addOption(
         "9 - " + Sub1C1C2.NAME,
@@ -252,7 +256,7 @@ public class RobotContainer {
         .whileTrue(
             new AutoAimCommand(
                     driveSubsystem,
-                    FieldPositions.getInstance().getSpeakerTranslation(),
+                    () -> FieldPositions.getInstance().getSpeakerTranslation(),
                     () -> getJoystickInput(driverController, JoystickAxis.Ly),
                     () -> getJoystickInput(driverController, JoystickAxis.Lx))
                 .repeatedly());
@@ -302,8 +306,7 @@ public class RobotContainer {
 
     new Trigger(() -> manipulatorSubsystem.isNoteInFeeder())
         .onTrue(Commands.runOnce(() -> candleSubsystem.setColor(Color.kGreen)))
-        .onFalse(
-            Commands.runOnce(() -> candleSubsystem.setAllianceColor(AllianceColor::isRedAlliance)));
+        .onFalse(Commands.runOnce(() -> candleSubsystem.setAllianceColor()));
 
     new Trigger(() -> manipulatorSubsystem.isNoteInRoller() && isTeleop)
         .onTrue(
@@ -394,8 +397,7 @@ public class RobotContainer {
         .y()
         .onTrue(
             Commands.runOnce(() -> candleSubsystem.setPattern(CandlePattern.STROBE, Color.kGold)))
-        .onFalse(
-            Commands.runOnce(() -> candleSubsystem.setAllianceColor(AllianceColor::isRedAlliance)));
+        .onFalse(Commands.runOnce(() -> candleSubsystem.setAllianceColor()));
 
     operatorController
         .x()
@@ -439,9 +441,14 @@ public class RobotContainer {
   public void robotInit() {
     if (manipulatorSubsystem.isNoteInFeeder()) {
       candleSubsystem.setColor(Color.kGreen);
-    } else {
-      candleSubsystem.setAllianceColor(AllianceColor::isRedAlliance);
     }
+  }
+
+  public void teleopInit() {
+    manipulatorSubsystem
+        .getShootStopCommand()
+        .alongWith(manipulatorSubsystem.getIntakeStopCommand())
+        .schedule();
   }
 
   /** Prepares the robot for being disabled, including stopping any rumble on the controllers. */

@@ -39,7 +39,8 @@ public class AutoShootCommand extends SequentialCommandGroup {
 
     addCommands(
         driveSubsystem.getDriveStopCommand(),
-        new AutoAimCommand(driveSubsystem, FieldPositions.getInstance().getSpeakerTranslation())
+        new AutoAimCommand(
+                driveSubsystem, () -> FieldPositions.getInstance().getSpeakerTranslation())
             .alongWith(
                 manipulatorSubsystem.getShooterAndArmPrepareCommand(
                     this::getDistanceToSpeakerCenter)),

@@ -44,6 +44,15 @@ public class ManipulatorSubsystem extends SubsystemBase {
   }
 
   /**
+   * Check if a note is in either the roller or feeder.
+   *
+   * @return True if a note is in the roller or feeder, false otherwise.
+   */
+  public boolean isNoteInIntake() {
+    return isNoteInRoller() || isNoteInFeeder();
+  }
+
+  /**
    * Generates the generic intake command.
    *
    * @return The generated intake command.

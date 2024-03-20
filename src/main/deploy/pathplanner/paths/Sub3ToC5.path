@@ -16,16 +16,16 @@
     },
     {
       "anchor": {
-        "x": 6.467143220000726,
+        "x": 6.760332377807613,
         "y": 1.0994593417758272
       },
       "prevControl": {
-        "x": 4.3708407416814845,
-        "y": 1.5392430784861564
+        "x": 4.664029899488371,
+        "y": 1.539243078486156
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "W3ToC5End"
     }
   ],
   "rotationTargets": [
