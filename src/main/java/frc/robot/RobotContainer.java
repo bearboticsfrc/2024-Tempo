@@ -183,7 +183,6 @@ public class RobotContainer {
    */
   private void buildAutoList() {
     autoCommandChooser.addOption("0 - NoOp", new InstantCommand());
-    // autoCommandChooser.addOption("1 - MiddleC1C2", MiddleC1C2.get(manipulatorSubsystem));
     autoCommandChooser.addOption(
         "1.5 - MiddleC1", MiddleC1.get(driveSubsystem, manipulatorSubsystem, true));
     autoCommandChooser.addOption(
