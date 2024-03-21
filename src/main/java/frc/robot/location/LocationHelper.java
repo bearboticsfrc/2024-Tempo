@@ -2,81 +2,34 @@ package frc.robot.location;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform2d;
-import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.geometry.Translation3d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.util.Units;
-import frc.robot.constants.RobotConstants;
-import frc.robot.subsystems.DriveSubsystem;
 
+/**
+ * A utility class providing static methods for geometric calculations related to robot positioning
+ * and orientation on the field.
+ */
 public class LocationHelper {
 
-  public static Rotation2d getDirection(Transform2d transform) {
-    return getDirection(transform.getTranslation());
-  }
-
-  public static Rotation2d getDirection(Translation2d transform) {
-    return new Rotation2d(transform.getX(), transform.getY());
-  }
-
-  public static double getDistance(Transform2d transform) {
-    return getDistance(transform.getTranslation());
-  }
-
-  public static double getDistance(Translation2d transform) {
-    return transform.getNorm();
-  }
-
-  public static Pose2d getPoseByDistanceAndAngleToPose(
-      Pose2d pose, double distance, Rotation2d angle) {
-    return pose.transformBy(
-        new Transform2d(new Translation2d(distance, angle).unaryMinus(), angle));
-  }
-
-  public static Translation2d getFieldRelativeLinearSpeedsMPS(DriveSubsystem driveSubsystem) {
-    ChassisSpeeds robotRelativeSpeeds =
-        RobotConstants.DRIVE_KINEMATICS.toChassisSpeeds(driveSubsystem.getModuleStates());
-
-    ChassisSpeeds fieldRelativeSpeeds =
-        ChassisSpeeds.fromFieldRelativeSpeeds(
-            robotRelativeSpeeds.vxMetersPerSecond,
-            robotRelativeSpeeds.vyMetersPerSecond,
-            robotRelativeSpeeds.omegaRadiansPerSecond,
-            driveSubsystem.getPose().getRotation().unaryMinus());
-
-    Translation2d translation =
-        new Translation2d(
-            fieldRelativeSpeeds.vxMetersPerSecond, fieldRelativeSpeeds.vyMetersPerSecond);
-
-    if (getDistance(translation) < 0.01) {
-      return new Translation2d();
-    } else {
-      return translation;
-    }
-  }
-
+  /**
+   * Calculates the straight-line distance between two poses on the field.
+   *
+   * @param fromPose The starting pose.
+   * @param toPose The target pose.
+   * @return The distance between the two poses in meters.
+   */
   public static double getDistanceToPose(Pose2d fromPose, Pose2d toPose) {
     return Math.hypot(fromPose.getX() - toPose.getX(), fromPose.getY() - toPose.getY());
   }
 
+  /**
+   * Calculates the rotation offset to a translation (point) on the field.
+   *
+   * @param fromPose The inital pose.
+   * @param translation The target point.
+   * @return A Rotation2d representing the angle from the starting pose to the target point.
+   */
   public static Rotation2d getRotationToTranslation(Pose2d fromPose, Translation2d translation) {
     return new Rotation2d(
         translation.getX() - fromPose.getX(), translation.getY() - fromPose.getY());
-  }
-
-  public static Transform3d normalizeCameraAngle(Transform3d cameraToTarget) {
-    double angle = Math.atan(cameraToTarget.getZ() / cameraToTarget.getX());
-    double theta = -angle + Units.degreesToRadians(20);
-    double hyp =
-        Math.sqrt(
-            (cameraToTarget.getX() * cameraToTarget.getX())
-                + (cameraToTarget.getZ() * cameraToTarget.getZ()));
-    double xPrime = hyp * Math.cos(theta);
-    double zPrime = -hyp * Math.sin(theta);
-
-    return new Transform3d(
-        new Translation3d(xPrime, cameraToTarget.getY(), zPrime), cameraToTarget.getRotation());
   }
 }

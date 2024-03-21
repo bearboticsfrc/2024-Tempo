@@ -15,12 +15,13 @@ import frc.robot.subsystems.vision.ObjectDetectionSubsystem;
 public class Sub2W2C3C2 {
   public static final String NAME = "Sub2W2C3C2";
   private static final String AUTO_NAME = "Sub2W2";
-  private static PathPlannerPath W2_TO_C3_PATH = PathPlannerPath.fromPathFile("W2toC3");
-  private static PathPlannerPath C3_TO_SHOOT_PATH =
+
+  private static final PathPlannerPath W2_TO_C3_PATH = PathPlannerPath.fromPathFile("W2toC3");
+  private static final PathPlannerPath C3_TO_SHOOT_PATH =
       PathPlannerPath.fromPathFile("C3ToShootVersion2");
-  private static PathPlannerPath SHOOT_TO_C2_PATH =
+  private static final PathPlannerPath SHOOT_TO_C2_PATH =
       PathPlannerPath.fromPathFile("ShootToC2AfterC3");
-  private static PathPlannerPath C2_TO_SHOOT_PATH =
+  private static final PathPlannerPath C2_TO_SHOOT_PATH =
       PathPlannerPath.fromPathFile("C2ToShootAfterC3");
 
   public static Command get(

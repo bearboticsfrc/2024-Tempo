@@ -35,7 +35,7 @@ public class CandleSubsystem extends SubsystemBase implements AllianceReadyListe
   }
 
   @Override
-  public void updateAllianceColor(Alliance alliance) {
+  public void updateAlliance(Alliance alliance) {
     Color currentColor = entireSegment.getColor();
 
     if (currentColor == null || currentColor == Color.kRed || currentColor == Color.kBlue) {
@@ -118,14 +118,14 @@ public class CandleSubsystem extends SubsystemBase implements AllianceReadyListe
    * alliance during competitions.
    */
   public void setAllianceColor() {
-    Color color = getAllianceColor(AllianceColor.getAlliance().get());
+    Color color = getAllianceColor(AllianceColor.isRedAlliance());
 
     setColor(color);
     setPattern(CandlePattern.LARSON, color, backTopSegment);
     setPattern(CandlePattern.LARSON, color, backBottomSegment);
   }
 
-  private Color getAllianceColor(Alliance alliance) {
-    return alliance == Alliance.Red ? Color.kRed : Color.kBlue;
+  private Color getAllianceColor(boolean isRedAlliance) {
+    return isRedAlliance ? Color.kRed : Color.kBlue;
   }
 }

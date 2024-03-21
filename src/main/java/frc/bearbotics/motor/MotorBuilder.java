@@ -1,7 +1,7 @@
 package frc.bearbotics.motor;
 
 import com.revrobotics.CANSparkBase.IdleMode;
-import frc.bearbotics.motor.cancoder.CANCoders.CANCoderBuilder;
+import frc.bearbotics.motor.cancoder.CANCoderBuilder;
 
 /** Builder class for configuring motor parameters. */
 public class MotorBuilder {

@@ -5,10 +5,12 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.bearbotics.fms.AllianceColor;
+import java.util.Optional;
 
 public class Robot extends TimedRobot {
   private Command autonomousCommand;
@@ -25,7 +27,12 @@ public class Robot extends TimedRobot {
 
   @Override
   public void robotPeriodic() {
-    DriverStation.getAlliance().ifPresent(AllianceColor::setAllianceColor);
+    Optional<Alliance> maybeAlliance = DriverStation.getAlliance();
+
+    if (maybeAlliance.isPresent()) {
+      AllianceColor.setAllianceColor(maybeAlliance.get());
+    }
+
     CommandScheduler.getInstance().run();
   }
 

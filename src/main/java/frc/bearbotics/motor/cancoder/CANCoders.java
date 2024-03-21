@@ -6,7 +6,6 @@ import com.ctre.phoenix6.configs.MagnetSensorConfigs;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.signals.AbsoluteSensorRangeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
@@ -14,18 +13,12 @@ import frc.robot.util.CTREUtil;
 import java.util.HashMap;
 import java.util.Map;
 
-/** Singleton class for managing and configuring CANCoders in a robotics application. */
+/** Singleton class for managing and configuring CANCoders */
 public class CANCoders {
-  // Timeout for configuring CANCoders (milliseconds)
   private final double CONFIGURATION_TIMEOUT = Units.millisecondsToSeconds(10000);
-
-  // Timeout for updating CANCoders (milliseconds)
   private final double UPDATE_TIMEOUT = Units.millisecondsToSeconds(1000);
 
-  // Singleton instance
   private static CANCoders instance;
-
-  // Map to store CANCoders based on their IDs
   private Map<Integer, CANcoder> cancoders = new HashMap<Integer, CANcoder>();
 
   /** Private constructor to enforce singleton pattern. */
@@ -102,54 +95,5 @@ public class CANCoders {
    */
   public CANcoder get(int canCoderId) {
     return cancoders.get(canCoderId);
-  }
-
-  /** Builder class for constructing instances of the {@link CANCoders} class. */
-  public static class CANCoderBuilder {
-    // ID of the CANCoder
-    private int id;
-
-    // Offset in degrees for the CANCoder
-    private Rotation2d offsetDegrees;
-
-    /**
-     * Gets the ID of the CANCoder.
-     *
-     * @return The ID of the CANCoder.
-     */
-    public int getId() {
-      return id;
-    }
-
-    /**
-     * Sets the ID of the CANCoder.
-     *
-     * @param id The ID to set.
-     * @return The current instance of the builder for method chaining.
-     */
-    public CANCoderBuilder setId(int id) {
-      this.id = id;
-      return this;
-    }
-
-    /**
-     * Gets the offset in degrees for the CANCoder.
-     *
-     * @return The offset in degrees for the CANCoder.
-     */
-    public Rotation2d getOffsetDegrees() {
-      return offsetDegrees;
-    }
-
-    /**
-     * Sets the offset in degrees for the CANCoder.
-     *
-     * @param offsetDegrees The offset in degrees to set.
-     * @return The current instance of the builder for method chaining.
-     */
-    public CANCoderBuilder setOffsetDegrees(Rotation2d offsetDegrees) {
-      this.offsetDegrees = offsetDegrees;
-      return this;
-    }
   }
 }

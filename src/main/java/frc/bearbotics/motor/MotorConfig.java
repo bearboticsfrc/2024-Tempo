@@ -134,7 +134,7 @@ public class MotorConfig {
    * @return This MotorConfig instance for method chaining.
    */
   public MotorConfig configureEncoder(double initialPosition) {
-    // TODO: Refactor
+    // TODO: Very smelly.
 
     String message =
         String.format(

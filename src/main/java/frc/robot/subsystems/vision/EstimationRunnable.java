@@ -16,16 +16,25 @@ import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
+/**
+ * Runnable implementation for performing pose estimation using AprilTag detections from
+ * PhotonVision
+ */
 public class EstimationRunnable implements Runnable {
-  /** Runnable that gets AprilTag data from PhotonVision. */
   private final PhotonPoseEstimator photonPoseEstimator;
-
   private final PhotonCamera photonCamera;
+
+  private final AprilTagFieldLayout layout;
+
   private final AtomicReference<EstimatedRobotPose> atomicEstimatedRobotPose =
-      new AtomicReference<EstimatedRobotPose>();
+      new AtomicReference<>();
 
-  private AprilTagFieldLayout layout;
-
+  /**
+   * Constructs a new EstimationRunnable with the specified camera configuration.
+   *
+   * @param name The name of the PhotonCamera used for vision processing.
+   * @param camera The VisionCamera configuration.
+   */
   public EstimationRunnable(String name, VisionCamera camera) {
     this.layout = AprilTagFields.k2024Crescendo.loadAprilTagLayoutField();
     this.layout.setOrigin(OriginPosition.kBlueAllianceWallRightSide);
@@ -41,12 +50,17 @@ public class EstimationRunnable implements Runnable {
     photonPoseEstimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
   }
 
+  /**
+   * The main run method executed by the runnable. It retrieves the latest results from the
+   * PhotonCamera, filters out targets based on ambiguity and distance, and updates the estimated
+   * robot pose accordingly. Only valid poses within the field boundaries are considered.
+   */
   @Override
   public void run() {
     PhotonPipelineResult photonResults = photonCamera.getLatestResult();
 
-    photonResults.targets.removeIf(t -> t.getPoseAmbiguity() > APRILTAG_AMBIGUITY_THRESHOLD);
-    photonResults.targets.removeIf(t -> isTargetTooFarAway(t));
+    photonResults.targets.removeIf(
+        t -> t.getPoseAmbiguity() > APRILTAG_AMBIGUITY_THRESHOLD || isTargetTooFarAway(t));
 
     if (!photonResults.hasTargets()) return;
 
@@ -55,7 +69,6 @@ public class EstimationRunnable implements Runnable {
         .ifPresent(
             estimatedRobotPose -> {
               Pose3d estimatedPose = estimatedRobotPose.estimatedPose;
-              // Make sure the measurement is on the field
               if (estimatedPose.getX() > 0.0
                   && estimatedPose.getX() <= FieldPositions.FIELD_LENGTH
                   && estimatedPose.getY() > 0.0
@@ -65,17 +78,24 @@ public class EstimationRunnable implements Runnable {
             });
   }
 
+  /**
+   * Determines whether a detected target is too far away based on a predefined culling distance.
+   *
+   * @param target The PhotonTrackedTarget to evaluate.
+   * @return True if the target is beyond the culling distance, false otherwise.
+   */
   private boolean isTargetTooFarAway(PhotonTrackedTarget target) {
     Transform3d t3d = target.getBestCameraToTarget();
     return (Math.hypot(t3d.getX(), t3d.getY())) > APRILTAG_CULL_DISTANCE;
   }
 
   /**
-   * Gets the latest robot pose. Calling this will only return the pose once. If it returns a
-   * non-null value, it is a new estimate that hasn't been returned before. This pose will be with
-   * the blue alliance origin.
+   * Retrieves the latest estimated robot pose and resets the internal reference to null. This
+   * method is designed to return each pose estimate only once to ensure each estimate is processed
+   * in a timely manner.
    *
-   * @return latest estimated pose
+   * @return The latest estimated robot pose, or null if there is no new estimate since the last
+   *     call.
    */
   public EstimatedRobotPose getLatestEstimatedPose() {
     return atomicEstimatedRobotPose.getAndSet(null);
