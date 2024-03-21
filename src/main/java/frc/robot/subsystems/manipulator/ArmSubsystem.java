@@ -37,14 +37,21 @@ public class ArmSubsystem extends SubsystemBase {
       new DoubleLogEntry(DataLogManager.getLog(), LOGGING_ROOT + "motor/absolute_position");
   private final DoubleLogEntry armMotorRelativePositionLogEntry =
       new DoubleLogEntry(DataLogManager.getLog(), LOGGING_ROOT + "motor/relative_position");
+
   private final DoubleLogEntry armMotorTemperatureLogEntry =
       new DoubleLogEntry(DataLogManager.getLog(), LOGGING_ROOT + "motor/temperature");
   private final DoubleLogEntry armMotorCurrentLogEntry =
       new DoubleLogEntry(DataLogManager.getLog(), LOGGING_ROOT + "motor/current");
+
   private final BooleanLogEntry armHomeLogEntry =
       new BooleanLogEntry(DataLogManager.getLog(), LOGGING_ROOT + "home");
   private final BooleanLogEntry armAtSetpointLogEntry =
       new BooleanLogEntry(DataLogManager.getLog(), LOGGING_ROOT + "at_setpoint");
+
+  private final DoubleLogEntry armGoalLogEntry =
+      new DoubleLogEntry(DataLogManager.getLog(), LOGGING_ROOT + "trapezoid/goal");
+  private final DoubleLogEntry armCurrentPositionLogEntry =
+      new DoubleLogEntry(DataLogManager.getLog(), LOGGING_ROOT + "trapezoid/current_position");
 
   private CANSparkMax armMotor;
 
@@ -186,6 +193,9 @@ public class ArmSubsystem extends SubsystemBase {
 
     armHomeLogEntry.append(isArmHome());
     armAtSetpointLogEntry.append(atTargetSetpoint());
+
+    armGoalLogEntry.append(targetState.position);
+    armCurrentPositionLogEntry.append(currentState.position);
   }
 
   /** Updates the arm's state based on the trapezoidal profile, adjusting the motor controller. */
