@@ -11,6 +11,9 @@ import com.revrobotics.SparkPIDController;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.util.datalog.BooleanLogEntry;
+import edu.wpi.first.util.datalog.DoubleLogEntry;
+import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -26,6 +29,22 @@ import java.util.function.DoubleSupplier;
 
 public class ArmSubsystem extends SubsystemBase {
   private final boolean SHUFFLEBOARD_ENABLED = true;
+
+  private final String LOGGING_ROOT = "subsystem/arm/";
+
+  // TOOD: Smelly
+  private final DoubleLogEntry armMotorAbsolutePositionLogEntry =
+      new DoubleLogEntry(DataLogManager.getLog(), LOGGING_ROOT + "motor/absolute_position");
+  private final DoubleLogEntry armMotorRelativePositionLogEntry =
+      new DoubleLogEntry(DataLogManager.getLog(), LOGGING_ROOT + "motor/relative_position");
+  private final DoubleLogEntry armMotorTemperatureLogEntry =
+      new DoubleLogEntry(DataLogManager.getLog(), LOGGING_ROOT + "motor/temperature");
+  private final DoubleLogEntry armMotorCurrentLogEntry =
+      new DoubleLogEntry(DataLogManager.getLog(), LOGGING_ROOT + "motor/current");
+  private final BooleanLogEntry armHomeLogEntry =
+      new BooleanLogEntry(DataLogManager.getLog(), LOGGING_ROOT + "home");
+  private final BooleanLogEntry armAtSetpointLogEntry =
+      new BooleanLogEntry(DataLogManager.getLog(), LOGGING_ROOT + "at_setpoint");
 
   private CANSparkMax armMotor;
 
@@ -150,11 +169,23 @@ public class ArmSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     updateState();
+    updateDataLogs();
 
     if (isArmHome() && targetState.position == 0) {
       armMotor.stopMotor(); // Prevent arm from pulling current when resting.
       armRelativeEncoder.setPosition(0.0);
     }
+  }
+
+  /** Update data logging for arm-related data. */
+  private void updateDataLogs() {
+    armMotorAbsolutePositionLogEntry.append(armAbsoluteMotorEncoder.getPosition());
+    armMotorRelativePositionLogEntry.append(armRelativeEncoder.getPosition());
+    armMotorTemperatureLogEntry.append(armMotor.getMotorTemperature());
+    armMotorCurrentLogEntry.append(armMotor.getOutputCurrent());
+
+    armHomeLogEntry.append(isArmHome());
+    armAtSetpointLogEntry.append(atTargetSetpoint());
   }
 
   /** Updates the arm's state based on the trapezoidal profile, adjusting the motor controller. */

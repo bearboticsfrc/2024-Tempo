@@ -5,6 +5,9 @@ import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkFlex;
 import com.revrobotics.CANSparkLowLevel;
 import com.revrobotics.RelativeEncoder;
+import edu.wpi.first.util.datalog.BooleanLogEntry;
+import edu.wpi.first.util.datalog.DoubleLogEntry;
+import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.bearbotics.motor.MotorBuilder;
@@ -16,6 +19,27 @@ import java.util.function.DoubleSupplier;
 
 public class ShooterSubsystem extends SubsystemBase {
   private final boolean SHUFFLEBOARD_ENABLED = true;
+
+  private final String LOGGING_ROOT = "subsystem/shooter/";
+
+  // TOOD: Smelly
+  private final DoubleLogEntry upperMotorVelocityLogEntry =
+      new DoubleLogEntry(DataLogManager.getLog(), LOGGING_ROOT + "upper_motor/velocity");
+  private final DoubleLogEntry lowerMotorVelocityLogEntry =
+      new DoubleLogEntry(DataLogManager.getLog(), LOGGING_ROOT + "lower_motor/velocity");
+  private final DoubleLogEntry upperMotorCurrentLogEntry =
+      new DoubleLogEntry(DataLogManager.getLog(), LOGGING_ROOT + "upper_motor/current");
+  private final DoubleLogEntry lowerMotorCurrentLogEntry =
+      new DoubleLogEntry(DataLogManager.getLog(), LOGGING_ROOT + "lower_motor/current");
+  private final DoubleLogEntry upperMotorTemperatureLogEntry =
+      new DoubleLogEntry(DataLogManager.getLog(), LOGGING_ROOT + "upper_motor/temperature");
+  private final DoubleLogEntry lowerMotorTemperatureLogEntry =
+      new DoubleLogEntry(DataLogManager.getLog(), LOGGING_ROOT + "lower_motor/temperature");
+  private final DoubleLogEntry targetVelocityLogEntry =
+      new DoubleLogEntry(DataLogManager.getLog(), LOGGING_ROOT + "target_velocity");
+
+  private final BooleanLogEntry setpointLogEntry =
+      new BooleanLogEntry(DataLogManager.getLog(), LOGGING_ROOT + "at_setpoint");
 
   private CANSparkFlex upperShooterMotor;
   private CANSparkFlex lowerShooterMotor;
@@ -31,6 +55,26 @@ public class ShooterSubsystem extends SubsystemBase {
     if (SHUFFLEBOARD_ENABLED) {
       setupShuffleboardTab(RobotConstants.SHOOTER_SYSTEM_TAB);
     }
+  }
+
+  @Override
+  public void periodic() {
+    updateDataLogs();
+  }
+
+  public void updateDataLogs() {
+    upperMotorVelocityLogEntry.append(upperShooterMotorEncoder.getVelocity());
+    lowerMotorVelocityLogEntry.append(lowerShooterMotorEncoder.getVelocity());
+
+    upperMotorCurrentLogEntry.append(upperShooterMotor.getOutputCurrent());
+    lowerMotorCurrentLogEntry.append(lowerShooterMotor.getOutputCurrent());
+
+    upperMotorTemperatureLogEntry.append(upperShooterMotor.getMotorTemperature());
+    lowerMotorTemperatureLogEntry.append(lowerShooterMotor.getMotorTemperature());
+
+    targetVelocityLogEntry.append(targetVelocity);
+
+    setpointLogEntry.append(atTargetVelocity());
   }
 
   private void configureMotors() {

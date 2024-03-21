@@ -4,6 +4,9 @@ import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkLowLevel;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
+import edu.wpi.first.util.datalog.BooleanLogEntry;
+import edu.wpi.first.util.datalog.DoubleLogEntry;
+import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -14,6 +17,24 @@ import frc.robot.constants.manipulator.IntakeConstants;
 
 public class IntakeSubsystem extends SubsystemBase {
   private final boolean SHUFFLEBOARD_ENABLED = false;
+
+  private final String LOGGING_ROOT = "subsystem/intake/";
+
+  // TODO: Smelly
+  private final DoubleLogEntry rollerVelocityLogEntry =
+      new DoubleLogEntry(DataLogManager.getLog(), LOGGING_ROOT + "roller/velocity");
+  private final DoubleLogEntry feederVelocityLogEntry =
+      new DoubleLogEntry(DataLogManager.getLog(), LOGGING_ROOT + "feeder/velocity");
+  private final BooleanLogEntry bottomBeambreakLogEntry =
+      new BooleanLogEntry(DataLogManager.getLog(), LOGGING_ROOT + "beambreak/bottom");
+  private final BooleanLogEntry topBeambreakLogEntry =
+      new BooleanLogEntry(DataLogManager.getLog(), LOGGING_ROOT + "beambreak/top");
+  private final BooleanLogEntry leftBeambreakLogEntry =
+      new BooleanLogEntry(DataLogManager.getLog(), LOGGING_ROOT + "beambreak/left");
+  private final BooleanLogEntry rightBeambreakLogEntry =
+      new BooleanLogEntry(DataLogManager.getLog(), LOGGING_ROOT + "beambreak/right");
+  private final BooleanLogEntry rollerBeambreakLogEntry =
+      new BooleanLogEntry(DataLogManager.getLog(), LOGGING_ROOT + "beambreak/roller");
 
   private CANSparkMax rollerMotor;
   private CANSparkMax feederMotor;
@@ -38,6 +59,22 @@ public class IntakeSubsystem extends SubsystemBase {
     if (SHUFFLEBOARD_ENABLED) {
       setupShuffleboardTab(RobotConstants.INTAKE_SYSTEM_TAB);
     }
+  }
+
+  @Override
+  public void periodic() {
+    updateDataLogs();
+  }
+
+  /** Update data logs. */
+  private void updateDataLogs() {
+    rollerVelocityLogEntry.append(rollerMotorEncoder.getVelocity());
+    feederVelocityLogEntry.append(feederMotorEncoder.getVelocity());
+    topBeambreakLogEntry.append(topBeamBreak.get());
+    bottomBeambreakLogEntry.append(bottomBeamBreak.get());
+    rightBeambreakLogEntry.append(rightBeamBreak.get());
+    leftBeambreakLogEntry.append(leftBeamBreak.get());
+    rollerBeambreakLogEntry.append(rollerBeamBreak.get());
   }
 
   private void configureMotors() {
