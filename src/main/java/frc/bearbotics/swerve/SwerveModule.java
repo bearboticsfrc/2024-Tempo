@@ -147,35 +147,34 @@ public class SwerveModule {
             String.format("%s_MOTOR_POSITION", motorType),
             new DoubleLogEntry(
                 log,
-                String.format(
-                    "/subsystems/drive/%s/%s_motor/position", moduleName, pathMotorType)));
+                String.format("/subsystem/drive/%s/%s_motor/position", moduleName, pathMotorType)));
       }
 
       dataLogs.put(
           String.format("%s_MOTOR_CURRENT", motorType),
           new DoubleLogEntry(
               log,
-              String.format("/subsystems/drive/%s/%s_motor/current", moduleName, pathMotorType)));
+              String.format("/subsystem/drive/%s/%s_motor/current", moduleName, pathMotorType)));
 
       dataLogs.put(
           String.format("%s_MOTOR_VELOCITY", motorType),
           new DoubleLogEntry(
               log,
-              String.format("/subsystems/drive/%s/%s_motor/velocity", moduleName, pathMotorType)));
+              String.format("/subsystem/drive/%s/%s_motor/velocity", moduleName, pathMotorType)));
 
       dataLogs.put(
           String.format("%s_MOTOR_APPLIED_OUTPUT", motorType),
           new DoubleLogEntry(
               log,
               String.format(
-                  "/subsystems/drive/%s/%s_motor/applied_output", moduleName, pathMotorType)));
+                  "/subsystem/drive/%s/%s_motor/applied_output", moduleName, pathMotorType)));
 
       dataLogs.put(
           String.format("%s_MOTOR_TEMPERATURE", motorType),
           new DoubleLogEntry(
               log,
               String.format(
-                  "/subsystems/drive/%s/%s_motor/temperature", moduleName, pathMotorType)));
+                  "/subsystem/drive/%s/%s_motor/temperature", moduleName, pathMotorType)));
     }
   }
 

@@ -8,7 +8,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 /** A subsytem purely for logging purposes. */
 public class PowerDistributionSubsystem extends SubsystemBase {
-  private final String LOGGING_ROOT = "PDP";
+  private final String LOGGING_ROOT = "subsystem/pdp";
 
   private final PowerDistribution powerDistribution;
 
