@@ -18,7 +18,7 @@ import frc.robot.constants.manipulator.ShooterConstants;
 import java.util.function.DoubleSupplier;
 
 public class ShooterSubsystem extends SubsystemBase {
-  private final boolean SHUFFLEBOARD_ENABLED = true;
+  private final boolean SHUFFLEBOARD_ENABLED = false;
 
   private final String LOGGING_ROOT = "subsystem/shooter/";
 

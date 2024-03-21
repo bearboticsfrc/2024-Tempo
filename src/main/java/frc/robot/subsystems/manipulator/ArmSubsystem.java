@@ -28,7 +28,7 @@ import frc.robot.util.RevUtil;
 import java.util.function.DoubleSupplier;
 
 public class ArmSubsystem extends SubsystemBase {
-  private final boolean SHUFFLEBOARD_ENABLED = true;
+  private final boolean SHUFFLEBOARD_ENABLED = false;
 
   private final String LOGGING_ROOT = "subsystem/arm/";
 
