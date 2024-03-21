@@ -105,11 +105,13 @@ public class PoseEstimatorSubsystem extends SubsystemBase {
         driveSubsystem.getPose().getRotation().plus(Rotation2d.fromDegrees(180)).getDegrees());
   }
 
-  public String getPoseString(Pose2d pose) {
-    return String.format(
-        "(%.2f, %.2f) %.2f degrees", pose.getX(), pose.getY(), pose.getRotation().getDegrees());
-  }
-
+  /**
+   * Calculates a confidence value for a vision-based pose estimate. The confidence value is
+   * influenced by the distance of the detected targets and the ambiguity of the pose.
+   *
+   * @param estimation The EstimatedRobotPose containing information about detected targets.
+   * @return A matrix representing the confidence in the x, y, and theta components of the pose.
+   */
   private Matrix<N3, N1> confidenceCalculator(EstimatedRobotPose estimation) {
     double smallestDistance = Double.POSITIVE_INFINITY;
     for (var target : estimation.targetsUsed) {
@@ -149,6 +151,12 @@ public class PoseEstimatorSubsystem extends SubsystemBase {
     return VisionConstants.VISION_MEASUREMENT_STD_DEVS.times(confidenceMultiplier);
   }
 
+  /**
+   * Checks and processes the latest pose estimate from an EstimationRunnable. If a new estimate is
+   * available, it is used to update the robot's pose in the DriveSubsystem.
+   *
+   * @param estimator The EstimationRunnable providing vision-based pose estimates.
+   */
   public void estimatorChecker(EstimationRunnable estamator) {
     EstimatedRobotPose robotPose = estamator.getLatestEstimatedPose();
 

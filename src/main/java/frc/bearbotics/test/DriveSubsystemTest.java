@@ -15,9 +15,17 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * A command to perform a series of automated tests on the DriveSubsystem to verify the
+ * functionality of each swerve module's drive and pivot capabilities.
+ */
 public class DriveSubsystemTest extends AbstractTestCommand {
   private final DriveSubsystem driveSubsystem;
 
+  /**
+   * A map to record the outcomes of the tests, where the key is the test name (module and test
+   * type) and the value is a boolean indicating whether the test passed (true) or failed (false).
+   */
   private Map<String, Boolean> outcomes =
       new LinkedHashMap<String, Boolean>() {
         {
@@ -32,9 +40,14 @@ public class DriveSubsystemTest extends AbstractTestCommand {
         }
       };
 
+  /**
+   * Constructs a new DriveSubsystemTest command.
+   *
+   * @param driveSubsystem The DriveSubsystem to be tested.
+   * @param shuffleboardTab The ShuffleboardTab to display the test results.
+   */
   public DriveSubsystemTest(DriveSubsystem driveSubsystem, ShuffleboardTab shuffleboardTab) {
     this.driveSubsystem = driveSubsystem;
-
     setupShuffleboardTab(shuffleboardTab);
   }
 
@@ -80,8 +93,15 @@ public class DriveSubsystemTest extends AbstractTestCommand {
             .toArray(SequentialCommandGroup[]::new));
   }
 
+  /**
+   * Constructs a command to test a single swerve module. It checks both the drive and pivot
+   * capabilities by setting a new state and verifying the module's response.
+   *
+   * @param module The SwerveModule to test.
+   * @return A command sequence to test the specified module.
+   */
   private Command getModuleTestCommand(SwerveModule module) {
-    Rotation2d initalSteerAngle = module.getRelativeAngle();
+    Rotation2d initialSteerAngle = module.getRelativeAngle();
     SwerveModuleState newState =
         new SwerveModuleState(0.5, Rotation2d.fromDegrees(90).plus(driveSubsystem.getHeading()));
 
@@ -90,6 +110,6 @@ public class DriveSubsystemTest extends AbstractTestCommand {
         Commands.waitSeconds(SwerveModuleConstants.TEST_WAIT),
         Commands.runOnce(() -> outcomes.put(module + " Drive", module.getDriveVelocity() != 0)),
         Commands.runOnce(
-            () -> outcomes.put(module + " Pivot", module.getRelativeAngle() != initalSteerAngle)));
+            () -> outcomes.put(module + " Pivot", module.getRelativeAngle() != initialSteerAngle)));
   }
 }
