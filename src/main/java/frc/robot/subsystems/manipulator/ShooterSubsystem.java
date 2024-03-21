@@ -20,7 +20,7 @@ import java.util.function.DoubleSupplier;
 public class ShooterSubsystem extends SubsystemBase {
   private final boolean SHUFFLEBOARD_ENABLED = true;
 
-  private static final double FUDGE = 750;
+  private static final double FUDGE = 500;
 
   private final String LOGGING_ROOT = "subsystem/shooter/";
 
