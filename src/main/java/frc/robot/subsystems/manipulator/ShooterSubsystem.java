@@ -200,7 +200,7 @@ public class ShooterSubsystem extends SubsystemBase {
   }
 
   public enum ShooterVelocity {
-    SUBWOOFER_SHOOT(2000),
+    SUBWOOFER_SHOOT(2000 + FUDGE),
     PODIUM_SHOOT(2750),
     BLOOP_SHOOT(950),
     AMP_SHOOT(1200),
@@ -213,7 +213,7 @@ public class ShooterSubsystem extends SubsystemBase {
     }
 
     public double getVelocity() {
-      return velocity + FUDGE;
+      return velocity;
     }
   }
 }
