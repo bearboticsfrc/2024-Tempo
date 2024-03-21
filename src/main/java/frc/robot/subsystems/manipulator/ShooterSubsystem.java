@@ -18,7 +18,9 @@ import frc.robot.constants.manipulator.ShooterConstants;
 import java.util.function.DoubleSupplier;
 
 public class ShooterSubsystem extends SubsystemBase {
-  private final boolean SHUFFLEBOARD_ENABLED = false;
+  private final boolean SHUFFLEBOARD_ENABLED = true;
+
+  private static final double FUDGE = 750;
 
   private final String LOGGING_ROOT = "subsystem/shooter/";
 
@@ -162,12 +164,12 @@ public class ShooterSubsystem extends SubsystemBase {
 
   private double getVelocityFromDistance(double distance) {
     if (distance <= 2) {
-      return 2200;
+      return 2200 + FUDGE;
     } else if (distance >= 5) {
-      return 3600;
+      return 3600 + FUDGE;
     }
 
-    return (17868.1 * Math.pow(distance, 0.070036)) - 16423.3;
+    return (17868.1 * Math.pow(distance, 0.070036)) - 16423.3 + FUDGE;
   }
 
   /**
@@ -211,7 +213,7 @@ public class ShooterSubsystem extends SubsystemBase {
     }
 
     public double getVelocity() {
-      return velocity;
+      return velocity + FUDGE;
     }
   }
 }
