@@ -25,6 +25,17 @@ public class IntakeSubsystem extends SubsystemBase {
       new DoubleLogEntry(DataLogManager.getLog(), LOGGING_ROOT + "roller/velocity");
   private final DoubleLogEntry feederVelocityLogEntry =
       new DoubleLogEntry(DataLogManager.getLog(), LOGGING_ROOT + "feeder/velocity");
+
+  private final DoubleLogEntry rollerCurrentLogEntry =
+      new DoubleLogEntry(DataLogManager.getLog(), LOGGING_ROOT + "roller/current");
+  private final DoubleLogEntry feederCurrentLogEntry =
+      new DoubleLogEntry(DataLogManager.getLog(), LOGGING_ROOT + "feeder/current");
+
+  private final DoubleLogEntry rollerTemperatureLogEntry =
+      new DoubleLogEntry(DataLogManager.getLog(), LOGGING_ROOT + "roller/temperature");
+  private final DoubleLogEntry feederTemperatureLogEntry =
+      new DoubleLogEntry(DataLogManager.getLog(), LOGGING_ROOT + "feeder/temperature");
+
   private final BooleanLogEntry bottomBeambreakLogEntry =
       new BooleanLogEntry(DataLogManager.getLog(), LOGGING_ROOT + "beambreak/bottom");
   private final BooleanLogEntry topBeambreakLogEntry =
@@ -70,6 +81,13 @@ public class IntakeSubsystem extends SubsystemBase {
   private void updateDataLogs() {
     rollerVelocityLogEntry.append(rollerMotorEncoder.getVelocity());
     feederVelocityLogEntry.append(feederMotorEncoder.getVelocity());
+
+    rollerCurrentLogEntry.append(rollerMotor.getOutputCurrent());
+    feederCurrentLogEntry.append(feederMotor.getOutputCurrent());
+
+    rollerTemperatureLogEntry.append(rollerMotor.getMotorTemperature());
+    feederTemperatureLogEntry.append(feederMotor.getMotorTemperature());
+
     topBeambreakLogEntry.append(topBeamBreak.get());
     bottomBeambreakLogEntry.append(bottomBeamBreak.get());
     rightBeambreakLogEntry.append(rightBeamBreak.get());
