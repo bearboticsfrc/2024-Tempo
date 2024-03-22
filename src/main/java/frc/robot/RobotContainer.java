@@ -254,7 +254,7 @@ public class RobotContainer {
 
     driverController
         .leftTrigger()
-        .whileTrue(manipulatorSubsystem.getIntakeCommand())
+        .whileTrue(manipulatorSubsystem.getManualIntakeCommand())
         .onFalse(manipulatorSubsystem.getIntakeStopCommand());
 
     driverController
@@ -429,6 +429,11 @@ public class RobotContainer {
     operatorController
         .leftTrigger()
         .onTrue(manipulatorSubsystem.getFeederRunCommand(IntakeSpeed.REVERSE))
+        .onFalse(manipulatorSubsystem.getIntakeStopCommand());
+
+    operatorController
+        .rightTrigger()
+        .whileTrue(manipulatorSubsystem.getIntakeCommand())
         .onFalse(manipulatorSubsystem.getIntakeStopCommand());
   }
 

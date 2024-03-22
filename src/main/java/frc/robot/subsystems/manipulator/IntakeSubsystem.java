@@ -140,6 +140,10 @@ public class IntakeSubsystem extends SubsystemBase {
     shuffleboardTab.addBoolean("Roller Beam Break", rollerBeamBreak::get);
   }
 
+  public boolean isNoteInTop() {
+    return !topBeamBreak.get();
+  }
+
   /**
    * Return a boolean whether a note has triggered the roller beam break sensor.
    *

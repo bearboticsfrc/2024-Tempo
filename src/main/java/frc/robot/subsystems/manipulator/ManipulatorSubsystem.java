@@ -70,6 +70,13 @@ public class ManipulatorSubsystem extends SubsystemBase {
         intakeSubsystem::isNoteInFeeder);
   }
 
+  public Command getManualIntakeCommand() {
+    return getRollerRunCommand(IntakeSpeed.FULL)
+        .alongWith(getFeederRunCommand(IntakeSpeed.TENTH))
+        .andThen(Commands.waitUntil(intakeSubsystem::isNoteInTop))
+        .andThen(getIntakeStopCommand());
+  }
+
   /**
    * Get a command to run the climber to a specified speed.
    *
@@ -130,10 +137,7 @@ public class ManipulatorSubsystem extends SubsystemBase {
    * @return The Command for feeding the intake.
    */
   public Command getIntakeFeedCommand() {
-    return Commands.sequence(
-        getFeederRunCommand(IntakeSpeed.FULL),
-        Commands.waitUntil(() -> !intakeSubsystem.isNoteInFeeder()),
-        getIntakeStopCommand());
+    return getFeederRunCommand(IntakeSpeed.FULL).withTimeout(1.5);
   }
 
   /**
@@ -283,11 +287,8 @@ public class ManipulatorSubsystem extends SubsystemBase {
    * @return The command.
    */
   public Command getShooterAndArmPrepareCommand(DoubleSupplier distanceSupplier) {
-    return Commands.either(
-        getArmPrepareCommand(distanceSupplier)
-            .alongWith(getShooterPrepareCommand(distanceSupplier)),
-        Commands.none(),
-        this::isNoteInFeeder);
+    return getArmPrepareCommand(distanceSupplier)
+        .alongWith(getShooterPrepareCommand(distanceSupplier));
   }
 
   /**
