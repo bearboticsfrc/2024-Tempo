@@ -16,7 +16,7 @@ import frc.robot.constants.RobotConstants;
 import frc.robot.constants.manipulator.IntakeConstants;
 
 public class IntakeSubsystem extends SubsystemBase {
-  private final boolean SHUFFLEBOARD_ENABLED = false;
+  private final boolean SHUFFLEBOARD_ENABLED = true;
 
   private final String LOGGING_ROOT = "subsystem/intake/";
 
@@ -150,21 +150,22 @@ public class IntakeSubsystem extends SubsystemBase {
   }
 
   /**
-   * Return a boolean whether a note has triggered the top and two side beam break sensors.
+   * Return a boolean whether a note has triggered the top and either of the two side beam break
+   * sensors.
    *
    * @return True if a note is not in the feeder, false otherwise.
    */
   public boolean isNoteInFeeder() {
-    return !topBeamBreak.get() && !leftBeamBreak.get() && !rightBeamBreak.get();
+    return !topBeamBreak.get() && isNoteInSide();
   }
 
   /**
-   * Return a boolean whether a note has triggered the two side beam break sensors.
+   * Return a boolean whether a note has triggered either of the two side beam break sensors.
    *
    * @return True if a note is not in the feeder, false otherwise.
    */
   public boolean isNoteInSide() {
-    return !leftBeamBreak.get() && !rightBeamBreak.get();
+    return !leftBeamBreak.get() || !rightBeamBreak.get();
   }
 
   /**
