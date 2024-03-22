@@ -97,7 +97,7 @@ public class ShooterSubsystem extends SubsystemBase {
             .withMotorInverted(ShooterConstants.UpperMotor.INVERTED)
             .withCurrentLimit(ShooterConstants.UpperMotor.CURRENT_LIMT)
             .withMotorPid(upperShooterMotorPidConfig)
-            .withIdleMode(IdleMode.kCoast);
+            .withIdleMode(IdleMode.kBrake);
 
     MotorBuilder lowerShooterMotorConfig =
         new MotorBuilder()
@@ -106,7 +106,7 @@ public class ShooterSubsystem extends SubsystemBase {
             .withMotorInverted(ShooterConstants.LowerMotor.INVERTED)
             .withCurrentLimit(ShooterConstants.LowerMotor.CURRENT_LIMT)
             .withMotorPid(lowerShooterMotorPid)
-            .withIdleMode(IdleMode.kCoast);
+            .withIdleMode(IdleMode.kBrake);
 
     upperShooterMotor =
         new CANSparkFlex(
