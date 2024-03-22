@@ -9,10 +9,10 @@ import frc.robot.subsystems.manipulator.ShooterSubsystem.ShooterVelocity;
 import java.util.function.DoubleSupplier;
 
 public class ManipulatorSubsystem extends SubsystemBase {
-  private final IntakeSubsystem intakeSubsystem;
-  private final ShooterSubsystem shooterSubsystem;
-  private final ClimberSubsystem climberSubsystem;
-  private final ArmSubsystem armSubsystem;
+  public final IntakeSubsystem intakeSubsystem;
+  public final ShooterSubsystem shooterSubsystem;
+  public final ClimberSubsystem climberSubsystem;
+  public final ArmSubsystem armSubsystem;
 
   /**
    * Constructor for the ManipulatorSubsystem class. Initializes intake, shooter, climber, and arm
@@ -73,8 +73,7 @@ public class ManipulatorSubsystem extends SubsystemBase {
   public Command getManualIntakeCommand() {
     return getRollerRunCommand(IntakeSpeed.FULL)
         .alongWith(getFeederRunCommand(IntakeSpeed.TENTH))
-        .andThen(Commands.waitUntil(intakeSubsystem::isNoteInTop))
-        .andThen(getIntakeStopCommand());
+        .andThen(Commands.waitUntil(intakeSubsystem::isNoteInTop).andThen(getIntakeStopCommand()));
   }
 
   /**
@@ -137,7 +136,9 @@ public class ManipulatorSubsystem extends SubsystemBase {
    * @return The Command for feeding the intake.
    */
   public Command getIntakeFeedCommand() {
-    return getFeederRunCommand(IntakeSpeed.FULL).withTimeout(1.5);
+    return getFeederRunCommand(IntakeSpeed.FULL)
+        .andThen(Commands.waitSeconds(0.75))
+        .andThen(getIntakeStopCommand());
   }
 
   /**

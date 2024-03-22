@@ -97,7 +97,7 @@ public class ShooterSubsystem extends SubsystemBase {
             .withMotorInverted(ShooterConstants.UpperMotor.INVERTED)
             .withCurrentLimit(ShooterConstants.UpperMotor.CURRENT_LIMT)
             .withMotorPid(upperShooterMotorPidConfig)
-            .withIdleMode(IdleMode.kBrake);
+            .withIdleMode(IdleMode.kCoast);
 
     MotorBuilder lowerShooterMotorConfig =
         new MotorBuilder()
@@ -106,7 +106,7 @@ public class ShooterSubsystem extends SubsystemBase {
             .withMotorInverted(ShooterConstants.LowerMotor.INVERTED)
             .withCurrentLimit(ShooterConstants.LowerMotor.CURRENT_LIMT)
             .withMotorPid(lowerShooterMotorPid)
-            .withIdleMode(IdleMode.kBrake);
+            .withIdleMode(IdleMode.kCoast);
 
     upperShooterMotor =
         new CANSparkFlex(
@@ -195,8 +195,8 @@ public class ShooterSubsystem extends SubsystemBase {
 
   /** Stop both shooter motors. */
   public void stop() {
-    upperShooterMotor.stopMotor();
-    lowerShooterMotor.stopMotor();
+    upperShooterMotor.getPIDController().setReference(0, ControlType.kVelocity);
+    lowerShooterMotor.getPIDController().setReference(0, ControlType.kVelocity);
   }
 
   public enum ShooterVelocity {
