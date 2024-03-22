@@ -33,8 +33,9 @@ public class Sub2W3W2W1C1 {
       DriveSubsystem driveSubsystem,
       ObjectDetectionSubsystem objectDetectionSubsystem,
       ManipulatorSubsystem manipulatorSubsystem) {
-    return new PathPlannerAuto(AUTO_NAME)
-        .alongWith(manipulatorSubsystem.getLineShootCommand())
+    return manipulatorSubsystem
+        .getSubwooferShootCommand()
+        .andThen(new PathPlannerAuto(AUTO_NAME))
         .andThen(getNotePickupAndAutoShootCommand(driveSubsystem, manipulatorSubsystem))
         .andThen(
             getReplannedPathAndShooterPrepareCommand(
