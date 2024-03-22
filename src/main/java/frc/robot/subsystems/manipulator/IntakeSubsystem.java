@@ -59,8 +59,6 @@ public class IntakeSubsystem extends SubsystemBase {
       new DigitalInput(IntakeConstants.LEFT_BEAM_BREAK_CHANNEL);
   private final DigitalInput rightBeamBreak =
       new DigitalInput(IntakeConstants.RIGHT_BEAM_BREAK_CHANNEL);
-  private final DigitalInput bottomBeamBreak =
-      new DigitalInput(IntakeConstants.BOTTOM_BEAM_BREAK_CHANNEL);
   private final DigitalInput rollerBeamBreak =
       new DigitalInput(IntakeConstants.ROLLER_BEAM_BREAK_CHANNEL);
 
@@ -89,7 +87,6 @@ public class IntakeSubsystem extends SubsystemBase {
     feederTemperatureLogEntry.append(feederMotor.getMotorTemperature());
 
     topBeambreakLogEntry.append(topBeamBreak.get());
-    bottomBeambreakLogEntry.append(bottomBeamBreak.get());
     rightBeambreakLogEntry.append(rightBeamBreak.get());
     leftBeambreakLogEntry.append(leftBeamBreak.get());
     rollerBeambreakLogEntry.append(rollerBeamBreak.get());
@@ -133,7 +130,6 @@ public class IntakeSubsystem extends SubsystemBase {
   private void setupShuffleboardTab(ShuffleboardTab shuffleboardTab) {
     shuffleboardTab.addDouble("Roller Velocity", rollerMotorEncoder::getVelocity);
     shuffleboardTab.addDouble("Feeder Velocity", feederMotorEncoder::getVelocity);
-    shuffleboardTab.addBoolean("Bottom Beam Break", bottomBeamBreak::get);
     shuffleboardTab.addBoolean("Left Beam Break", leftBeamBreak::get);
     shuffleboardTab.addBoolean("Right Beam Break", rightBeamBreak::get);
     shuffleboardTab.addBoolean("Top Beam Break", topBeamBreak::get);
