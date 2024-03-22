@@ -22,7 +22,7 @@ public class ArmConstants {
               Map.entry(2.00, 17.4),
               Map.entry(2.25, 20.9),
               Map.entry(2.50, 23.5),
-              Map.entry(3.00, 25.75),
+              Map.entry(3.00, 26.5),
               Map.entry(3.50, 30.0),
               Map.entry(4.00, 33.25),
               Map.entry(4.50, 35.5),
