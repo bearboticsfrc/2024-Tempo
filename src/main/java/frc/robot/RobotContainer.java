@@ -425,6 +425,11 @@ public class RobotContainer {
     operatorController.povUp().onTrue(manipulatorSubsystem.getArmRunCommand(ArmPosition.AMP_SHOOT));
 
     operatorController.povDown().onTrue(manipulatorSubsystem.getShootStopCommand());
+
+    operatorController
+        .leftTrigger()
+        .onTrue(manipulatorSubsystem.getFeederRunCommand(IntakeSpeed.REVERSE))
+        .onFalse(manipulatorSubsystem.getIntakeStopCommand());
   }
 
   /**
