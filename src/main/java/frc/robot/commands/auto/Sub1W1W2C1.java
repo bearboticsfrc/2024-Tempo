@@ -99,11 +99,7 @@ public class Sub1W1W2C1 {
         .getDriveStopCommand()
         .andThen(
             new AutoNotePickupCommand(
-                    driveSubsystem,
-                    objectDetectionSubsystem,
-                    () ->
-                        manipulatorSubsystem.isNoteInFeeder()
-                            || manipulatorSubsystem.isNoteInRoller())
+                    driveSubsystem, objectDetectionSubsystem, manipulatorSubsystem::isNoteInIntake)
                 .alongWith(manipulatorSubsystem.getIntakeCommand()));
   }
 

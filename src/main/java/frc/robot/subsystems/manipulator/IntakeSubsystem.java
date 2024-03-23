@@ -36,8 +36,6 @@ public class IntakeSubsystem extends SubsystemBase {
   private final DoubleLogEntry feederTemperatureLogEntry =
       new DoubleLogEntry(DataLogManager.getLog(), LOGGING_ROOT + "feeder/temperature");
 
-  private final BooleanLogEntry bottomBeambreakLogEntry =
-      new BooleanLogEntry(DataLogManager.getLog(), LOGGING_ROOT + "beambreak/bottom");
   private final BooleanLogEntry topBeambreakLogEntry =
       new BooleanLogEntry(DataLogManager.getLog(), LOGGING_ROOT + "beambreak/top");
   private final BooleanLogEntry leftBeambreakLogEntry =
@@ -150,22 +148,12 @@ public class IntakeSubsystem extends SubsystemBase {
   }
 
   /**
-   * Return a boolean whether a note has triggered the top and either of the two side beam break
-   * sensors.
+   * Return a boolean whether a note has triggered the top beam break sensors.
    *
    * @return True if a note is not in the feeder, false otherwise.
    */
   public boolean isNoteInFeeder() {
-    return !topBeamBreak.get() && isNoteInSide();
-  }
-
-  /**
-   * Return a boolean whether a note has triggered either of the two side beam break sensors.
-   *
-   * @return True if a note is not in the feeder, false otherwise.
-   */
-  public boolean isNoteInSide() {
-    return !leftBeamBreak.get() || !rightBeamBreak.get();
+    return !topBeamBreak.get();
   }
 
   /**

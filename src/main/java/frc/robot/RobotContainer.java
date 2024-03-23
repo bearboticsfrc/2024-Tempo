@@ -254,7 +254,7 @@ public class RobotContainer {
 
     driverController
         .leftTrigger()
-        .whileTrue(manipulatorSubsystem.getManualIntakeCommand())
+        .whileTrue(manipulatorSubsystem.getIntakeCommand())
         .onFalse(manipulatorSubsystem.getIntakeStopCommand());
 
     driverController

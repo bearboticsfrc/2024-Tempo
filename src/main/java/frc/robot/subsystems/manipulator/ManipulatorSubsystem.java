@@ -60,24 +60,11 @@ public class ManipulatorSubsystem extends SubsystemBase {
   public Command getIntakeCommand() {
     return Commands.either(
         Commands.none(),
-        Commands.sequence(
-            Commands.parallel(
-                getRollerRunCommand(IntakeSpeed.FULL), getFeederRunCommand(IntakeSpeed.QUARTER)),
-            Commands.waitUntil(intakeSubsystem::isNoteInSide),
-            getFeederRunCommand(IntakeSpeed.TENTH),
-            Commands.waitUntil(intakeSubsystem::isNoteInFeeder),
-            getIntakeStopCommand()),
-        intakeSubsystem::isNoteInFeeder);
-  }
-
-  public Command getManualIntakeCommand() {
-    return Commands.either(
-        Commands.none(),
         getRollerRunCommand(IntakeSpeed.FULL)
             .alongWith(getFeederRunCommand(IntakeSpeed.TENTH))
-            .andThen(
-                Commands.waitUntil(intakeSubsystem::isNoteInTop).andThen(getIntakeStopCommand())),
-        intakeSubsystem::isNoteInTop);
+            .andThen(Commands.waitUntil(intakeSubsystem::isNoteInFeeder))
+            .andThen(getIntakeStopCommand()),
+        intakeSubsystem::isNoteInFeeder);
   }
 
   /**
