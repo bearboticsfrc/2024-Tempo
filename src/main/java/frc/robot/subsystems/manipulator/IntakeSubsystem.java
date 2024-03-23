@@ -4,6 +4,9 @@ import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkLowLevel;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
+import edu.wpi.first.util.datalog.BooleanLogEntry;
+import edu.wpi.first.util.datalog.DoubleLogEntry;
+import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -13,7 +16,34 @@ import frc.robot.constants.RobotConstants;
 import frc.robot.constants.manipulator.IntakeConstants;
 
 public class IntakeSubsystem extends SubsystemBase {
-  private final boolean SHUFFLEBOARD_ENABLED = false;
+  private final boolean SHUFFLEBOARD_ENABLED = true;
+
+  private final String LOGGING_ROOT = "subsystem/intake/";
+
+  // TODO: Smelly
+  private final DoubleLogEntry rollerVelocityLogEntry =
+      new DoubleLogEntry(DataLogManager.getLog(), LOGGING_ROOT + "roller/velocity");
+  private final DoubleLogEntry feederVelocityLogEntry =
+      new DoubleLogEntry(DataLogManager.getLog(), LOGGING_ROOT + "feeder/velocity");
+
+  private final DoubleLogEntry rollerCurrentLogEntry =
+      new DoubleLogEntry(DataLogManager.getLog(), LOGGING_ROOT + "roller/current");
+  private final DoubleLogEntry feederCurrentLogEntry =
+      new DoubleLogEntry(DataLogManager.getLog(), LOGGING_ROOT + "feeder/current");
+
+  private final DoubleLogEntry rollerTemperatureLogEntry =
+      new DoubleLogEntry(DataLogManager.getLog(), LOGGING_ROOT + "roller/temperature");
+  private final DoubleLogEntry feederTemperatureLogEntry =
+      new DoubleLogEntry(DataLogManager.getLog(), LOGGING_ROOT + "feeder/temperature");
+
+  private final BooleanLogEntry topBeambreakLogEntry =
+      new BooleanLogEntry(DataLogManager.getLog(), LOGGING_ROOT + "beambreak/top");
+  private final BooleanLogEntry leftBeambreakLogEntry =
+      new BooleanLogEntry(DataLogManager.getLog(), LOGGING_ROOT + "beambreak/left");
+  private final BooleanLogEntry rightBeambreakLogEntry =
+      new BooleanLogEntry(DataLogManager.getLog(), LOGGING_ROOT + "beambreak/right");
+  private final BooleanLogEntry rollerBeambreakLogEntry =
+      new BooleanLogEntry(DataLogManager.getLog(), LOGGING_ROOT + "beambreak/roller");
 
   private CANSparkMax rollerMotor;
   private CANSparkMax feederMotor;
@@ -27,8 +57,6 @@ public class IntakeSubsystem extends SubsystemBase {
       new DigitalInput(IntakeConstants.LEFT_BEAM_BREAK_CHANNEL);
   private final DigitalInput rightBeamBreak =
       new DigitalInput(IntakeConstants.RIGHT_BEAM_BREAK_CHANNEL);
-  private final DigitalInput bottomBeamBreak =
-      new DigitalInput(IntakeConstants.BOTTOM_BEAM_BREAK_CHANNEL);
   private final DigitalInput rollerBeamBreak =
       new DigitalInput(IntakeConstants.ROLLER_BEAM_BREAK_CHANNEL);
 
@@ -38,6 +66,28 @@ public class IntakeSubsystem extends SubsystemBase {
     if (SHUFFLEBOARD_ENABLED) {
       setupShuffleboardTab(RobotConstants.INTAKE_SYSTEM_TAB);
     }
+  }
+
+  @Override
+  public void periodic() {
+    updateDataLogs();
+  }
+
+  /** Update data logs. */
+  private void updateDataLogs() {
+    rollerVelocityLogEntry.append(rollerMotorEncoder.getVelocity());
+    feederVelocityLogEntry.append(feederMotorEncoder.getVelocity());
+
+    rollerCurrentLogEntry.append(rollerMotor.getOutputCurrent());
+    feederCurrentLogEntry.append(feederMotor.getOutputCurrent());
+
+    rollerTemperatureLogEntry.append(rollerMotor.getMotorTemperature());
+    feederTemperatureLogEntry.append(feederMotor.getMotorTemperature());
+
+    topBeambreakLogEntry.append(topBeamBreak.get());
+    rightBeambreakLogEntry.append(rightBeamBreak.get());
+    leftBeambreakLogEntry.append(leftBeamBreak.get());
+    rollerBeambreakLogEntry.append(rollerBeamBreak.get());
   }
 
   private void configureMotors() {
@@ -78,11 +128,14 @@ public class IntakeSubsystem extends SubsystemBase {
   private void setupShuffleboardTab(ShuffleboardTab shuffleboardTab) {
     shuffleboardTab.addDouble("Roller Velocity", rollerMotorEncoder::getVelocity);
     shuffleboardTab.addDouble("Feeder Velocity", feederMotorEncoder::getVelocity);
-    shuffleboardTab.addBoolean("Bottom Beam Break", bottomBeamBreak::get);
     shuffleboardTab.addBoolean("Left Beam Break", leftBeamBreak::get);
     shuffleboardTab.addBoolean("Right Beam Break", rightBeamBreak::get);
     shuffleboardTab.addBoolean("Top Beam Break", topBeamBreak::get);
     shuffleboardTab.addBoolean("Roller Beam Break", rollerBeamBreak::get);
+  }
+
+  public boolean isNoteInTop() {
+    return !topBeamBreak.get();
   }
 
   /**
@@ -95,21 +148,12 @@ public class IntakeSubsystem extends SubsystemBase {
   }
 
   /**
-   * Return a boolean whether a note has triggered the top and two side beam break sensors.
+   * Return a boolean whether a note has triggered the top beam break sensors.
    *
    * @return True if a note is not in the feeder, false otherwise.
    */
   public boolean isNoteInFeeder() {
-    return !topBeamBreak.get() && !leftBeamBreak.get() && !rightBeamBreak.get();
-  }
-
-  /**
-   * Return a boolean whether a note has triggered the two side beam break sensors.
-   *
-   * @return True if a note is not in the feeder, false otherwise.
-   */
-  public boolean isNoteInSide() {
-    return !leftBeamBreak.get() && !rightBeamBreak.get();
+    return !topBeamBreak.get();
   }
 
   /**

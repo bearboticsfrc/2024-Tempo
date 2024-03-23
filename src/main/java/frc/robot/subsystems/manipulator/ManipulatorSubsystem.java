@@ -9,10 +9,10 @@ import frc.robot.subsystems.manipulator.ShooterSubsystem.ShooterVelocity;
 import java.util.function.DoubleSupplier;
 
 public class ManipulatorSubsystem extends SubsystemBase {
-  private final IntakeSubsystem intakeSubsystem;
-  private final ShooterSubsystem shooterSubsystem;
-  private final ClimberSubsystem climberSubsystem;
-  private final ArmSubsystem armSubsystem;
+  public final IntakeSubsystem intakeSubsystem;
+  public final ShooterSubsystem shooterSubsystem;
+  public final ClimberSubsystem climberSubsystem;
+  public final ArmSubsystem armSubsystem;
 
   /**
    * Constructor for the ManipulatorSubsystem class. Initializes intake, shooter, climber, and arm
@@ -60,13 +60,10 @@ public class ManipulatorSubsystem extends SubsystemBase {
   public Command getIntakeCommand() {
     return Commands.either(
         Commands.none(),
-        Commands.sequence(
-            Commands.parallel(
-                getRollerRunCommand(IntakeSpeed.FULL), getFeederRunCommand(IntakeSpeed.QUARTER)),
-            Commands.waitUntil(intakeSubsystem::isNoteInSide),
-            getFeederRunCommand(IntakeSpeed.TENTH),
-            Commands.waitUntil(intakeSubsystem::isNoteInFeeder),
-            getIntakeStopCommand()),
+        getRollerRunCommand(IntakeSpeed.FULL)
+            .alongWith(getFeederRunCommand(IntakeSpeed.TENTH))
+            .andThen(Commands.waitUntil(intakeSubsystem::isNoteInFeeder))
+            .andThen(getIntakeStopCommand()),
         intakeSubsystem::isNoteInFeeder);
   }
 
@@ -130,10 +127,9 @@ public class ManipulatorSubsystem extends SubsystemBase {
    * @return The Command for feeding the intake.
    */
   public Command getIntakeFeedCommand() {
-    return Commands.sequence(
-        getFeederRunCommand(IntakeSpeed.FULL),
-        Commands.waitUntil(() -> !intakeSubsystem.isNoteInFeeder()),
-        getIntakeStopCommand());
+    return getFeederRunCommand(IntakeSpeed.FULL)
+        .andThen(Commands.waitSeconds(0.75))
+        .andThen(getIntakeStopCommand());
   }
 
   /**
@@ -283,11 +279,8 @@ public class ManipulatorSubsystem extends SubsystemBase {
    * @return The command.
    */
   public Command getShooterAndArmPrepareCommand(DoubleSupplier distanceSupplier) {
-    return Commands.either(
-        getArmPrepareCommand(distanceSupplier)
-            .alongWith(getShooterPrepareCommand(distanceSupplier)),
-        Commands.none(),
-        this::isNoteInFeeder);
+    return getArmPrepareCommand(distanceSupplier)
+        .alongWith(getShooterPrepareCommand(distanceSupplier));
   }
 
   /**

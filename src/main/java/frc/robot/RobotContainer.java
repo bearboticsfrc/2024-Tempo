@@ -313,7 +313,8 @@ public class RobotContainer {
                         LocationHelper.getDistanceToPose(
                             driveSubsystem.getPose(),
                             FieldPositions.getInstance().getSpeakerCenter()))
-                .andThen(manipulatorSubsystem.getShootCommand()));
+                .andThen(manipulatorSubsystem.getShootCommand()))
+        .onFalse(manipulatorSubsystem.getShootStopCommand());
 
     new Trigger(() -> manipulatorSubsystem.isNoteInFeeder())
         .onTrue(Commands.runOnce(() -> candleSubsystem.setColor(Color.kGreen)))
@@ -425,6 +426,16 @@ public class RobotContainer {
     operatorController.povUp().onTrue(manipulatorSubsystem.getArmRunCommand(ArmPosition.AMP_SHOOT));
 
     operatorController.povDown().onTrue(manipulatorSubsystem.getShootStopCommand());
+
+    operatorController
+        .leftTrigger()
+        .onTrue(manipulatorSubsystem.getFeederRunCommand(IntakeSpeed.REVERSE))
+        .onFalse(manipulatorSubsystem.getIntakeStopCommand());
+
+    operatorController
+        .rightTrigger()
+        .whileTrue(manipulatorSubsystem.getIntakeCommand())
+        .onFalse(manipulatorSubsystem.getIntakeStopCommand());
   }
 
   /**

@@ -27,8 +27,9 @@ public class Sub2W2C3C2 {
       DriveSubsystem driveSubsystem,
       ObjectDetectionSubsystem objectDetectionSubsystem,
       ManipulatorSubsystem manipulatorSubsystem) {
-    return new PathPlannerAuto(AUTO_NAME)
-        .alongWith(manipulatorSubsystem.getLineShootCommand())
+    return manipulatorSubsystem
+        .getSubwooferShootCommand()
+        .andThen(new PathPlannerAuto(AUTO_NAME))
         .andThen(new WaitUntilCommand(manipulatorSubsystem::isNoteInFeeder))
         .andThen(manipulatorSubsystem.getFarPodiumShootCommand())
         .andThen(getReplannedPath(driveSubsystem, W2_TO_C3_PATH))

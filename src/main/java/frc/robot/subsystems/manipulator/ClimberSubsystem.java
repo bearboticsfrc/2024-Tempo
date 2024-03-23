@@ -4,6 +4,9 @@ import com.revrobotics.CANSparkBase.SoftLimitDirection;
 import com.revrobotics.CANSparkLowLevel;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
+import edu.wpi.first.util.datalog.BooleanLogEntry;
+import edu.wpi.first.util.datalog.DoubleLogEntry;
+import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -15,6 +18,18 @@ import frc.robot.constants.manipulator.ClimberConstants;
 
 public class ClimberSubsystem extends SubsystemBase {
   private final boolean SHUFFLEBOARD_ENABLED = false;
+
+  private final String LOGGING_ROOT = "subsystem/climber/";
+
+  // TOOD: Smelly
+  private final DoubleLogEntry climberMotorRelativePositionLogEntry =
+      new DoubleLogEntry(DataLogManager.getLog(), LOGGING_ROOT + "motor/relative_position");
+  private final DoubleLogEntry climberMotorTemperatureLogEntry =
+      new DoubleLogEntry(DataLogManager.getLog(), LOGGING_ROOT + "motor/temperature");
+  private final DoubleLogEntry climberMotorCurrentLogEntry =
+      new DoubleLogEntry(DataLogManager.getLog(), LOGGING_ROOT + "motor/current");
+  private final BooleanLogEntry climberHomeLogEntry =
+      new BooleanLogEntry(DataLogManager.getLog(), LOGGING_ROOT + "home");
 
   private CANSparkMax climberMotor;
   private CANSparkMax climberMotorFollower;
@@ -80,9 +95,19 @@ public class ClimberSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
+    updateDataLogs();
+
     if (isClimberHome() && climberMotorEncoder.getPosition() != 0) {
       climberMotorEncoder.setPosition(0);
     }
+  }
+
+  /** Update data logs. */
+  private void updateDataLogs() {
+    climberMotorRelativePositionLogEntry.append(climberMotorEncoder.getPosition());
+    climberMotorCurrentLogEntry.append(climberMotor.getOutputCurrent());
+    climberMotorTemperatureLogEntry.append(climberMotor.getMotorTemperature());
+    climberHomeLogEntry.append(isClimberHome());
   }
 
   public boolean isClimberHome() {

@@ -92,7 +92,7 @@ public class SmartSub3ToC5C3 {
                     .andThen(
                         getAutoNotePickupCommand(
                             driveSubsystem, objectDetectionSubsystem, manipulatorSubsystem))
-                    .withTimeout(1)
+                    .withTimeout(1.5)
                     .withName("C5 Pickup"))
             .withSuccessCallback(manipulatorSubsystem::isNoteInIntake);
 
