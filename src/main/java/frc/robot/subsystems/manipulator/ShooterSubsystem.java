@@ -112,10 +112,27 @@ public class ShooterSubsystem extends SubsystemBase {
         < ShooterConstants.VELOCITY_TOLERANCE;
   }
 
+  /**
+   * Sets the shooter velocity based on a supplied distance.
+   *
+   * <p>The actual velocity is determined by a separate method that calculates the optimal velocity
+   * based on the given distance.
+   *
+   * @param distanceSupplier A DoubleSupplier providing the current distance to the target in
+   *     meters.
+   */
   public void set(DoubleSupplier distanceSupplier) {
     set(getVelocityFromDistance(distanceSupplier.getAsDouble()));
   }
 
+  /**
+   * Calculates the shooter velocity based on the distance from the target. This method uses a
+   * mathematical model to determine the optimal shooting velocity for a given distance.
+   *
+   * @param distance The distance from the target in meters.
+   * @return The calculated velocity in RPM (rotations per minute) required to shoot the note to the
+   *     target at the specified distance.
+   */
   private double getVelocityFromDistance(double distance) {
     if (distance <= 2) {
       return 2200;

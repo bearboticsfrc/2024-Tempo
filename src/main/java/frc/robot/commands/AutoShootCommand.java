@@ -44,7 +44,7 @@ public class AutoShootCommand extends SequentialCommandGroup {
             .alongWith(
                 manipulatorSubsystem.getShooterAndArmPrepareCommand(
                     this::getDistanceToSpeakerCenter)),
-        manipulatorSubsystem.getShootCommand());
+        manipulatorSubsystem.getShootFeedCommand());
 
     addRequirements(driveSubsystem, manipulatorSubsystem);
   }

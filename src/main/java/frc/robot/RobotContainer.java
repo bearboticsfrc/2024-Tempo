@@ -313,7 +313,7 @@ public class RobotContainer {
                         LocationHelper.getDistanceToPose(
                             driveSubsystem.getPose(),
                             FieldPositions.getInstance().getSpeakerCenter()))
-                .andThen(manipulatorSubsystem.getShootCommand()));
+                .andThen(manipulatorSubsystem.getShootFeedCommand()));
 
     new Trigger(() -> manipulatorSubsystem.isNoteInFeeder())
         .onTrue(Commands.runOnce(() -> candleSubsystem.setColor(Color.kGreen)))
