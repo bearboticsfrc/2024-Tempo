@@ -5,16 +5,12 @@ import com.revrobotics.CANSparkLowLevel;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.bearbotics.motor.MotorBuilder;
 import frc.bearbotics.motor.MotorConfig;
-import frc.robot.constants.RobotConstants;
 import frc.robot.constants.manipulator.IntakeConstants;
 
 public class IntakeSubsystem extends SubsystemBase {
-  private final boolean SHUFFLEBOARD_ENABLED = false;
-
   private CANSparkMax rollerMotor;
   private CANSparkMax feederMotor;
 
@@ -27,17 +23,11 @@ public class IntakeSubsystem extends SubsystemBase {
       new DigitalInput(IntakeConstants.LEFT_BEAM_BREAK_CHANNEL);
   private final DigitalInput rightBeamBreak =
       new DigitalInput(IntakeConstants.RIGHT_BEAM_BREAK_CHANNEL);
-  private final DigitalInput bottomBeamBreak =
-      new DigitalInput(IntakeConstants.BOTTOM_BEAM_BREAK_CHANNEL);
   private final DigitalInput rollerBeamBreak =
       new DigitalInput(IntakeConstants.ROLLER_BEAM_BREAK_CHANNEL);
 
   public IntakeSubsystem() {
     configureMotors();
-
-    if (SHUFFLEBOARD_ENABLED) {
-      setupShuffleboardTab(RobotConstants.INTAKE_SYSTEM_TAB);
-    }
   }
 
   private void configureMotors() {
@@ -73,16 +63,6 @@ public class IntakeSubsystem extends SubsystemBase {
         .configureMotor()
         .configureEncoder()
         .burnFlash();
-  }
-
-  private void setupShuffleboardTab(ShuffleboardTab shuffleboardTab) {
-    shuffleboardTab.addDouble("Roller Velocity", rollerMotorEncoder::getVelocity);
-    shuffleboardTab.addDouble("Feeder Velocity", feederMotorEncoder::getVelocity);
-    shuffleboardTab.addBoolean("Bottom Beam Break", bottomBeamBreak::get);
-    shuffleboardTab.addBoolean("Left Beam Break", leftBeamBreak::get);
-    shuffleboardTab.addBoolean("Right Beam Break", rightBeamBreak::get);
-    shuffleboardTab.addBoolean("Top Beam Break", topBeamBreak::get);
-    shuffleboardTab.addBoolean("Roller Beam Break", rollerBeamBreak::get);
   }
 
   /**

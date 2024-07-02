@@ -122,14 +122,6 @@ tasks.withType(JavaCompile) {
     options.compilerArgs.add '-XDstringConcat=inline'
 }
 
-task putGitInfo(type: Exec) {
-    doFirst {
-        commandLine "java", "-classpath", "$projectDir/build/classes/java/main/", "frc.robot.util.GitVersion"
-    }
-}
-
-//force this task to run before jar packaging
-jar.dependsOn putGitInfo
 // Configure jar and deploy tasks
 deployArtifact.jarTask = jar
 wpi.java.configureExecutableTasks(jar)

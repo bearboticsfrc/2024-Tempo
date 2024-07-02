@@ -9,7 +9,6 @@ import com.revrobotics.SparkPIDController;
 import edu.wpi.first.util.datalog.StringLogEntry;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.Timer;
-import frc.bearbotics.motor.cancoder.CANCoders;
 import frc.robot.util.RevUtil;
 
 /** Configuration class for motor parameters, including feedback sensors and builders. */
@@ -205,25 +204,6 @@ public class MotorConfig {
     }
 
     logEntry.append(message);
-    return this;
-  }
-
-  /**
-   * Configures the can coder parameters using CANCoders.
-   *
-   * @return This MotorConfig instance for method chaining.
-   */
-  public MotorConfig configureCanCoder() {
-    CANCoders.getInstance().configure(motorBuilder.getCanCoderBuilder());
-
-    String message =
-        String.format(
-            "[MotorConfig.configureCanCoder] %s:\n\tSet ID -> %s\n\tSet offset angle (degrees) -> %s\n",
-            motorBuilder.getName(),
-            motorBuilder.getCanCoderBuilder().getId(),
-            motorBuilder.getCanCoderBuilder().getOffsetDegrees().getDegrees());
-    logEntry.append(message);
-
     return this;
   }
 

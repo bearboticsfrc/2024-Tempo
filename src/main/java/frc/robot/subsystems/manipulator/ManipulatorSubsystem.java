@@ -3,16 +3,12 @@ package frc.robot.subsystems.manipulator;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.subsystems.manipulator.ArmSubsystem.ArmPosition;
 import frc.robot.subsystems.manipulator.IntakeSubsystem.IntakeSpeed;
 import frc.robot.subsystems.manipulator.ShooterSubsystem.ShooterVelocity;
-import java.util.function.DoubleSupplier;
 
 public class ManipulatorSubsystem extends SubsystemBase {
   private final IntakeSubsystem intakeSubsystem;
   private final ShooterSubsystem shooterSubsystem;
-  private final ClimberSubsystem climberSubsystem;
-  private final ArmSubsystem armSubsystem;
 
   /**
    * Constructor for the ManipulatorSubsystem class. Initializes intake, shooter, climber, and arm
@@ -21,8 +17,6 @@ public class ManipulatorSubsystem extends SubsystemBase {
   public ManipulatorSubsystem() {
     intakeSubsystem = new IntakeSubsystem();
     shooterSubsystem = new ShooterSubsystem();
-    climberSubsystem = new ClimberSubsystem();
-    armSubsystem = new ArmSubsystem();
   }
 
   /**
@@ -53,24 +47,6 @@ public class ManipulatorSubsystem extends SubsystemBase {
   }
 
   /**
-   * Generates the generic intake command.
-   *
-   * @return The generated intake command.
-   */
-  public Command getIntakeCommand() {
-    return Commands.either(
-        Commands.none(),
-        Commands.sequence(
-            Commands.parallel(
-                getRollerRunCommand(IntakeSpeed.FULL), getFeederRunCommand(IntakeSpeed.QUARTER)),
-            Commands.waitUntil(intakeSubsystem::isNoteInSide),
-            getFeederRunCommand(IntakeSpeed.TENTH),
-            Commands.waitUntil(intakeSubsystem::isNoteInFeeder),
-            getIntakeStopCommand()),
-        intakeSubsystem::isNoteInFeeder);
-  }
-
-  /**
    * Get a command to run the roller at a specified speed.
    *
    * @param speed The desired roller intake speed.
@@ -95,9 +71,9 @@ public class ManipulatorSubsystem extends SubsystemBase {
    *
    * @return The command to stop the roller and feeder.
    */
-  public Command getIntakeStopCommand() {
+  public Command getShooterStopCommand() {
     return Commands.parallel(
-        getRollerRunCommand(IntakeSpeed.OFF), getFeederRunCommand(IntakeSpeed.OFF));
+        getShooterRunCommand(ShooterVelocity.OFF), getFeederRunCommand(IntakeSpeed.OFF));
   }
 
   /**
@@ -110,30 +86,7 @@ public class ManipulatorSubsystem extends SubsystemBase {
     return Commands.sequence(
         getFeederRunCommand(IntakeSpeed.FULL),
         Commands.waitUntil(() -> !intakeSubsystem.isNoteInFeeder()),
-        getIntakeStopCommand());
-  }
-
-  /**
-   * Get a command to run the climber to a specified speed.
-   *
-   * @param speedSupplier The desired climber speed supplier.
-   * @return The RunCommand to set the climber speed.
-   */
-  public Command getClimberRunCommand(DoubleSupplier speedSupplier) {
-    return Commands.run(() -> climberSubsystem.set(speedSupplier.getAsDouble()), this);
-  }
-
-  /**
-   * Get a command to home the climber.
-   *
-   * @return The Command to home the climber.
-   */
-  public Command getClimberHomeCommand() {
-    return Commands.sequence(
-            Commands.run(() -> climberSubsystem.set(-0.5), this),
-            Commands.waitUntil(climberSubsystem::isClimberHome),
-            Commands.run(() -> climberSubsystem.stop(), this))
-        .withName("Home Climber");
+        getShooterStopCommand());
   }
 
   /**
@@ -144,64 +97,6 @@ public class ManipulatorSubsystem extends SubsystemBase {
    */
   public Command getShooterRunCommand(ShooterVelocity velocity) {
     return Commands.runOnce(() -> shooterSubsystem.set(velocity));
-  }
-
-  /**
-   * Get a command to run the shooter at a calcluated velocity using the distance supplier.
-   *
-   * @param distanceSupplier The supplier for the distance.
-   * @return The Command to set the shooter velocity.
-   */
-  public Command getShooterRunCommand(DoubleSupplier distanceSupplier) {
-    return Commands.runOnce(() -> shooterSubsystem.set(distanceSupplier));
-  }
-
-  /**
-   * Get a command to prepare the arm at a specified position and the shooter at a specified
-   * velocity, and then shoot.
-   *
-   * @param armPosition The position.
-   * @param shooterVelocity The velocity.
-   * @return The Command.
-   */
-  private Command getShootCommand(ArmPosition armPosition, ShooterVelocity shooterVelocity) {
-    return Commands.sequence(
-        Commands.parallel(
-            getArmPrepareCommand(armPosition), getShooterPrepareCommand(shooterVelocity)),
-        getShootFeedCommand());
-  }
-
-  /**
-   * Get a command to stop the shooter.
-   *
-   * @return The Command to stop the shooter.
-   */
-  public Command getShootStopCommand() {
-    return Commands.parallel(
-        Commands.runOnce(() -> shooterSubsystem.stop()), getArmRunCommand(ArmPosition.HOME));
-  }
-
-  /**
-   * Get a command to feed the shooter sequence, including feeding notes.
-   *
-   * @return The Command for shooting.
-   */
-  public Command getShootFeedCommand() {
-    return Commands.sequence(getIntakeFeedCommand(), getShootStopCommand());
-  }
-
-  /**
-   * Get a command to prepare the shooter and arm for a specified distance using a supplier.
-   *
-   * @param distanceSupplier The supplier for the shooting distance.
-   * @return The command.
-   */
-  public Command getShooterAndArmPrepareCommand(DoubleSupplier distanceSupplier) {
-    return Commands.either(
-        getArmPrepareCommand(distanceSupplier)
-            .alongWith(getShooterPrepareCommand(distanceSupplier)),
-        Commands.none(),
-        this::isNoteInFeeder);
   }
 
   /**
@@ -217,123 +112,13 @@ public class ManipulatorSubsystem extends SubsystemBase {
   }
 
   /**
-   * Get a command to run the shooter at a calcluated velocity using the distance supplier, and wait
-   * until the shooter reaches target velocity.
-   *
-   * @param distanceSupplier The supplier for the shooter velocity.
-   * @return The command.
-   */
-  public Command getShooterPrepareCommand(DoubleSupplier distanceSupplier) {
-    return Commands.sequence(
-        getShooterRunCommand(distanceSupplier),
-        Commands.waitUntil(shooterSubsystem::atTargetVelocity));
-  }
-
-  /**
-   * Get a command to run the arm to a specified position.
-   *
-   * @param position The desired arm position.
-   * @return The Command to set the arm position.
-   */
-  public Command getArmRunCommand(ArmPosition position) {
-    return Commands.runOnce(() -> armSubsystem.set(position));
-  }
-
-  /**
-   * Get a command to run the arm at a calcluated position using the distance supplier.
-   *
-   * @param distanceSupplier The supplier for the distance.
-   * @return The Command to set the arm position.
-   */
-  public Command getArmRunCommand(DoubleSupplier distanceSupplier) {
-    return Commands.runOnce(() -> armSubsystem.set(distanceSupplier));
-  }
-
-  /**
-   * Get a command to run the arm to a specified position, and wait until the arm reaches target
-   * position.
-   *
-   * @param position The desired arm position.
-   * @return The command.
-   */
-  private Command getArmPrepareCommand(ArmPosition position) {
-    return Commands.sequence(
-        getArmRunCommand(position), Commands.waitUntil(armSubsystem::atTargetSetpoint));
-  }
-
-  /**
-   * Get a command to run the arm at a calcluated position using the distance supplier, and wait
-   * until the arm reaches target position.
-   *
-   * @param distanceSupplier The supplier for the arm position.
-   * @return The command.
-   */
-  private Command getArmPrepareCommand(DoubleSupplier distanceSupplier) {
-    return Commands.sequence(
-        getArmRunCommand(distanceSupplier), Commands.waitUntil(armSubsystem::atTargetSetpoint));
-  }
-
-  /**
-   * Get a command to execute the entire shooting sequence for the podium.
-   *
-   * @return The command.
-   */
-  public Command getPodiumShootCommand() {
-    return getShootCommand(ArmPosition.PODIUM_SHOOT, ShooterVelocity.PODIUM_SHOOT);
-  }
-
-  /**
-   * Get a command to execute the entire shooting sequence for the far podium.
-   *
-   * @return The command.
-   */
-  public Command getFarPodiumShootCommand() {
-    return getShootCommand(ArmPosition.FAR_PODIUM_SHOOT, ShooterVelocity.PODIUM_SHOOT);
-  }
-
-  /**
-   * Get a command to execute the entire shooting sequence for the line.
-   *
-   * @return The command.
-   */
-  public Command getLineShootCommand() {
-    return getShootCommand(ArmPosition.LINE_SHOOT, ShooterVelocity.SUBWOOFER_SHOOT);
-  }
-
-  /**
-   * Get a command to execute the entire shooting sequence for the stage.
-   *
-   * @return The command.
-   */
-  public Command getStageShootCommand() {
-    return getShootCommand(ArmPosition.STAGE_SHOOT, ShooterVelocity.STAGE_SHOOT);
-  }
-
-  /**
-   * Get a command to execute the entire shooting sequence for the amp.
-   *
-   * @return The command.
-   */
-  public Command getAmpShootCommand() {
-    return getShootCommand(ArmPosition.AMP_SHOOT, ShooterVelocity.AMP_SHOOT);
-  }
-
-  /**
-   * Get a command to execute the entire shooting sequence for the subwoofer setup.
-   *
-   * @return The command.
-   */
-  public Command getSubwooferShootCommand() {
-    return getShootCommand(ArmPosition.HOME, ShooterVelocity.SUBWOOFER_SHOOT);
-  }
-
-  /**
    * Get a command to execute the entire shooting sequence for a bloop shot. A bloop shoot is
    * designed to gracefully eject a note from the shooter. Does not bloopy bloop.
    *
    * @return The command.
    */
   public Command getBloopShootCommand() {
-    return getShootCommand(ArmPosition.HOME, ShooterVelocity.BLOOP_SHOOT);
+    return Commands.sequence(
+        getShooterPrepareCommand(ShooterVelocity.BLOOP_SHOOT), getIntakeFeedCommand());
   }
 }

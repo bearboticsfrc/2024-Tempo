@@ -1,7 +1,6 @@
 package frc.bearbotics.motor;
 
 import com.revrobotics.CANSparkBase.IdleMode;
-import frc.bearbotics.motor.cancoder.CANCoderBuilder;
 
 /** Builder class for configuring motor parameters. */
 public class MotorBuilder {
@@ -18,7 +17,6 @@ public class MotorBuilder {
   private MotorPidBuilder[] pidSlots = new MotorPidBuilder[2];
   private MotorSoftLimit reverseSoftLimit;
   private MotorSoftLimit forwardSoftLimit;
-  private CANCoderBuilder canCoderBuilder;
 
   /**
    * Get the configured name of the motor.
@@ -297,27 +295,6 @@ public class MotorBuilder {
    */
   public MotorBuilder withForwardSoftLimit(MotorSoftLimit softLimit) {
     this.forwardSoftLimit = softLimit;
-    return this;
-  }
-
-  /**
-   * Gets the CANCoderBuilder associated with this MotorBuilder.
-   *
-   * @return The CANCoderBuilder for configuring CANCoder parameters.
-   */
-  public CANCoderBuilder getCanCoderBuilder() {
-    return canCoderBuilder;
-  }
-
-  /**
-   * Sets the CANCoderBuilder for configuring CANCoder parameters and returns the updated
-   * MotorBuilder instance.
-   *
-   * @param canCoderBuilder The CANCoderBuilder to be associated with this MotorBuilder.
-   * @return This MotorBuilder instance for method chaining.
-   */
-  public MotorBuilder withCanCoderBuilder(CANCoderBuilder canCoderBuilder) {
-    this.canCoderBuilder = canCoderBuilder;
     return this;
   }
 }
