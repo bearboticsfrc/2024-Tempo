@@ -1,9 +1,8 @@
 package frc.robot.subsystems.localization;
 
 import edu.wpi.first.apriltag.AprilTag;
-import edu.wpi.first.math.geometry.Transform3d;
 import frc.robot.subsystems.vision.VisionCamera;
-
+import java.util.*;
 // tag calb will use two average valued camera to tag transform vectors from two different cameras
 // on a single tag
 // these two cameras will be positioned on two ends of a single side of the robot prefferable aiming
@@ -13,16 +12,24 @@ import frc.robot.subsystems.vision.VisionCamera;
 // if the two cameras cannot be positioned towards each other in this manner due to the priority of
 // some other robot design constraint
 // then such cameras should ideally have their focus aiming towards the tag
-public class TagCalb {
+public class TagCalbDuo {
+  private double kickerZOne;
+  private double kickerXOne;
 
-  public TagCalb(
+  private double kickerZTwo;
+  private double kickerXTwo;
+
+  Vector<Double> idealizedVectorOne;
+  Vector<Double> idealizedVectorTwo;
+
+  public TagCalbDuo(
       boolean inverted,
       double knownRobotDistance,
       AprilTag tagToCalb,
       VisionCamera localizingCamera1,
       VisionCamera localizingCamera2) {}
 
-  public double calibratedVector(Transform3d cameraTransform) {
-    return 0.0;
+  public Vector<Double> CalibratedVector() {
+    return new Vector<Double>();
   }
 }
