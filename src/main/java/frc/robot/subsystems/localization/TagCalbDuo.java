@@ -4,18 +4,21 @@ import edu.wpi.first.apriltag.AprilTag;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.wpilibj.DataLogManager;
+import frc.robot.location.FieldPositions;
 import frc.robot.subsystems.vision.VisionCamera;
 import java.util.*;
 import java.util.function.DoubleSupplier;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
+// there are no rotational vector quantities for sake of mathmatical sophistication
+// these quantities are in a seperate field
+// and it doesn't make sense to define this space as as set
+// and it allows for a intuitive geometric representation of this transform
 // purely for the sake of simplicity the Z vector quantity
 // is used for algebraic representation only
-// this quantity will be kicked by a robot constant at the end of the program
-// the main call back of the tag calb duo class is the Transform3d function
 // CalibratedThreeDimensionalVector
-// kickers must use degrees
+// unit are in radians
 // tag calb will use two average valued camera to tag transform vectors from two different cameras
 // on a single tag
 // these two cameras will be positioned on two ends of a single side of the robot prefferable aiming
@@ -30,10 +33,10 @@ public class TagCalbDuo {
 
   private AprilTag tagToCalb;
 
-  private double kickerZOne;
+  private double kickerYOne;
   private double kickerXOne;
 
-  private double kickerZTwo;
+  private double kickerYTwo;
   private double kickerXTwo;
 
   private VisionCamera localizingCameraOne;
@@ -84,29 +87,29 @@ public class TagCalbDuo {
     oneToTagList.add(localizingCameraTwo.getRobotToCameraTransform());
     this.cameraToTagTransformTwo = addThreeDimensionalVectors(twoToTagList);
 
-    kickerZOne =
+    kickerYOne =
         sinusoidalKicker(
             localizingCameraOneSupplierZ,
-            knownRobotToTagTransform.getZ(),
-            knownRobotToTagTransform.getY());
+            cameraToTagTransformOne.getZ(),
+            cameraToTagTransformOne.getY());
 
     kickerXOne =
         sinusoidalKicker(
             localizingCameraOneSupplierX,
-            knownRobotToTagTransform.getY(),
-            knownRobotToTagTransform.getX());
+            cameraToTagTransformOne.getY(),
+            cameraToTagTransformOne.getX());
 
-    kickerZTwo =
+    kickerYTwo =
         sinusoidalKicker(
             localizingCameraTwoSupplierZ,
-            knownRobotToTagTransform.getZ(),
-            knownRobotToTagTransform.getY());
+            cameraToTagTransformTwo.getZ(),
+            cameraToTagTransformTwo.getY());
 
     kickerXTwo =
         sinusoidalKicker(
             localizingCameraTwoSupplierX,
-            knownRobotToTagTransform.getY(),
-            knownRobotToTagTransform.getX());
+            cameraToTagTransformTwo.getY(),
+            cameraToTagTransformTwo.getX());
   }
 
   public Transform3d CalibratedThreeDimensionalVector() {
@@ -115,16 +118,39 @@ public class TagCalbDuo {
 
     PhotonPipelineResult resultTwo = localizingCameraTwo.getPhotonCamera().getLatestResult();
 
-    double qZOne = 0;
-    double qZTwo = 0;
-    double qYOne = 0;
-    double qYTwo = 0;
-    double qXOne = 0;
-    double qXTwo = 0;
+    Transform3d naturalCameraToTagOne = naturalCameraToTag(resultOne, this.tagToCalb.ID);
+    Transform3d naturalCameraToTagTwo = naturalCameraToTag(resultTwo, this.tagToCalb.ID);
 
-    // appply angular quantities to y
+    if ((naturalCameraToTagOne == null) || (naturalCameraToTagTwo == null)) {
+      return null;
+    }
+
+    // since quantity z is given
+
+    double qZ = FieldPositions.getInstance().getTagPose3d(this.tagToCalb.ID).getZ();
+
+    double estimatedQYOne = naturalCameraToTagOne.getY();
+    double estimatedQYTwo = naturalCameraToTagTwo.getY();
+
+    double qYOne = applyAngularKickers(qZ, estimatedQYOne, kickerYOne);
+    double qYTwo = applyAngularKickers(qZ, estimatedQYTwo, kickerYTwo);
+
+    double estimatedQXOne = naturalCameraToTagOne.getX();
+    double estimatedQXTwo = naturalCameraToTagTwo.getX();
+
+    double qXOne = applyAngularKickers(qYOne, estimatedQXOne, kickerXOne);
+    double qXTwo = applyAngularKickers(qYTwo, estimatedQXTwo, kickerXTwo);
+
+    //
 
     return new Transform3d();
+  }
+
+  private double applyAngularKickers(
+      double knownSinudal, double estimatedCosinudal, double sinudalAngularKicker) {
+
+    return knownSinudal
+        / (Math.sin(Math.atan(knownSinudal / estimatedCosinudal) + sinudalAngularKicker));
   }
 
   private Transform3d naturalCameraToTag(PhotonPipelineResult latestResult, int tag) {
@@ -182,15 +208,4 @@ public class TagCalbDuo {
     }
     return summnationVector;
   }
-
-  // this has a stationless rotation quantity
-  // because pure linear algebra should not have a rotation quantity on a vector
-  // because rotation has no effect on the mathmatical quantity of a vector anyway
-  // vectors are not a coordinate system they are quanties
-  // a geometric point 3d space should be represented seperately by a 4 dimensional set
-  // consisting of 3 different vector quantities
-  // and a 3d vector defined in a field for rotation
-  // there fore these quantities should be placed in a seperate object
-  // therefore the rotation quantity Vector from this function is fundamentally useless
-
 }

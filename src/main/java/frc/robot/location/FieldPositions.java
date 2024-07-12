@@ -4,6 +4,7 @@ import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFieldLayout.OriginPosition;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -204,5 +205,9 @@ public class FieldPositions {
 
   public Pose2d getTagPose(int tag) {
     return layout.getTagPose(tag).get().toPose2d();
+  }
+
+  public Pose3d getTagPose3d(int tag) {
+    return layout.getTagPose(tag).get();
   }
 }
