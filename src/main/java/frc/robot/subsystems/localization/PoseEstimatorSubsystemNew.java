@@ -1,4 +1,4 @@
-package frc.robot.subsystems.vision;
+package frc.robot.subsystems.localization;
 
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -22,7 +22,7 @@ import java.util.List;
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 
-public class PoseEstimatorSubsystem extends SubsystemBase {
+public class PoseEstimatorSubsystemNew extends SubsystemBase {
   private final DriveSubsystem driveSubsystem;
 
   private List<VisionCamera> cameras = new ArrayList<>();
@@ -33,7 +33,7 @@ public class PoseEstimatorSubsystem extends SubsystemBase {
   private StructPublisher<Pose2d> fusedPosePublisher;
   private DoublePublisher headingPublisher;
 
-  public PoseEstimatorSubsystem(DriveSubsystem driveSubsystem, FieldPositions fieldPositions) {
+  public PoseEstimatorSubsystemNew(DriveSubsystem driveSubsystem, FieldPositions fieldPositions) {
     this.driveSubsystem = driveSubsystem;
 
     // Front Left

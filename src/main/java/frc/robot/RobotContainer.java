@@ -47,11 +47,11 @@ import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.PowerDistributionSubsystem;
 import frc.robot.subsystems.candle.CandlePattern;
 import frc.robot.subsystems.candle.CandleSubsystem;
+import frc.robot.subsystems.localization.PoseEstimatorSubsystem;
 import frc.robot.subsystems.manipulator.ArmSubsystem.ArmPosition;
 import frc.robot.subsystems.manipulator.IntakeSubsystem.IntakeSpeed;
 import frc.robot.subsystems.manipulator.ManipulatorSubsystem;
 import frc.robot.subsystems.vision.ObjectDetectionSubsystem;
-import frc.robot.subsystems.vision.PoseEstimatorSubsystem;
 import java.util.Map;
 import java.util.Optional;
 

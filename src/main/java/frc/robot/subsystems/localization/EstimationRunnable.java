@@ -1,4 +1,4 @@
-package frc.robot.subsystems.vision;
+package frc.robot.subsystems.localization;
 
 import static frc.robot.constants.VisionConstants.*;
 

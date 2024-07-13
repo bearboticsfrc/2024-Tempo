@@ -6,7 +6,6 @@ import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.wpilibj.DataLogManager;
 import frc.robot.location.FieldPositions;
-import frc.robot.subsystems.vision.VisionCamera;
 import java.util.*;
 import java.util.function.DoubleSupplier;
 import org.photonvision.targeting.PhotonPipelineResult;
@@ -16,7 +15,7 @@ import org.photonvision.targeting.PhotonTrackedTarget;
 // applys trigonometric kickers to produce a more accurate transform
 // from a calibrated 3d vector space
 
-public class TagCalbDuo {
+public class CalibratedDuoCameras {
 
   private final int calbIterations = 10;
 
@@ -56,7 +55,7 @@ public class TagCalbDuo {
           naturalCameraToTag(localizingCameraOne.getPhotonCamera().getLatestResult(), tagToCalb.ID)
               .getX();
 
-  public TagCalbDuo(
+  public CalibratedDuoCameras(
       boolean inverted,
       AprilTag tagToCalb,
       VisionCamera localizingCameraOne,
@@ -111,6 +110,12 @@ public class TagCalbDuo {
     Transform3d naturalCameraToTagTwo = naturalCameraToTag(resultTwo, this.tagToCalb.ID);
 
     if ((naturalCameraToTagOne == null) || (naturalCameraToTagTwo == null)) {
+      if ((naturalCameraToTagOne == null)) {
+        DataLogManager.log("camera one not found");
+      }
+      if ((naturalCameraToTagTwo == null)) {
+        DataLogManager.log("camera two not found");
+      }
       return null;
     }
 
