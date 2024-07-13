@@ -3,6 +3,7 @@ package frc.robot.subsystems.localization;
 import edu.wpi.first.apriltag.AprilTag;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.wpilibj.DataLogManager;
 import frc.robot.location.FieldPositions;
 import frc.robot.subsystems.vision.VisionCamera;
@@ -11,22 +12,10 @@ import java.util.function.DoubleSupplier;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
-// there are no rotational vector quantities for sake of mathmatical sophistication
-// these quantities are in a seperate field
-// and it doesn't make sense to define this space as as set
-// and it allows for a intuitive geometric representation of this transform
-// purely for the sake of simplicity the Z vector quantity
-// is used for algebraic representation only
-// CalibratedThreeDimensionalVector
-// unit are in radians
-// tag calb will use two average valued camera to tag transform vectors from two different cameras
-// on a single tag
-// these two cameras will be positioned on two ends of a single side of the robot prefferable aiming
-// towards each other(inverted)
-// the angle of intersection should ideally be perpendicular
-// if the two cameras cannot be positioned towards each other in this manner due to the priority of
-// some other robot design constraint
-// then such cameras should ideally have their focus aiming towards the tag
+// units radians
+// applys trigonometric kickers to produce a more accurate transform
+// from a calibrated 3d vector space
+
 public class TagCalbDuo {
 
   private final int calbIterations = 10;
@@ -132,18 +121,45 @@ public class TagCalbDuo {
     double estimatedQYOne = naturalCameraToTagOne.getY();
     double estimatedQYTwo = naturalCameraToTagTwo.getY();
 
+    // kick y
+
     double qYOne = applyAngularKickers(qZ, estimatedQYOne, kickerYOne);
     double qYTwo = applyAngularKickers(qZ, estimatedQYTwo, kickerYTwo);
 
     double estimatedQXOne = naturalCameraToTagOne.getX();
     double estimatedQXTwo = naturalCameraToTagTwo.getX();
 
+    // kick x
+
     double qXOne = applyAngularKickers(qYOne, estimatedQXOne, kickerXOne);
     double qXTwo = applyAngularKickers(qYTwo, estimatedQXTwo, kickerXTwo);
 
-    //
+    Translation3d calibratedTranslationOne = new Translation3d(qXOne, qYOne, qZ);
+    Translation3d calibratedTranslationTwo = new Translation3d(qXTwo, qYTwo, qZ);
 
-    return new Transform3d();
+    Transform3d calibratedTransform3dOne =
+        new Transform3d(calibratedTranslationOne, naturalCameraToTagOne.getRotation());
+
+    Transform3d calibratedTransform3dTwo =
+        new Transform3d(calibratedTranslationTwo, naturalCameraToTagTwo.getRotation());
+
+    // apply robot Transform
+
+    List<Transform3d> calibratedRobotOne = new ArrayList<Transform3d>();
+    calibratedRobotOne.add(calibratedTransform3dOne);
+    calibratedRobotOne.add(localizingCameraOne.getRobotToCameraTransform().times(-1));
+    Transform3d calibratedPoseOne = addThreeDimensionalVectors(calibratedRobotOne);
+
+    List<Transform3d> calibratedRobotTwo = new ArrayList<Transform3d>();
+    calibratedRobotTwo.add(calibratedTransform3dTwo);
+    calibratedRobotTwo.add(localizingCameraTwo.getRobotToCameraTransform().times(-1));
+    Transform3d calibratedPoseTwo = addThreeDimensionalVectors(calibratedRobotTwo);
+
+    List<Transform3d> calibratedPoses = new ArrayList<Transform3d>();
+    calibratedPoses.add(calibratedPoseOne);
+    calibratedPoses.add(calibratedPoseTwo);
+
+    return addThreeDimensionalVectors(calibratedPoses);
   }
 
   private double applyAngularKickers(
@@ -199,13 +215,28 @@ public class TagCalbDuo {
   public Transform3d addThreeDimensionalVectors(List<Transform3d> vectors) {
     Transform3d summnationVector = new Transform3d();
     for (Transform3d vector : vectors) {
+      List<Rotation3d> rotationSum = new ArrayList<Rotation3d>();
+      rotationSum.add(summnationVector.getRotation());
+      rotationSum.add(vector.getRotation());
       summnationVector =
           new Transform3d(
               summnationVector.getX() + vector.getX(),
               summnationVector.getY() + vector.getY(),
               summnationVector.getZ() + vector.getZ(),
-              new Rotation3d());
+              addRotation3d(rotationSum));
     }
     return summnationVector;
+  }
+
+  public Rotation3d addRotation3d(List<Rotation3d> rotations) {
+    Rotation3d sumnationRotation = new Rotation3d();
+    for (Rotation3d rotation : rotations) {
+      sumnationRotation =
+          new Rotation3d(
+              rotation.getX() + sumnationRotation.getX(),
+              rotation.getY() + sumnationRotation.getY(),
+              rotation.getZ() + sumnationRotation.getZ());
+    }
+    return sumnationRotation;
   }
 }
