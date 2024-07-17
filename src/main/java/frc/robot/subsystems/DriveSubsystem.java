@@ -9,6 +9,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
@@ -54,6 +55,7 @@ public class DriveSubsystem extends SubsystemBase {
   private GenericEntry competitionTabMaxSpeedEntry;
 
   private double maxSpeed = SpeedMode.TURBO.getMaxSpeed();
+  private Pose2d visionDrivePose;
   private boolean fieldRelativeMode = true;
 
   private StructPublisher<Pose2d> posePublisher;
@@ -552,6 +554,14 @@ public class DriveSubsystem extends SubsystemBase {
 
   public void addVisionMeasurement(Pose2d visionPose, double timestamp, Matrix<N3, N1> stdDevs) {
     odometry.addVisionMeasurement(visionPose, timestamp, stdDevs);
+  }
+
+  public void addCalibratedVisionPose(Pose3d pose) {
+    visionDrivePose = pose.toPose2d();
+  }
+
+  public Pose2d getCalibratedVisionPose() {
+    return visionDrivePose;
   }
 
   /** Resets the IMU to a heading of zero. */

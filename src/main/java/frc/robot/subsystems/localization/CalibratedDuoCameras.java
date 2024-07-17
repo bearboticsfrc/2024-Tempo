@@ -1,5 +1,7 @@
 package frc.robot.subsystems.localization;
 
+import static frc.robot.constants.VisionConstants.APRILTAG_AMBIGUITY_THRESHOLD;
+
 import edu.wpi.first.apriltag.AprilTag;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
@@ -56,7 +58,6 @@ public class CalibratedDuoCameras {
               .getX();
 
   public CalibratedDuoCameras(
-      boolean inverted,
       AprilTag tagToCalb,
       VisionCamera localizingCameraOne,
       VisionCamera localizingCameraTwo,
@@ -188,8 +189,11 @@ public class CalibratedDuoCameras {
     if (targets.isEmpty()) {
       return null;
     }
+
     for (PhotonTrackedTarget target : targets) {
-      if (target.getFiducialId() == fiducialId) {
+      if (target.getPoseAmbiguity() > APRILTAG_AMBIGUITY_THRESHOLD) {
+        return null;
+      } else if (target.getFiducialId() == fiducialId) {
         return target;
       }
     }
@@ -233,7 +237,7 @@ public class CalibratedDuoCameras {
     return summnationVector;
   }
 
-  public Rotation3d addRotation3d(List<Rotation3d> rotations) {
+  public static Rotation3d addRotation3d(List<Rotation3d> rotations) {
     Rotation3d sumnationRotation = new Rotation3d();
     for (Rotation3d rotation : rotations) {
       sumnationRotation =
@@ -243,5 +247,13 @@ public class CalibratedDuoCameras {
               rotation.getZ() + sumnationRotation.getZ());
     }
     return sumnationRotation;
+  }
+
+  public int getFiducialId() {
+    return tagToCalb.ID;
+  }
+
+  public VisionCamera[] getCameras() {
+    return new VisionCamera[] {localizingCameraOne, localizingCameraTwo};
   }
 }
