@@ -1,10 +1,12 @@
-package frc.robot.subsystems.localization;
+package frc.robot;
 
 import edu.wpi.first.apriltag.AprilTag;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import frc.robot.constants.VisionConstants;
 import frc.robot.location.FieldPositions;
+import frc.robot.subsystems.localization.CalibratedDuoCameras;
+import frc.robot.subsystems.localization.VisionCamera;
 import frc.robot.util.StoreCalibratedCameras;
 import java.util.ArrayList;
 import java.util.List;
@@ -52,6 +54,10 @@ public final class CalibrateCameras {
     for (VisionCamera i : cameras) {
       cameraNames.add(i.getNiceName());
     }
+  }
+
+  public static void main(String[] args) {
+    configure();
   }
 
   private static void configure() {
