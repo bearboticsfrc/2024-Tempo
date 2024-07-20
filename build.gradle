@@ -28,6 +28,7 @@ spotless {
 }
 
 def ROBOT_MAIN_CLASS = "frc.robot.Main"
+def CALIBRATE_CAMERAS_EXECUTABLE = "frc.robot.Main.CalibrateCameras"
 
 // Define my targets (RoboRIO) and artifacts (deployable files)
 // This is added by GradleRIO's backing project DeployUtils.
@@ -111,10 +112,17 @@ jar {
 
     duplicatesStrategy = DuplicatesStrategy.INCLUDE
     manifest {
+        //attributes "Main-Class": "frc.robot.CalibrateCameras"
+        //attributes "Class-Path": configurations.compile.collect { it.absolutePath }.join(" ")
+        //attributes(
+        //    'Class-Path': configurations.compileClassPath.collect{it.toURI().toString()}.join(' '),
+        //    CALIBRATE_CAMERAS_EXECUTABLE: )
+        attributes "Main-Class": CALIBRATE_CAMERAS_EXECUTABLE
+        //attributes "Class-Path": configurations.runtimeClasspath.collect { it.absolutePath }.join(" ")
+        edu.wpi.first.gradlerio.GradleRIOPlugin.javaManifest(CALIBRATE_CAMERAS_EXECUTABLE)
         edu.wpi.first.gradlerio.GradleRIOPlugin.javaManifest(ROBOT_MAIN_CLASS)
-        attributes(
-                'Main-Class': 'com.frc.robot.CalibrateCameras'
-        )
+
+        
     }
 }
 
