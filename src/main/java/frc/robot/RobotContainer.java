@@ -27,6 +27,7 @@ public class RobotContainer {
 
   public void robotInit() {
     candleSubsystem.setColor(Color.kBlue);
+    candleSubsystem.customColor();
   }
 
   /** Sets up a list of test commands for debugging and calibration purposes. */
