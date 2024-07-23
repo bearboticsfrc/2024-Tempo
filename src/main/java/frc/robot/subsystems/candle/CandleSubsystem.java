@@ -89,13 +89,17 @@ public class CandleSubsystem extends SubsystemBase implements AllianceReadyListe
     segment.setColor(color);
   }
 
-  public double[] UserColor() {
+  public double[] userColor() {
     double red = RED.getDouble(255.0);
     double green = GREEN.getDouble(255.0);
     double blue = BLUE.getDouble(255.0);
     double[] rgb = {red, green, blue};
     return rgb;
   }
+public void customColor() {
+  int[]rgbColor = userColor();
+  entireSegment.rgbInterpreting(rgbColor[0],rgbColor[1],rgbColor[2]);
+}
 
   /**
    * Sets a specific animation pattern with a specified color for the entire LED strip. Supports

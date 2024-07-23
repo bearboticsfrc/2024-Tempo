@@ -116,4 +116,9 @@ public class CandleSegment {
   private void setAnimation(Animation animation, int slot) {
     candle.animate(animation, animationSlot);
   }
+
+  public void rgbInterpreting(int red, int green, int blue) {
+    candle.setLEDs(red, green, blue);
+
+  }
 }
