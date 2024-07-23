@@ -98,7 +98,7 @@ public class CandleSubsystem extends SubsystemBase implements AllianceReadyListe
   }
 public void customColor() {
   double[] rgbColor = userColor();
-  entireSegment.rgbInterpreting(rgbColor[0],rgbColor[1],rgbColor[2]);
+  entireSegment.rgbInterpreting((int)rgbColor[0],(int)rgbColor[1],(int)rgbColor[2]);
 }
 
   /**
