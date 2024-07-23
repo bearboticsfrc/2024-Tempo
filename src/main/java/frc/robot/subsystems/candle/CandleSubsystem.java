@@ -81,6 +81,16 @@ public class CandleSubsystem extends SubsystemBase implements AllianceReadyListe
     segment.setColor(color);
   }
 
+  public void UserColor(){
+if(45 != RED.getDouble(1.0)){
+  System.out.println("yes");
+}
+else{
+  System.out.println("hell yeah!");
+}
+
+  }
+
   /**
    * Sets a specific animation pattern with a specified color for the entire LED strip. Supports
    * strobe and larson patterns.
