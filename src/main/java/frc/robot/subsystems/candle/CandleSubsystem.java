@@ -3,7 +3,6 @@ package frc.robot.subsystems.candle;
 import com.ctre.phoenix.led.CANdle;
 import com.ctre.phoenix.led.CANdle.VBatOutputMode;
 import com.ctre.phoenix.led.CANdleConfiguration;
-
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -17,15 +16,10 @@ import frc.robot.constants.CandleConstants;
 public class CandleSubsystem extends SubsystemBase implements AllianceReadyListener {
   /** The CANdle device instance used to control the LEDs. */
   private ShuffleboardTab tab = Shuffleboard.getTab("Candle subsystem");
-  private GenericEntry RED = 
-    tab.add("red",0)
-      .getEntry();
-  private GenericEntry GREEN = 
-    tab.add("red",0)
-      .getEntry();
-  private GenericEntry BLUE = 
-    tab.add("red",0)
-      .getEntry();
+
+  private GenericEntry RED = tab.add("red", 0).getEntry();
+  private GenericEntry GREEN = tab.add("red", 0).getEntry();
+  private GenericEntry BLUE = tab.add("red", 0).getEntry();
   private final CANdle CANDLE = new CANdle(CandleConstants.PORT);
 
   /** Represents the entire strip of LEDs as a single segment. */
@@ -95,13 +89,12 @@ public class CandleSubsystem extends SubsystemBase implements AllianceReadyListe
     segment.setColor(color);
   }
 
-  public double[] UserColor(){
+  public double[] UserColor() {
     double red = RED.getDouble(255.0);
     double green = GREEN.getDouble(255.0);
     double blue = BLUE.getDouble(255.0);
-    double[] rgb = {red,green,blue};
+    double[] rgb = {red, green, blue};
     return rgb;
-
   }
 
   /**
