@@ -119,6 +119,5 @@ public class CandleSegment {
 
   public void rgbInterpreting(int red, int green, int blue) {
     candle.setLEDs(red, green, blue);
-
   }
 }

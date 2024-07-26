@@ -18,8 +18,8 @@ public class CandleSubsystem extends SubsystemBase implements AllianceReadyListe
   private ShuffleboardTab tab = Shuffleboard.getTab("Candle subsystem");
 
   private GenericEntry RED = tab.add("red", 0).getEntry();
-  private GenericEntry GREEN = tab.add("red", 0).getEntry();
-  private GenericEntry BLUE = tab.add("red", 0).getEntry();
+  private GenericEntry GREEN = tab.add("green", 0).getEntry();
+  private GenericEntry BLUE = tab.add("blue", 0).getEntry();
   private final CANdle CANDLE = new CANdle(CandleConstants.PORT);
 
   /** Represents the entire strip of LEDs as a single segment. */
@@ -96,10 +96,11 @@ public class CandleSubsystem extends SubsystemBase implements AllianceReadyListe
     double[] rgb = {red, green, blue};
     return rgb;
   }
-public void customColor() {
-  double[] rgbColor = userColor();
-  entireSegment.rgbInterpreting((int)rgbColor[0],(int)rgbColor[1],(int)rgbColor[2]);
-}
+
+  public void customColor() {
+    double[] rgbColor = userColor();
+    entireSegment.rgbInterpreting((int) rgbColor[0], (int) rgbColor[1], (int) rgbColor[2]);
+  }
 
   /**
    * Sets a specific animation pattern with a specified color for the entire LED strip. Supports
