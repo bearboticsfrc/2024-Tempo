@@ -39,6 +39,7 @@ public class PoseEstimatorSubsystem extends SubsystemBase {
     // Front Left
     cameras.add(
         new VisionCamera(
+            1,
             "FrontLeft",
             new PhotonCamera(VisionConstants.FRONT_LEFT_CAMERA_NAME),
             VisionConstants.ROBOT_TO_FRONT_LEFT_CAMERA));
@@ -46,6 +47,7 @@ public class PoseEstimatorSubsystem extends SubsystemBase {
     // Front Right
     cameras.add(
         new VisionCamera(
+            2,
             "FrontRight",
             new PhotonCamera(VisionConstants.FRONT_RIGHT_CAMERA_NAME),
             VisionConstants.ROBOT_TO_FRONT_RIGHT_CAMERA));
@@ -53,6 +55,7 @@ public class PoseEstimatorSubsystem extends SubsystemBase {
     // Back Right
     cameras.add(
         new VisionCamera(
+            3,
             "BackRight",
             new PhotonCamera(VisionConstants.BACK_RIGHT_CAMERA_NAME),
             VisionConstants.ROBOT_TO_BACK_RIGHT_CAMERA));
@@ -60,6 +63,7 @@ public class PoseEstimatorSubsystem extends SubsystemBase {
     // Back Left
     cameras.add(
         new VisionCamera(
+            4,
             "BackLeft",
             new PhotonCamera(VisionConstants.BACK_LEFT_CAMERA_NAME),
             VisionConstants.ROBOT_TO_BACK_LEFT_CAMERA));

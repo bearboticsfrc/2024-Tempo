@@ -22,7 +22,7 @@ import java.util.List;
 public class PoseEstimatorSubsystemNew extends SubsystemBase {
   private final DriveSubsystem driveSubsystem;
 
-  private static final List<CalibratedDuoCameras> cameras =
+  private static final List<CalibratedCamera> cameras =
       StoreCalibratedCameras.loadVersion().getCalilCalibratedDuoCameras();
 
   private List<Notifier> notifiers = new ArrayList<>();
@@ -54,7 +54,7 @@ public class PoseEstimatorSubsystemNew extends SubsystemBase {
   public void estimator() {
     int count = 0;
     Pose3d sumnationPose = new Pose3d();
-    for (CalibratedDuoCameras duo : cameras) {
+    for (CalibratedCamera duo : cameras) {
       Transform3d duoTransform = duo.CalibratedThreeDimensionalVector();
       if (duoTransform != null) {
         Pose3d tagPose = FieldPositions.getInstance().getTagPose3d(duo.getFiducialId());
@@ -78,7 +78,7 @@ public class PoseEstimatorSubsystemNew extends SubsystemBase {
     rotList.add(one.getRotation());
     rotList.add(two.getRotation());
 
-    Rotation3d rot = CalibratedDuoCameras.addRotation3d(rotList);
+    Rotation3d rot = CalibratedCamera.addRotation3d(rotList);
     return new Pose3d(x, y, z, rot);
   }
 

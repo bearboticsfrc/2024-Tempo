@@ -4,7 +4,7 @@ import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
-import frc.robot.subsystems.localization.CalibratedDuoCameras;
+import frc.robot.subsystems.localization.CalibratedCamera;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -22,10 +22,10 @@ public class StoreCalibratedCameras implements Serializable {
   private static final String filename = "calibrationinfo.obj";
   private Date calibrationDate;
 
-  private List<CalibratedDuoCameras> calibratedDuoCameras;
+  private List<CalibratedCamera> calibratedDuoCameras;
 
   public static StoreCalibratedCameras fromCalibrateCameras(
-      Date buildDate, List<CalibratedDuoCameras> calibratedDuoCameras) {
+      Date buildDate, List<CalibratedCamera> calibratedDuoCameras) {
     StoreCalibratedCameras calibration = new StoreCalibratedCameras();
     calibration.calibratedDuoCameras = calibratedDuoCameras;
     calibration.calibrationDate = buildDate;
@@ -38,7 +38,7 @@ public class StoreCalibratedCameras implements Serializable {
    *
    * @return The CalibratedDuoCameras list
    */
-  public List<CalibratedDuoCameras> getCalilCalibratedDuoCameras() {
+  public List<CalibratedCamera> getCalilCalibratedDuoCameras() {
     return calibratedDuoCameras;
   }
 

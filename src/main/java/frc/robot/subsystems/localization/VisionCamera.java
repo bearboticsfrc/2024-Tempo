@@ -5,6 +5,7 @@ import org.photonvision.PhotonCamera;
 
 /** Represents a vision camera on the robot. */
 public class VisionCamera {
+  private double niceNumber;
   private String niceName;
   private PhotonCamera photonCamera;
   private Transform3d robotToCameraTransform;
@@ -19,7 +20,11 @@ public class VisionCamera {
    *     camera's coordinate system.
    */
   public VisionCamera(
-      String niceName, PhotonCamera photonCamera, Transform3d robotToCameraTransform) {
+      int niceNumber,
+      String niceName,
+      PhotonCamera photonCamera,
+      Transform3d robotToCameraTransform) {
+    this.niceNumber = niceNumber;
     this.niceName = niceName;
     this.photonCamera = photonCamera;
     this.robotToCameraTransform = robotToCameraTransform;
@@ -32,6 +37,15 @@ public class VisionCamera {
    */
   public String getNiceName() {
     return niceName;
+  }
+
+  /**
+   * Gets the user-friendly number of the camera.
+   *
+   * @return The user-friendly number of the camera.
+   */
+  public double getNiceNumber() {
+    return niceNumber;
   }
 
   /**
