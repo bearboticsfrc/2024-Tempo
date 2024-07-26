@@ -36,5 +36,7 @@ public class RobotContainer {
         .a()
         .whileTrue(manipulatorSubsystem.getBloopShootCommand())
         .onFalse(manipulatorSubsystem.getShooterStopCommand());
+
+    driverController.x().onTrue(new InstantCommand(() -> candleSubsystem.customColor()))
   }
 }
