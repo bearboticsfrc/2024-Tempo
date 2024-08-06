@@ -15,6 +15,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -45,6 +46,7 @@ import frc.robot.location.FieldPositions;
 import frc.robot.location.LocationHelper;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.PowerDistributionSubsystem;
+import frc.robot.subsystems.calibration.CalibrationSubsystem;
 import frc.robot.subsystems.candle.CandlePattern;
 import frc.robot.subsystems.candle.CandleSubsystem;
 import frc.robot.subsystems.localization.PoseEstimatorSubsystem;
@@ -79,7 +81,6 @@ public class RobotContainer {
   private final ObjectDetectionSubsystem objectDetectionSubsystem =
       new ObjectDetectionSubsystem(VisionConstants.OBJECT_DETECTION_CAMERA);
 
-  @SuppressWarnings("unused")
   private final PoseEstimatorSubsystem poseEstimatorSubsystem =
       new PoseEstimatorSubsystem(driveSubsystem, FieldPositions.getInstance());
 
@@ -113,6 +114,7 @@ public class RobotContainer {
           new ScheduleCommand(new AutoShootCommand(driveSubsystem, manipulatorSubsystem)));
 
   public RobotContainer() {
+    SmartDashboard.putData("Calibrate", new InstantCommand(CalibrationSubsystem::configure));
     setupShuffleboardTab(RobotConstants.COMPETITION_TAB);
     configurePathPlanner();
     buildAutoList();

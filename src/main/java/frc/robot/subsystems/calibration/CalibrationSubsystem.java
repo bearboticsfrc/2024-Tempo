@@ -1,14 +1,13 @@
-package frc.robot;
+package frc.robot.subsystems.calibration;
 
-import edu.wpi.first.apriltag.AprilTag;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.VisionConstants;
-import frc.robot.location.FieldPositions;
 import frc.robot.subsystems.localization.CalibratedCamera;
 import frc.robot.subsystems.localization.VisionCamera;
 import frc.robot.util.StoreCalibratedCameras;
@@ -16,26 +15,25 @@ import java.util.ArrayList;
 import java.util.List;
 import org.photonvision.PhotonCamera;
 
-public final class CalibrateCameras {
+public final class CalibrationSubsystem extends SubsystemBase {
   private static final double defaultTransform = 1;
   private static final double noNameCamera = 0;
+  private static final ShuffleboardTab tab = Shuffleboard.getTab("Add Cameras");
 
-  private static ShuffleboardTab tab = Shuffleboard.getTab("Add Cameras");
-  private static GenericEntry xTab = tab.add("X: ", 1).getEntry();
-  private static GenericEntry yTab = tab.add("Y: ", 1).getEntry();
-  private static GenericEntry zTab = tab.add("Z: ", 1).getEntry();
-  private static GenericEntry fidID = tab.add("Fiducial ID: ", 0).getEntry();
+  private static final GenericEntry xTab = tab.add("X: ", 1).getEntry();
+  private static final GenericEntry yTab = tab.add("Y: ", 1).getEntry();
+  private static final GenericEntry zTab = tab.add("Z: ", 1).getEntry();
+  private static final GenericEntry fidID = tab.add("Fiducial ID: ", 0).getEntry();
+
   private static GenericEntry cameraID = tab.add("camera : ", noNameCamera).getEntry();
 
-  private static List<VisionCamera> cameras = new ArrayList<>();
-  private static List<AprilTag> knownTags = FieldPositions.getInstance().getLayout().getTags();
-
-  private static List<String> cameraNames = new ArrayList<>();
+  private static List<VisionCamera> cameras = new ArrayList<VisionCamera>();
 
   private static List<CalibratedCamera> calibratedCameras =
       StoreCalibratedCameras.loadVersion().getCalilCalibratedDuoCameras();
 
-  public CalibrateCameras() {
+  {
+
     // Front Left
     cameras.add(
         new VisionCamera(
@@ -69,8 +67,9 @@ public final class CalibrateCameras {
             VisionConstants.ROBOT_TO_BACK_LEFT_CAMERA));
   }
 
-  private static void configure() {
-    VisionCamera camera = retrieveVisionCamera(cameraID.getDouble(noNameCamera));
+  public static void configure() {
+    VisionCamera camera =
+        retrieveVisionCamera(CalibrationSubsystem.cameraID.getDouble(noNameCamera));
     if (camera == null) {
       return;
     }
@@ -88,18 +87,18 @@ public final class CalibrateCameras {
   }
 
   private static void storeCalibratedCameras(CalibratedCamera add) {
-    for (CalibratedCamera i : calibratedCameras) {
+    for (CalibratedCamera i : CalibrationSubsystem.calibratedCameras) {
       if ((i.getFiducialId() == add.getFiducialId()) && (i.getCamera() == add.getCamera())) {
         i = add;
         return;
       }
     }
-    calibratedCameras.add(add);
+    CalibrationSubsystem.calibratedCameras.add(add);
   }
 
   private static VisionCamera retrieveVisionCamera(double id) {
 
-    for (VisionCamera i : cameras) {
+    for (VisionCamera i : CalibrationSubsystem.cameras) {
       if (id == i.getNiceNumber()) {
         return i;
       }
