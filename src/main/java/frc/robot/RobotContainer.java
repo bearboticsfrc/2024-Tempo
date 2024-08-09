@@ -33,11 +33,11 @@ public class RobotContainer {
 
   /** Sets up a list of test commands for debugging and calibration purposes. */
   private void configureDriverBindings() {
-    driverController
-        .a()
-        .whileTrue(manipulatorSubsystem.getBloopShootCommand())
-        .onFalse(manipulatorSubsystem.getShooterStopCommand());
+    /*driverController
+    .a()
+    .whileTrue(manipulatorSubsystem.getBloopShootCommand())
+    .onFalse(manipulatorSubsystem.getShooterStopCommand());
+    */
     driverController.x().onTrue(new InstantCommand(() -> candleSubsystem.customColor()));
-
   }
 }
