@@ -18,12 +18,14 @@ import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.util.StoreCalibratedCameras;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class PoseEstimatorSubsystem extends SubsystemBase {
   private final DriveSubsystem driveSubsystem;
+   private final List<CalibratedCamera> cameras;
+   private Pose2d pose;
 
-  private static final List<CalibratedCamera> cameras =
-      StoreCalibratedCameras.loadVersion().getCalilCalibratedDuoCameras();
+  
 
   private List<Notifier> notifiers = new ArrayList<>();
 
@@ -31,7 +33,11 @@ public class PoseEstimatorSubsystem extends SubsystemBase {
   private DoublePublisher headingPublisher;
 
   public PoseEstimatorSubsystem(DriveSubsystem driveSubsystem, FieldPositions fieldPositions) {
+    pose = new Pose2d();
+
     this.driveSubsystem = driveSubsystem;
+    cameras =
+      StoreCalibratedCameras.loadStaticVersion();
 
     ShuffleboardTab tab = Shuffleboard.getTab("Vision");
 
@@ -48,12 +54,15 @@ public class PoseEstimatorSubsystem extends SubsystemBase {
     headingPublisher =
         NetworkTableInstance.getDefault().getDoubleTopic("/vision/heading").publish();
 
-    tab.addString("Pose", () -> StringFormatting.poseToString(driveSubsystem.getPose()));
+    tab.addString("Pose", () -> StringFormatting.poseToString(getPose2d()));
   }
 
   public void estimator() {
     int count = 0;
     Pose3d sumnationPose = new Pose3d();
+    if(cameras==null){
+      return;
+    }
     for (CalibratedCamera duo : cameras) {
       Transform3d duoTransform = duo.CalibratedThreeDimensionalVector();
       if (duoTransform != null) {
@@ -67,7 +76,13 @@ public class PoseEstimatorSubsystem extends SubsystemBase {
       return;
     }
     sumnationPose.div(count);
+    
     driveSubsystem.addCalibratedVisionPose(sumnationPose);
+  }
+
+  public Pose2d getPose2d(){
+    return this.pose;
+
   }
 
   public Pose3d addPoses(Pose3d one, Pose3d two) {
@@ -84,12 +99,18 @@ public class PoseEstimatorSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-    fusedPosePublisher.set(driveSubsystem.getCalibratedVisionPose());
-    headingPublisher.set(
-        driveSubsystem
-            .getCalibratedVisionPose()
-            .getRotation()
-            .plus(Rotation2d.fromDegrees(180))
-            .getDegrees());
+    Optional<Pose2d> posePer = driveSubsystem.getCalibratedVisionPose();
+
+    if (posePer.isPresent()) {
+      pose = posePer.get();
+      
+
+      headingPublisher.set(posePer.get()
+              .getRotation()
+              .plus(Rotation2d.fromDegrees(180))
+              .getDegrees());
+              
+      fusedPosePublisher.set(posePer.get());
+    }
   }
 }

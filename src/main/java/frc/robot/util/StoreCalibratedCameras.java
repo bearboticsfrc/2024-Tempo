@@ -73,7 +73,7 @@ public class StoreCalibratedCameras implements Serializable {
    *
    * @return The StoreCalibratedCameras wrapper object.
    */
-  public static StoreCalibratedCameras loadVersion() {
+  private static StoreCalibratedCameras loadVersion() {
     String path = Filesystem.getDeployDirectory() + "/" + filename;
     StoreCalibratedCameras calibration;
 
@@ -83,11 +83,23 @@ public class StoreCalibratedCameras implements Serializable {
       calibration = (StoreCalibratedCameras) objectInputStream.readObject();
       objectInputStream.close();
     } catch (Exception ignored) {
-      calibration = StoreCalibratedCameras.fromCalibrateCameras(new Date(0), null);
+      return null;
     }
 
     return calibration;
   }
+
+  public static List<CalibratedCamera> loadStaticVersion(){
+    if(StoreCalibratedCameras.loadVersion()==null){
+      return null;
+    }
+    else{
+    return StoreCalibratedCameras.loadVersion().getCalilCalibratedDuoCameras();
+    }
+  }
+
+
+
 
   /**
    * Execute a shell command using the supplied runtime.

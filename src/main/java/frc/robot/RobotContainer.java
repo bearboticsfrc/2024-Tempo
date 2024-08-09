@@ -84,6 +84,8 @@ public class RobotContainer {
   private final PoseEstimatorSubsystem poseEstimatorSubsystem =
       new PoseEstimatorSubsystem(driveSubsystem, FieldPositions.getInstance());
 
+    private final CalibrationSubsystem calibrationSubsystem = new CalibrationSubsystem();
+
   private final CandleSubsystem candleSubsystem = new CandleSubsystem();
 
   private boolean isTeleop;
@@ -114,7 +116,7 @@ public class RobotContainer {
           new ScheduleCommand(new AutoShootCommand(driveSubsystem, manipulatorSubsystem)));
 
   public RobotContainer() {
-    SmartDashboard.putData("Calibrate", new InstantCommand(CalibrationSubsystem::configure));
+    SmartDashboard.putData("Calibrate", new InstantCommand(calibrationSubsystem::configure));
     setupShuffleboardTab(RobotConstants.COMPETITION_TAB);
     configurePathPlanner();
     buildAutoList();

@@ -6,7 +6,6 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix6.hardware.Pigeon2;
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -15,8 +14,6 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.math.numbers.N1;
-import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructPublisher;
@@ -43,6 +40,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.DoubleStream;
 
 /** Controls the four swerve modules for autonomous and teleoperated modes. */
@@ -552,16 +550,14 @@ public class DriveSubsystem extends SubsystemBase {
     odometry.resetPosition(getHeading(), getModulePositions(), pose);
   }
 
-  public void addVisionMeasurement(Pose2d visionPose, double timestamp, Matrix<N3, N1> stdDevs) {
-    odometry.addVisionMeasurement(visionPose, timestamp, stdDevs);
-  }
+
 
   public void addCalibratedVisionPose(Pose3d pose) {
     visionDrivePose = pose.toPose2d();
   }
 
-  public Pose2d getCalibratedVisionPose() {
-    return visionDrivePose;
+  public Optional<Pose2d> getCalibratedVisionPose() {
+    return Optional.ofNullable(visionDrivePose);
   }
 
   /** Resets the IMU to a heading of zero. */

@@ -15,24 +15,38 @@ import java.util.ArrayList;
 import java.util.List;
 import org.photonvision.PhotonCamera;
 
-public final class CalibrationSubsystem extends SubsystemBase {
-  private static final double defaultTransform = 1;
-  private static final double noNameCamera = 0;
-  private static final ShuffleboardTab tab = Shuffleboard.getTab("Add Cameras");
+public class CalibrationSubsystem extends SubsystemBase {
+  private  double defaultTransform;
+  private  double noNameCamera;
+  private  ShuffleboardTab tab;
 
-  private static final GenericEntry xTab = tab.add("X: ", 1).getEntry();
-  private static final GenericEntry yTab = tab.add("Y: ", 1).getEntry();
-  private static final GenericEntry zTab = tab.add("Z: ", 1).getEntry();
-  private static final GenericEntry fidID = tab.add("Fiducial ID: ", 0).getEntry();
+  private  GenericEntry xTab;
+  private GenericEntry yTab ;
+  private  GenericEntry zTab ;
+  private GenericEntry fidID ;
 
-  private static GenericEntry cameraID = tab.add("camera : ", noNameCamera).getEntry();
+  private  GenericEntry cameraID ;
 
-  private static List<VisionCamera> cameras = new ArrayList<VisionCamera>();
+  private List<VisionCamera> cameras;
 
-  private static List<CalibratedCamera> calibratedCameras =
-      StoreCalibratedCameras.loadVersion().getCalilCalibratedDuoCameras();
+  private List<CalibratedCamera> calibratedCameras;
 
-  {
+  public CalibrationSubsystem(){
+    this.defaultTransform = 1;
+    this.noNameCamera = 0;
+    this.tab = Shuffleboard.getTab("Add Cameras");
+
+    this.xTab = tab.add("X: ", 1).getEntry();
+  this.yTab = tab.add("Y: ", 1).getEntry();
+  this.zTab = tab.add("Z: ", 1).getEntry();
+  this.fidID = tab.add("Fiducial ID: ", 0).getEntry();
+
+  this.cameraID = tab.add("camera : ", noNameCamera).getEntry();
+
+  this.cameras = new ArrayList<VisionCamera>();
+
+  this.calibratedCameras =
+      StoreCalibratedCameras.loadStaticVersion();
 
     // Front Left
     cameras.add(
@@ -67,38 +81,42 @@ public final class CalibrationSubsystem extends SubsystemBase {
             VisionConstants.ROBOT_TO_BACK_LEFT_CAMERA));
   }
 
-  public static void configure() {
+  public void configure() {
     VisionCamera camera =
-        retrieveVisionCamera(CalibrationSubsystem.cameraID.getDouble(noNameCamera));
+        retrieveVisionCamera(this.cameraID.getDouble(noNameCamera));
     if (camera == null) {
       return;
     }
-    int id = new Double(fidID.getDouble(0)).intValue();
+    int id = new Double(this.fidID.getDouble(0)).intValue();
     if (id == 0) {
       return;
     }
-    double x = xTab.getDouble(1);
-    double y = yTab.getDouble(1);
-    double z = zTab.getDouble(1);
+    double x =this. xTab.getDouble(0);
+    double y = this.yTab.getDouble(0);
+    double z = this.zTab.getDouble(0);
     Transform3d trans = new Transform3d(x, y, z, new Rotation3d());
 
     CalibratedCamera calibration = new CalibratedCamera(id, camera, trans);
     storeCalibratedCameras(calibration);
   }
 
-  private static void storeCalibratedCameras(CalibratedCamera add) {
-    for (CalibratedCamera i : CalibrationSubsystem.calibratedCameras) {
+  private  void storeCalibratedCameras(CalibratedCamera add) {
+    if(this.calibratedCameras==null){
+      return;
+    }
+    for (CalibratedCamera i : this.calibratedCameras) {
       if ((i.getFiducialId() == add.getFiducialId()) && (i.getCamera() == add.getCamera())) {
         i = add;
         return;
       }
     }
-    CalibrationSubsystem.calibratedCameras.add(add);
+    this.calibratedCameras.add(add);
+    return;
   }
 
-  private static VisionCamera retrieveVisionCamera(double id) {
+  private VisionCamera retrieveVisionCamera(double id) {
 
-    for (VisionCamera i : CalibrationSubsystem.cameras) {
+    for (VisionCamera i : this.cameras) {
       if (id == i.getNiceNumber()) {
         return i;
       }
