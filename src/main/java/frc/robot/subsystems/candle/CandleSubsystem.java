@@ -149,4 +149,9 @@ public class CandleSubsystem extends SubsystemBase implements AllianceReadyListe
   private Color getAllianceColor(boolean isRedAlliance) {
     return isRedAlliance ? Color.kRed : Color.kBlue;
   }
+
+  @Override
+  public void periodic() {
+    customColor();
+  }
 }
