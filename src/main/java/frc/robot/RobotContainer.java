@@ -5,7 +5,6 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.util.Color;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.subsystems.candle.CandleSubsystem;
 import frc.robot.subsystems.manipulator.ManipulatorSubsystem;
@@ -38,6 +37,6 @@ public class RobotContainer {
     .whileTrue(manipulatorSubsystem.getBloopShootCommand())
     .onFalse(manipulatorSubsystem.getShooterStopCommand());
     */
-   // driverController.x().onTrue(new InstantCommand(() -> candleSubsystem.customColor()));
+    // driverController.x().onTrue(new InstantCommand(() -> candleSubsystem.customColor()));
   }
 }
