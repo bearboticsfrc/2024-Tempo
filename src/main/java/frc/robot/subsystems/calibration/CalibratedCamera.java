@@ -1,4 +1,4 @@
-package frc.robot.subsystems.localization;
+package frc.robot.subsystems.calibration;
 
 import static frc.robot.constants.VisionConstants.APRILTAG_AMBIGUITY_THRESHOLD;
 
@@ -6,7 +6,10 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.wpilibj.DataLogManager;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.constants.RobotConstants;
 import frc.robot.location.FieldPositions;
+import frc.robot.subsystems.localization.VisionCamera;
 import java.util.*;
 import java.util.function.DoubleSupplier;
 import org.photonvision.targeting.PhotonPipelineResult;
@@ -16,7 +19,7 @@ import org.photonvision.targeting.PhotonTrackedTarget;
 // applys trigonometric kickers to produce a more accurate transform
 // from a calibrated 3d vector space
 
-public class CalibratedCamera {
+public class CalibratedCamera extends SubsystemBase {
 
   private final int calbIterations = 10;
 
@@ -38,7 +41,8 @@ public class CalibratedCamera {
       () -> naturalCameraToTag(localizingCamera.getPhotonCamera().getLatestResult(), tagID).getX();
 
   public CalibratedCamera(
-      int tagID, VisionCamera localizingCameraOne, Transform3d knownRobotToTagTransform) {
+      int tagID, VisionCamera localizingCameraOne, Transform3d knownRobotToTagTransform)
+      throws InterruptedException {
 
     this.tagID = tagID;
     this.localizingCamera = localizingCameraOne;
@@ -136,19 +140,23 @@ public class CalibratedCamera {
   private double sinusoidalKicker(
       DoubleSupplier oneDimensionalSinudalVectorSupplier,
       double knownSinudalVector,
-      double knownCosinudalVector) {
+      double knownCosinudalVector)
+      throws InterruptedException {
 
     double hypotenuse = Math.hypot(knownSinudalVector, knownCosinudalVector);
     double k = 0;
 
     for (int i = 0; i < calbIterations; ) {
-      double sinusoidalVector = oneDimensionalSinudalVectorSupplier.getAsDouble();
-      if (sinusoidalVector != 0) {
+      DataLogManager.log("starting calibration");
+      Double sinusoidalVector = oneDimensionalSinudalVectorSupplier.getAsDouble();
+      if ((sinusoidalVector != 0) && (sinusoidalVector != null)) {
         k += sinusoidalVector;
         i++;
+        DataLogManager.log("new iteration");
       } else {
         DataLogManager.log("calibration tag not found");
       }
+      //Thread.sleep(Double.valueOf(RobotConstants.CYCLE_TIME).longValue());
     }
     k /= calbIterations;
     return Math.asin(knownSinudalVector / hypotenuse) - k;

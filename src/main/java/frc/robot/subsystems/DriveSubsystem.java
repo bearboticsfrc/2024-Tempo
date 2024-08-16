@@ -550,8 +550,6 @@ public class DriveSubsystem extends SubsystemBase {
     odometry.resetPosition(getHeading(), getModulePositions(), pose);
   }
 
-
-
   public void addCalibratedVisionPose(Pose3d pose) {
     visionDrivePose = pose.toPose2d();
   }

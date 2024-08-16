@@ -4,7 +4,7 @@ import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
-import frc.robot.subsystems.localization.CalibratedCamera;
+import frc.robot.subsystems.calibration.CalibratedCamera;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -89,17 +89,13 @@ public class StoreCalibratedCameras implements Serializable {
     return calibration;
   }
 
-  public static List<CalibratedCamera> loadStaticVersion(){
-    if(StoreCalibratedCameras.loadVersion()==null){
+  public static List<CalibratedCamera> loadStaticVersion() {
+    if (StoreCalibratedCameras.loadVersion() == null) {
       return null;
-    }
-    else{
-    return StoreCalibratedCameras.loadVersion().getCalilCalibratedDuoCameras();
+    } else {
+      return StoreCalibratedCameras.loadVersion().getCalilCalibratedDuoCameras();
     }
   }
-
-
-
 
   /**
    * Execute a shell command using the supplied runtime.

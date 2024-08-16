@@ -46,7 +46,7 @@ import frc.robot.location.FieldPositions;
 import frc.robot.location.LocationHelper;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.PowerDistributionSubsystem;
-import frc.robot.subsystems.calibration.CalibrationSubsystem;
+import frc.robot.subsystems.calibration.CalibrationCommand;
 import frc.robot.subsystems.candle.CandlePattern;
 import frc.robot.subsystems.candle.CandleSubsystem;
 import frc.robot.subsystems.localization.PoseEstimatorSubsystem;
@@ -84,7 +84,7 @@ public class RobotContainer {
   private final PoseEstimatorSubsystem poseEstimatorSubsystem =
       new PoseEstimatorSubsystem(driveSubsystem, FieldPositions.getInstance());
 
-    private final CalibrationSubsystem calibrationSubsystem = new CalibrationSubsystem();
+  private final CalibrationCommand calibrationCommand = new CalibrationCommand();
 
   private final CandleSubsystem candleSubsystem = new CandleSubsystem();
 
@@ -116,7 +116,6 @@ public class RobotContainer {
           new ScheduleCommand(new AutoShootCommand(driveSubsystem, manipulatorSubsystem)));
 
   public RobotContainer() {
-    SmartDashboard.putData("Calibrate", new InstantCommand(calibrationSubsystem::configure));
     setupShuffleboardTab(RobotConstants.COMPETITION_TAB);
     configurePathPlanner();
     buildAutoList();
@@ -137,6 +136,7 @@ public class RobotContainer {
         () ->
             LocationHelper.getDistanceToPose(
                 driveSubsystem.getPose(), FieldPositions.getInstance().getSpeakerCenter()));
+    tab.add("Calibration Command", calibrationCommand);
   }
 
   /**
