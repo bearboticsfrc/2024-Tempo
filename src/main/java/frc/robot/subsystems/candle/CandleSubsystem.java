@@ -3,6 +3,7 @@ package frc.robot.subsystems.candle;
 import com.ctre.phoenix.led.CANdle;
 import com.ctre.phoenix.led.CANdle.VBatOutputMode;
 import com.ctre.phoenix.led.CANdleConfiguration;
+import com.ctre.phoenix6.hardware.Pigeon2;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -12,11 +13,14 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.bearbotics.fms.AllianceColor;
 import frc.bearbotics.fms.AllianceReadyListener;
 import frc.robot.constants.CandleConstants;
+import frc.robot.constants.RobotConstants;
 
 public class CandleSubsystem extends SubsystemBase implements AllianceReadyListener {
   /** The CANdle device instance used to control the LEDs. */
-  private ShuffleboardTab tab = Shuffleboard.getTab("Candle subsystem");
+  private final Pigeon2 pigeonImu = new Pigeon2(RobotConstants.PIGEON_CAN_ID);
 
+  private ShuffleboardTab tab = Shuffleboard.getTab("Candle subsystem");
+  private GenericEntry YAW = tab.add("yaw", 180).getEntry();
   private GenericEntry RED = tab.add("red", 0).getEntry();
   private GenericEntry GREEN = tab.add("green", 0).getEntry();
   private GenericEntry BLUE = tab.add("blue", 0).getEntry();
@@ -152,6 +156,14 @@ public class CandleSubsystem extends SubsystemBase implements AllianceReadyListe
 
   @Override
   public void periodic() {
-    customColor();
+    angleColor();
+    YAW.setDouble(pigeonImu.getYaw().getValueAsDouble());
+  }
+
+  public void angleColor() {
+    int yaw = ((int)Math.random()) * 180;
+    if((int)(Math.random())*2 == 1)yaw = 0-yaw;
+    //int yaw = (int)pigeonImu.getYaw().getValueAsDouble();
+    entireSegment.rgbInterpreting(180, 255 - Math.abs(yaw), 75 + Math.abs(yaw));
   }
 }
