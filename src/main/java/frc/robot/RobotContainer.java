@@ -13,7 +13,6 @@ import frc.robot.constants.DriveConstants;
 import frc.robot.subsystems.PowerDistributionSubsystem;
 import frc.robot.subsystems.candle.CandleSubsystem;
 
-
 /**
  * The RobotContainer class serves as the central hub for the robot's system configurations and
  * operations. It initializes all robot subsystems, configures command bindings for both the driver
@@ -23,7 +22,6 @@ import frc.robot.subsystems.candle.CandleSubsystem;
 public class RobotContainer {
   private final CommandXboxController driverController =
       new CommandXboxController(DriveConstants.DRIVER_CONTROLLER_PORT);
-
 
   @SuppressWarnings("unused")
   private final PowerDistributionSubsystem powerDistributionSubsystem =
@@ -43,26 +41,20 @@ public class RobotContainer {
    * following with appropriate PID constants, setting up replanning configurations, and
    * establishing any global overrides.
    */
-  
 
   /**
    * Builds and configures the list of autonomous commands available for selection. This method
    * populates the SendableChooser with pre-defined autonomous routines.
- 
-  /**
-   * Sets up a list of test commands for debugging and calibration purposes. These commands are
-   * accessible from the Test tab on the Shuffleboard.
+   *
+   * <p>/** Sets up a list of test commands for debugging and calibration purposes. These commands
+   * are accessible from the Test tab on the Shuffleboard.
    */
-  private void configureDriverBindings() {
-
-
-  }
+  private void configureDriverBindings() {}
 
   /**
    * Configures the button bindings for the driver's Xbox controller. This method maps controller
    * inputs to robot commands for driving, manipulation, and other teleoperated actions.
    */
-
 
   /**
    * Retrieves joystick input from a specified axis, applies deadband and scaling, and optionally
@@ -114,7 +106,6 @@ public class RobotContainer {
    * method maps operator inputs to commands for robot manipulation and other functions.
    */
 
-
   /**
    * Sets the robot's operational mode to teleoperated and optionally resets odometry.
    *
@@ -124,17 +115,14 @@ public class RobotContainer {
     isTeleop = mode;
   }
 
- 
-
   /**
    * Performs initialization tasks when the robot is first started. This includes setting initial
    * subsystem states and configuring global settings.
    */
   public void robotInit() {
-      candleSubsystem.setColor(Color.kGreen);
+    candleSubsystem.setColor(Color.kGreen);
   }
 
-  
   /** Prepares the robot for being disabled, including stopping any rumble on the controllers. */
   public void disabledInit() {
     driverController.getHID().setRumble(RumbleType.kBothRumble, 0);

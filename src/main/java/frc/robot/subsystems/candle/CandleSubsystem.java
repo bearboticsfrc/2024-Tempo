@@ -61,11 +61,11 @@ public class CandleSubsystem extends SubsystemBase implements AllianceReadyListe
     segment.setColor(Color.kBlack);
   }
 
-@Override
-public void periodic() {
-  
+  @Override
+  public void periodic() {
+
     setColor(Color.kGreen);
-}
+  }
 
   /**
    * Sets the color of the entire LED strip.

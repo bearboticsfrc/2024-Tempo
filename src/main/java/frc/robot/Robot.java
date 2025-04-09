@@ -40,7 +40,6 @@ public class Robot extends TimedRobot {
   public void autonomousInit() {
     robotContainer.setTeleop(false);
 
-
     // schedule the autonomous command (example)
     if (autonomousCommand != null) {
       autonomousCommand.schedule();
